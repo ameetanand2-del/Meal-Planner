@@ -525,7 +525,7 @@ select {
       </div>
       <span class="app-name">Nutri<em>o</em></span>
     </div>
-    <span class="vtag">v1.0</span>
+    <span class="vtag">v2.0</span>
   </div>
 </header>
 
@@ -545,8 +545,8 @@ select {
 <!-- ═══ PLANNER ═══ -->
 <div id="sec-planner" class="section">
   <div class="cal-toggle">
-    <button class="ctbtn active" id="ctog-week"  onclick="setCalView('week')">Weekly</button>
-    <button class="ctbtn"        id="ctog-day"   onclick="setCalView('day')">Daily</button>
+    <button class="ctbtn active" id="ctog-day"   onclick="setCalView('day')">Daily</button>
+    <button class="ctbtn"        id="ctog-week"  onclick="setCalView('week')">Weekly</button>
     <button class="ctbtn"        id="ctog-month" onclick="setCalView('month')">Monthly</button>
   </div>
   <div class="cal-nav">
@@ -603,6 +603,7 @@ select {
   <div class="tog-bar">
     <button class="ctbtn active" id="settog-goals" onclick="setSettingsTab('goals')">🎯 Goals</button>
     <button class="ctbtn" id="settog-rules" onclick="setSettingsTab('rules')">🚫 Rules</button>
+    <button class="ctbtn" id="settog-caltrack" onclick="setSettingsTab('caltrack')">📊 Calories</button>
   </div>
   <div id="settings-wrap"></div>
 </div>
@@ -808,7 +809,7 @@ select {
   <div class="modal">
     <div class="modal-handle"></div>
     <div class="modal-title">Add Food Rule</div>
-    <div class="form-group"><label>Ingredient / Food Name</label><input type="text" id="rule-name" placeholder="e.g. Seed Oils, HFCS"></div>
+    <div class="form-group"><label>Ingredient / Food Name</label><div style="margin-bottom:8px"><div style="font-size:11px;color:var(--text3);margin-bottom:6px">Pick a preset category…</div><div id="rule-cats" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px"></div><div style="font-size:11px;color:var(--text3);margin-bottom:6px">…or type a custom ingredient</div></div><input type="text" id="rule-name" placeholder="e.g. Seed Oils, MSG, Aspartame"></div>
     <div class="form-group"><label>Rule Type</label>
       <div style="display:flex;flex-direction:column;gap:10px;margin-top:6px">
         <label style="text-transform:none;letter-spacing:0;font-size:13px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:10px;cursor:pointer">
@@ -840,6 +841,12 @@ const DS=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 // ── MACRO DATABASE (per 100g: p=protein, c=carbs, f=fat, fi=fiber) ──────────
 var MACRO_DB = {};
 
+// ── USDA FoodData Central API Key ─────────────────────────────
+// DEMO_KEY works for testing (rate limited to ~30 req/hour).
+// Get a free personal key at: https://fdc.nal.usda.gov/api-key-signup
+// Then replace 'DEMO_KEY' below with your key.
+var USDA_API_KEY = 'DEMO_KEY';
+
 // ── STATE ─────────────────────────────────────────────────────
 const DEMO_MEALS = [{"id": "demo01", "name": "Greek Yogurt & Berry Bowl", "tags": {"cuisine": [], "effort": ["Quick"], "diet": ["High Protein"]}, "ingredients": [{"name": "Greek Yogurt", "amount": "200", "unit": "g", "calories": 118}, {"name": "Mixed Berries", "amount": "80", "unit": "g", "calories": 46}, {"name": "Granola", "amount": "30", "unit": "g", "calories": 120}, {"name": "Honey", "amount": "10", "unit": "g", "calories": 30}]}, {"id": "demo02", "name": "Avocado Eggs on Toast", "tags": {"cuisine": [], "effort": ["Quick"], "diet": []}, "ingredients": [{"name": "Sourdough Bread", "amount": "80", "unit": "g", "calories": 198}, {"name": "Avocado", "amount": "100", "unit": "g", "calories": 160}, {"name": "Eggs", "amount": "2", "unit": "whole", "calories": 156}, {"name": "Chilli Flakes", "amount": "1", "unit": "g", "calories": 3}]}, {"id": "demo03", "name": "Grilled Chicken & Quinoa", "tags": {"cuisine": [], "effort": ["Medium"], "diet": ["High Protein", "Gluten Free"]}, "ingredients": [{"name": "Chicken Breast", "amount": "180", "unit": "g", "calories": 297}, {"name": "Quinoa", "amount": "80", "unit": "g", "calories": 292}, {"name": "Baby Spinach", "amount": "60", "unit": "g", "calories": 14}, {"name": "Olive Oil", "amount": "10", "unit": "g", "calories": 88}, {"name": "Lemon", "amount": "30", "unit": "g", "calories": 9}]}, {"id": "demo04", "name": "Salmon & Sweet Potato", "tags": {"cuisine": [], "effort": ["Medium"], "diet": ["Gluten Free", "Omega-3"]}, "ingredients": [{"name": "Salmon Fillet", "amount": "180", "unit": "g", "calories": 367}, {"name": "Sweet Potato", "amount": "200", "unit": "g", "calories": 172}, {"name": "Broccoli", "amount": "120", "unit": "g", "calories": 41}, {"name": "Olive Oil", "amount": "10", "unit": "g", "calories": 88}]}, {"id": "demo05", "name": "Overnight Oats", "tags": {"cuisine": [], "effort": ["Quick"], "diet": ["Vegetarian"]}, "ingredients": [{"name": "Rolled Oats", "amount": "80", "unit": "g", "calories": 304}, {"name": "Almond Milk", "amount": "200", "unit": "ml", "calories": 52}, {"name": "Banana", "amount": "100", "unit": "g", "calories": 89}, {"name": "Chia Seeds", "amount": "15", "unit": "g", "calories": 72}, {"name": "Peanut Butter", "amount": "20", "unit": "g", "calories": 119}]}, {"id": "demo06", "name": "Turkey & Veggie Stir Fry", "tags": {"cuisine": ["Asian"], "effort": ["Medium"], "diet": ["High Protein"]}, "ingredients": [{"name": "Turkey Mince", "amount": "180", "unit": "g", "calories": 234}, {"name": "Brown Rice", "amount": "80", "unit": "g", "calories": 286}, {"name": "Bell Pepper", "amount": "100", "unit": "g", "calories": 31}, {"name": "Broccoli", "amount": "100", "unit": "g", "calories": 34}, {"name": "Soy Sauce", "amount": "15", "unit": "ml", "calories": 9}]}, {"id": "demo07", "name": "Tuna Nicoise Salad", "tags": {"cuisine": ["Mediterranean"], "effort": ["Quick"], "diet": ["High Protein", "Gluten Free"]}, "ingredients": [{"name": "Tuna in Water", "amount": "150", "unit": "g", "calories": 159}, {"name": "Eggs", "amount": "2", "unit": "whole", "calories": 156}, {"name": "Green Beans", "amount": "80", "unit": "g", "calories": 25}, {"name": "Cherry Tomatoes", "amount": "80", "unit": "g", "calories": 14}, {"name": "Olive Oil", "amount": "10", "unit": "g", "calories": 88}]}, {"id": "demo08", "name": "Lentil & Vegetable Soup", "tags": {"cuisine": [], "effort": ["Batch Cook"], "diet": ["Vegan", "High Fiber"]}, "ingredients": [{"name": "Red Lentils", "amount": "100", "unit": "g", "calories": 353}, {"name": "Carrot", "amount": "100", "unit": "g", "calories": 41}, {"name": "Onion", "amount": "80", "unit": "g", "calories": 32}, {"name": "Diced Tomatoes", "amount": "200", "unit": "g", "calories": 36}, {"name": "Vegetable Stock", "amount": "400", "unit": "ml", "calories": 16}]}, {"id": "demo09", "name": "Protein Smoothie", "tags": {"cuisine": [], "effort": ["Quick"], "diet": ["High Protein"]}, "ingredients": [{"name": "Whey Protein", "amount": "30", "unit": "g", "calories": 120}, {"name": "Banana", "amount": "100", "unit": "g", "calories": 89}, {"name": "Almond Milk", "amount": "250", "unit": "ml", "calories": 65}, {"name": "Peanut Butter", "amount": "15", "unit": "g", "calories": 89}, {"name": "Spinach", "amount": "30", "unit": "g", "calories": 7}]}, {"id": "demo10", "name": "Beef & Broccoli Rice Bowl", "tags": {"cuisine": ["Asian"], "effort": ["Medium"], "diet": ["High Protein"]}, "ingredients": [{"name": "Lean Beef Strips", "amount": "180", "unit": "g", "calories": 270}, {"name": "Brown Rice", "amount": "80", "unit": "g", "calories": 286}, {"name": "Broccoli", "amount": "150", "unit": "g", "calories": 51}, {"name": "Garlic", "amount": "10", "unit": "g", "calories": 15}, {"name": "Soy Sauce", "amount": "15", "unit": "ml", "calories": 9}]}];
 const DEMO_PLAN  = {"2026-03-16": {"Breakfast": [{"mealId": "demo05", "portions": 1}], "Lunch": [{"mealId": "demo03", "portions": 1}], "Dinner": [{"mealId": "demo04", "portions": 1}]}, "2026-03-17": {"Breakfast": [{"mealId": "demo01", "portions": 1}], "Lunch": [{"mealId": "demo07", "portions": 1}], "Dinner": [{"mealId": "demo06", "portions": 1}]}, "2026-03-18": {"Breakfast": [{"mealId": "demo02", "portions": 1}], "Lunch": [{"mealId": "demo08", "portions": 1}], "Dinner": [{"mealId": "demo10", "portions": 1}]}, "2026-03-19": {"Breakfast": [{"mealId": "demo05", "portions": 1}], "Lunch": [{"mealId": "demo03", "portions": 1}], "Dinner": [{"mealId": "demo04", "portions": 1}]}, "2026-03-20": {"Snack": [{"mealId": "demo09", "portions": 1}], "Lunch": [{"mealId": "demo07", "portions": 1}], "Dinner": [{"mealId": "demo06", "portions": 1}]}, "2026-03-21": {"Breakfast": [{"mealId": "demo01", "portions": 1}], "Lunch": [{"mealId": "demo08", "portions": 1}], "Dinner": [{"mealId": "demo10", "portions": 1}]}, "2026-03-22": {"Breakfast": [{"mealId": "demo02", "portions": 1}], "Lunch": [{"mealId": "demo03", "portions": 1}], "Dinner": [{"mealId": "demo04", "portions": 1}]}};
@@ -856,7 +863,7 @@ let targets = (function(){
 })();
 
 // UI state
-let calView = 'week', calOff = 0, selDate = dkey(new Date());
+let calView = 'day', calOff = 0, selDate = dkey(new Date());
 let assignMode = null, curPort = 1, _assignDK = null, _assignMT = null;
 
 // ── SAVE ──────────────────────────────────────────────────────
@@ -920,11 +927,20 @@ function mealCals(meal, portions) {
   if (!meal || !meal.ingredients) return 0;
   portions = portions || 1;
   var total = meal.ingredients.reduce(function(s, ing) {
+    var amt = parseFloat(ing.amount) || 0;
+    var unit = ing.unit || 'g';
+    if (unit === 'tsp')       amt *= 5;
+    else if (unit === 'tbsp') amt *= 15;
+    else if (unit === 'cup')  amt *= 240;
+    // Use ing.calories (per 100g) if available — set by USDA, OFFs, or demo data
+    if (ing.calories && parseFloat(ing.calories) > 0) {
+      return s + Math.round((parseFloat(ing.calories) / 100) * amt);
+    }
+    // Fallback to lookup
     return s + calcCals(ing.name, ing.amount, ing.unit);
   }, 0);
   return Math.round(total * portions);
 }
-
 function getMacros(ingName, calories, amount, unit) {
   var key = null, nameLow = ingName.toLowerCase();
   for (var k in MACRO_DB) {
@@ -960,8 +976,22 @@ function mealMacros(m, portions) {
   if (!m) return {p:0,c:0,f:0,fi:0};
   var tot = {p:0,c:0,f:0,fi:0};
   m.ingredients.forEach(function(ing) {
-    var mac = getMacros(ing.name, ing.calories, ing.amount, ing.unit);
-    tot.p += mac.p; tot.c += mac.c; tot.f += mac.f; tot.fi += (mac.fi||0);
+    var amt = parseFloat(ing.amount) || 0;
+    var unit = ing.unit || 'g';
+    if (unit === 'tsp')       amt *= 5;
+    else if (unit === 'tbsp') amt *= 15;
+    else if (unit === 'cup')  amt *= 240;
+    var ratio = amt / 100;
+    if (MACRO_DB[ing.name]) {
+      var db = MACRO_DB[ing.name];
+      tot.p  += (db.p  || 0) * ratio;
+      tot.c  += (db.c  || 0) * ratio;
+      tot.f  += (db.f  || 0) * ratio;
+      tot.fi += (db.fi || 0) * ratio;
+    } else {
+      var mac = getMacros(ing.name, ing.calories, ing.amount, ing.unit);
+      tot.p += mac.p; tot.c += mac.c; tot.f += mac.f; tot.fi += (mac.fi||0);
+    }
   });
   return {p:Math.round(tot.p*portions),c:Math.round(tot.c*portions),f:Math.round(tot.f*portions),fi:Math.round(tot.fi*portions)};
 }
@@ -1018,6 +1048,15 @@ function renderToday() {
   h += '<div class="today-macro-pill"><div class="today-macro-val">' + mac.f + 'g</div><div class="today-macro-lbl">Fat</div></div>';
   h += '</div></div>';
 
+  // ── View toggle state (meal vs ingredient)
+  if (typeof window._todayView === 'undefined') window._todayView = 'meal';
+
+  // View toggle
+  h += '<div style="display:flex;background:var(--surface2);border-radius:14px;padding:3px;margin-bottom:12px;border:1px solid var(--border-soft);gap:2px">';
+  h += '<button class="ctbtn' + (window._todayView==='meal'?' active':'') + '" onclick="window._todayView=\'meal\';renderToday()">🍽 Meal View</button>';
+  h += '<button class="ctbtn' + (window._todayView==='ingredient'?' active':'') + '" onclick="window._todayView=\'ingredient\';renderToday()">🥦 Ingredient View</button>';
+  h += '</div>';
+
   // ── Meal slots
   MT.forEach(function(mt) {
     var slots = getSlots(dk, mt);
@@ -1033,10 +1072,36 @@ function renderToday() {
     } else {
       slots.forEach(function(sl) {
         var m = getMeal(sl.mealId); if (!m) return;
-        h += '<div class="slot-meal-row">';
-        h += '<span class="slot-meal-name">' + m.name + (sl.portions > 1 ? ' <span style="color:var(--text3);font-size:11px">×' + sl.portions + '</span>' : '') + '</span>';
-        h += '<span class="slot-meal-kcal">' + mealCals(m, sl.portions||1) + ' kcal</span>';
-        h += '</div>';
+        if (window._todayView === 'ingredient') {
+          // ── Ingredient view — show each ingredient with editable amount
+          h += '<div style="padding:6px 0;border-bottom:1px solid var(--border-soft)">';
+          h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">';
+          h += '<span style="font-size:13px;font-weight:700;color:var(--text)">' + m.name + '</span>';
+          h += '<button onclick="rmSlotToday(\'' + dk + '\',\'' + mt + '\',\'' + sl.mealId + '\')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:13px;padding:2px 4px">✕</button>';
+          h += '</div>';
+          if (m.ingredients && m.ingredients.length) {
+            m.ingredients.forEach(function(ing, ii) {
+              var ingCal = ing.calories > 0 ? Math.round(ing.calories / 100 * (parseFloat(ing.amount)||0)) : 0;
+              h += '<div style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid var(--border-soft)">';
+              h += '<span style="flex:1;font-size:12px;color:var(--text2)">' + ing.name + '</span>';
+              h += '<input type="number" value="' + ing.amount + '" min="0" step="1" '
+                + 'style="width:58px;padding:4px 6px;font-size:12px;text-align:center;border-radius:8px;border:1.5px solid var(--border);background:var(--surface2);color:var(--text);font-family:DM Sans,sans-serif" '
+                + 'oninput="updateTodayIng(\'' + sl.mealId + '\',' + ii + ',this.value)">';
+              h += '<span style="font-size:11px;color:var(--text3);min-width:16px">' + ing.unit + '</span>';
+              h += '<span style="font-size:11px;font-weight:700;color:var(--accent);min-width:36px;text-align:right" id="ingcal-' + sl.mealId + '-' + ii + '">' + ingCal + '</span>';
+              h += '</div>';
+            });
+          }
+          h += '</div>';
+        } else {
+          // ── Meal view — simple row
+          h += '<div class="slot-meal-row">';
+          h += '<span class="slot-meal-name">' + m.name + (sl.portions > 1 ? ' <span style="color:var(--text3);font-size:11px">×' + sl.portions + '</span>' : '') + '</span>';
+          h += '<div style="display:flex;align-items:center;gap:8px">';
+          h += '<span class="slot-meal-kcal">' + mealCals(m, sl.portions||1) + ' kcal</span>';
+          h += '<button onclick="rmSlotToday(\'' + dk + '\',\'' + mt + '\',\'' + sl.mealId + '\')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:13px;padding:2px">✕</button>';
+          h += '</div></div>';
+        }
       });
     }
     h += '<button class="slot-add-btn" onclick="openAssign(\'' + dk + '\',\'' + mt + '\')">+ Add to ' + mt + '</button>';
@@ -1049,11 +1114,45 @@ function renderToday() {
   document.getElementById('today-wrap').innerHTML = h;
 }
 
+
+// ── TODAY HELPERS ──────────────────────────────────────────────
+function rmSlotToday(dk, mt, mealId) {
+  if (!plan[dk] || !plan[dk][mt]) return;
+  plan[dk][mt] = plan[dk][mt].filter(function(s){ return s.mealId !== mealId; });
+  save(); renderToday();
+}
+
+function updateTodayIng(mealId, ingIdx, newAmt) {
+  var m = getMeal(mealId);
+  if (!m || !m.ingredients[ingIdx]) return;
+  m.ingredients[ingIdx].amount = newAmt;
+  // Update ingredient calorie display inline
+  var cal = m.ingredients[ingIdx].calories;
+  var computed = cal > 0 ? Math.round(cal / 100 * (parseFloat(newAmt)||0)) : 0;
+  var el = document.getElementById('ingcal-' + mealId + '-' + ingIdx);
+  if (el) el.textContent = computed;
+  save();
+  // Refresh header totals without full re-render (preserve input focus)
+  var dk = dkey(new Date());
+  var tc = dayCals(dk);
+  var mac = dayMacros(dk);
+  var tgt = targets;
+  var pct = tgt.kcal > 0 ? Math.min(100, Math.round(tc / tgt.kcal * 100)) : 0;
+  var numEl = document.querySelector('.today-kcal-num');
+  if (numEl) numEl.textContent = tc;
+  var fill = document.querySelector('.today-prog-fill');
+  if (fill) fill.style.width = pct + '%';
+  var pills = document.querySelectorAll('.today-macro-val');
+  var vals = [mac.p + 'g', mac.c + 'g', mac.f + 'g'];
+  pills.forEach(function(p, i){ if (vals[i]) p.textContent = vals[i]; });
+}
+
 // ── PLANNER ───────────────────────────────────────────────────
 function setCalView(v) {
   calView = v;
-  ['week','day','month'].forEach(function(x){
-    document.getElementById('ctog-' + x).classList.toggle('active', x === v);
+  ['day','week','month'].forEach(function(x){
+    var el = document.getElementById('ctog-' + x);
+    if (el) el.classList.toggle('active', x === v);
   });
   renderCal();
 }
@@ -1210,10 +1309,27 @@ function renderMonth() {
     var dk = dkey(dt);
     var hasMeals = MT.some(function(mt){ return getSlots(dk,mt).length > 0; });
     var cal = dayCals(dk);
+    // Calorie performance colour
+    var threshold = (typeof targets.calThreshold !== 'undefined') ? targets.calThreshold : 30;
+    var cellClass = 'mcell' + (isToday(dk)?' today':'');
+    var dotColor = '';
+    if (hasMeals && targets.kcal > 0) {
+      var pctDay = cal / targets.kcal * 100;
+      if (pctDay > 105) {
+        dotColor = 'var(--red)';
+      } else if (pctDay >= (100 - threshold)) {
+        dotColor = 'var(--green)';
+      } else {
+        dotColor = 'var(--yellow)';
+      }
+    } else if (hasMeals) {
+      dotColor = 'var(--green)';
+    }
     var cell = document.createElement('div');
-    cell.className = 'mcell' + (isToday(dk)?' today':'') + (hasMeals?' has-meals':'');
+    cell.className = cellClass;
+    if (hasMeals && dotColor) cell.style.borderColor = dotColor;
     cell.innerHTML = '<div class="mnum">' + day + '</div>'
-      + (hasMeals ? '<div class="mdot"></div><div class="mcal-lbl">' + cal + '</div>' : '');
+      + (hasMeals ? '<div class="mdot" style="background:' + dotColor + '"></div><div class="mcal-lbl">' + cal + '</div>' : '');
     cell.onclick = (function(d){ return function(){ selDate=d; setCalView('day'); }; })(dk);
     grid.appendChild(cell);
   }
@@ -1311,8 +1427,26 @@ function applyPlanToDayFromAssign(mp, dk) {
 }
 
 function openAssign(dk, mt) {
-  _assignDK = dk; _assignMT = mt; assignMode = null; curPort = 1;
+  _assignDK = dk; assignMode = null; curPort = 1;
   document.getElementById('pval').textContent = 1;
+
+  // If no meal type supplied, show selector first
+  if (!mt) {
+    _assignMT = null;
+    document.getElementById('m-assign-title').textContent = 'Add Meal';
+    var list = document.getElementById('assign-list');
+    list.innerHTML = '<div style="margin-bottom:12px"><div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px">Meal Type</div>'
+      + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'
+      + MT.map(function(t){
+          var sc = SLOT_COLORS[t];
+          return '<button onclick="openAssign(\'' + dk + '\',\'' + t + '\')" style="padding:12px;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;font-family:DM Sans,sans-serif;font-size:13px;font-weight:700;color:var(--text2);display:flex;align-items:center;gap:8px"><div style="width:10px;height:10px;border-radius:50%;background:' + sc + '"></div>' + t + '</button>';
+        }).join('')
+      + '</div></div>';
+    document.getElementById('m-assign').classList.add('open');
+    return;
+  }
+
+  _assignMT = mt;
   document.getElementById('m-assign-title').textContent = 'Add to ' + mt;
   setAssignTab('meal');
 
@@ -1350,12 +1484,15 @@ function applyDay(dk) {
   if (!plan[dk][assignMode.mealType]) plan[dk][assignMode.mealType] = [];
   plan[dk][assignMode.mealType].push({mealId: assignMode.mealId, portions: assignMode.portions});
   save(); renderCal();
+  // Refresh Today if the assigned day is today
+  if (dk === dkey(new Date())) renderToday();
 }
 
 function cancelAssign() {
   assignMode = null;
   document.getElementById('assign-banner').classList.remove('vis');
   renderCal();
+  renderToday();
 }
 
 function chgPort(dir) {
@@ -1567,8 +1704,8 @@ function renderPicker() {
     _lastPickerQ = '';
     el.innerHTML = '<div style="padding:30px 16px;text-align:center;color:var(--text3)">'
       + '<div style="font-size:28px;margin-bottom:10px">🔍</div>'
-      + '<div style="font-size:14px;font-weight:700;color:var(--text2);margin-bottom:6px">Search 3 million foods</div>'
-      + '<div style="font-size:12px;line-height:1.7">Type at least 2 letters to search<br>the Open Food Facts database</div>'
+      + '<div style="font-size:14px;font-weight:700;color:var(--text2);margin-bottom:6px">Search USDA Food Database</div>'
+      + '<div style="font-size:12px;line-height:1.7">Type at least 2 letters to search<br>380,000+ verified foods</div>'
       + '</div>';
     return;
   }
@@ -1584,81 +1721,98 @@ function liveSearch(q, el) {
   if (q === _lastPickerQ) return;
   _lastPickerQ = q;
 
-  // Show loading state
   el.innerHTML = '<div style="padding:24px;text-align:center">'
     + '<div style="width:24px;height:24px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite;margin:0 auto 10px"></div>'
-    + '<div style="font-size:12px;color:var(--text3)">Searching food database…</div></div>';
+    + '<div style="font-size:12px;color:var(--text3)">Searching USDA food database\u2026</div></div>';
 
-  // Call Open Food Facts API
-  var url = 'https://world.openfoodfacts.org/cgi/search.pl?search_terms='
-    + encodeURIComponent(q)
-    + '&search_simple=1&action=process&json=1&page_size=20&fields=product_name,nutriments,serving_size,quantity,brands,categories_tags';
+  // ── USDA FoodData Central API ─────────────────────────────────
+  // Free API key: https://fdc.nal.usda.gov/api-key-signup
+  // Replace DEMO_KEY below with your key for higher rate limits
+  var url = 'https://api.nal.usda.gov/fdc/v1/foods/search'
+    + '?api_key=' + USDA_API_KEY
+    + '&query=' + encodeURIComponent(q)
+    + '&pageSize=20'
+    + '&dataType=Foundation,SR%20Legacy,Branded';
 
   fetch(url)
-    .then(function(r){ return r.json(); })
+    .then(function(r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    })
     .then(function(data) {
       el.innerHTML = '';
-      var results = [];
-
-      // Pantry section removed — Open Food Facts is the only source
-
-      // Parse API results
-      var products = (data.products || []).filter(function(p){
-        return p.product_name && p.nutriments && p.nutriments['energy-kcal_100g'];
+      var foods = (data.foods || []).filter(function(f) {
+        // Must have at least calories to be useful
+        return f.foodNutrients && f.foodNutrients.some(function(n){
+          return n.nutrientId === 1008 && n.value > 0; // Energy (kcal)
+        });
       });
 
-      if (products.length) {
-        var hdr2 = document.createElement('div');
-        hdr2.style.cssText = 'padding:7px 14px;font-size:10px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;background:var(--surface2);border-bottom:1px solid var(--border)';
-        hdr2.textContent = 'Open Food Facts Database';
-        el.appendChild(hdr2);
-
-        products.slice(0, 15).forEach(function(p) {
-          var n  = p.nutriments;
-          var kcal = Math.round(n['energy-kcal_100g'] || 0);
-          var prot = Math.round(n['proteins_100g'] || 0);
-          var carb = Math.round(n['carbohydrates_100g'] || 0);
-          var fat  = Math.round(n['fat_100g'] || 0);
-          var fiber= Math.round(n['fiber_100g'] || 0);
-          var name = p.product_name;
-          var brand = p.brands ? ' · ' + p.brands.split(',')[0] : '';
-
-          var div = document.createElement('div'); div.className = 'db-item';
-          div.innerHTML = '<div style="flex:1">'
-            + '<div class="db-item-name">' + name + '<span style="font-size:10px;font-weight:400;color:var(--text3)">' + brand + '</span></div>'
-            + '<div class="db-item-meta">' + kcal + ' kcal · P:' + prot + 'g C:' + carb + 'g F:' + fat + 'g' + (fiber ? ' Fi:' + fiber + 'g' : '') + '</div>'
-            + '</div>'
-            + '<div class="db-item-cal">' + kcal + '<span style="font-size:9px;color:var(--text3)">/100g</span></div>';
-
-          // When picked: add to local MACRO_DB so nutrition calculates correctly
-          (function(fn, fkcal, fp, fc, ff, ffi) {
-            div.addEventListener('click', function() {
-              // Store in MACRO_DB for this session
-              MACRO_DB[fn] = { p: fp, c: fc, f: ff, fi: ffi };
-              // Also add to custIngs so findFood works
-              if (!findFood(fn)) {
-                custIngs.push({ n: fn, cat: 'Open Food Facts', u: 'g', c: fkcal });
-                save();
-              }
-              pickFood(fn, 'g');
-            });
-          })(name, kcal, prot, carb, fat, fiber);
-
-          el.appendChild(div);
-        });
-      } else if (!localMatches.length) {
-        el.innerHTML += '<div style="padding:20px;text-align:center;color:var(--text3);font-size:13px">'
-          + 'No results found.<br><span style="font-size:11px">Try a different search term</span></div>';
+      if (!foods.length) {
+        el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text3);font-size:13px">'
+          + 'No results for "<strong>' + q + '</strong>"<br>'
+          + '<span style="font-size:11px">Try a simpler search term</span></div>';
+        return;
       }
-    })
-    .catch(function() {
-      // API failed — fall back to local only
-      el.innerHTML = '';
+
+      // Section header
       var hdr = document.createElement('div');
-      hdr.style.cssText = 'padding:8px 14px;font-size:11px;color:var(--yellow);background:var(--yellow-light);border-bottom:1px solid var(--border)';
-      hdr.textContent = '⚠️ Food database offline — showing pantry only';
+      hdr.style.cssText = 'padding:7px 14px;font-size:10px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;background:var(--surface2);border-bottom:1px solid var(--border)';
+      hdr.textContent = 'USDA Food Database';
       el.appendChild(hdr);
-      el.innerHTML += '<div style="padding:16px;text-align:center;color:var(--text3);font-size:12px">Please check your internet connection and try again.</div>';
+
+      foods.slice(0, 20).forEach(function(f) {
+        // Pull macro nutrients from nutrient array
+        function getNut(id) {
+          var n = (f.foodNutrients || []).find(function(n){ return n.nutrientId === id; });
+          return n ? Math.round(n.value) : 0;
+        }
+        var kcal  = getNut(1008); // Energy kcal
+        var prot  = getNut(1003); // Protein
+        var carb  = getNut(1005); // Carbohydrate
+        var fat   = getNut(1004); // Total fat
+        var fiber = getNut(1079); // Fiber
+
+        var name  = f.description || 'Unknown';
+        // Clean up USDA ALL-CAPS names → Title Case
+        name = name.split(',')[0].toLowerCase().replace(/\b\w/g, function(c){ return c.toUpperCase(); });
+        var brand = (f.brandOwner || f.brandName || '').split(',')[0].trim();
+        var badge = f.dataType === 'Foundation' ? 'USDA'
+                  : f.dataType === 'SR Legacy'  ? 'USDA'
+                  : brand ? brand : '';
+
+        var div = document.createElement('div'); div.className = 'db-item';
+        div.innerHTML = '<div style="flex:1">'
+          + '<div class="db-item-name">' + name
+          + (badge ? '<span class="picker-source-badge">' + badge + '</span>' : '')
+          + '</div>'
+          + '<div class="db-item-meta">' + kcal + ' kcal &nbsp;&middot;&nbsp; P:' + prot + 'g &nbsp;C:' + carb + 'g &nbsp;F:' + fat + 'g'
+          + (fiber ? ' &nbsp;Fi:' + fiber + 'g' : '') + '</div>'
+          + '</div>'
+          + '<div class="db-item-cal">' + kcal + '<span style="font-size:9px;color:var(--text3)">/100g</span></div>';
+
+        // Store macro data and add to custIngs when picked
+        (function(fn, fkcal, fp, fc, ff, ffi) {
+          div.addEventListener('click', function() {
+            MACRO_DB[fn] = { p: fp, c: fc, f: ff, fi: ffi };
+            if (!findFood(fn)) {
+              custIngs.push({ n: fn, cat: 'USDA', u: 'g', c: fkcal });
+              save();
+            }
+            pickFood(fn, 'g');
+          });
+        })(name, kcal, prot, carb, fat, fiber);
+
+        el.appendChild(div);
+      });
+    })
+    .catch(function(err) {
+      el.innerHTML = '<div style="padding:16px 14px;background:var(--yellow-light);border-radius:var(--radius-sm);margin:8px 0">'
+        + '<div style="font-size:13px;font-weight:700;color:var(--yellow);margin-bottom:4px">\u26a0\ufe0f Could not reach food database</div>'
+        + '<div style="font-size:11px;color:var(--text2);line-height:1.6">Check your internet connection.<br>'
+        + 'If the problem continues, the DEMO_KEY rate limit may have been hit \u2014 '
+        + '<a href=\"https://fdc.nal.usda.gov/api-key-signup\" target=\"_blank\" style=\"color:var(--accent)\">get a free API key</a>.</div>'
+        + '</div>';
     });
 }
 
@@ -2303,6 +2457,7 @@ function setSettingsTab(tab) {
 function renderSettings() {
   var wrap=document.getElementById('settings-wrap'); if(!wrap)return;
   if(settingsTab==='goals') wrap.innerHTML=renderGoalsView();
+  else if(settingsTab==='caltrack') wrap.innerHTML=renderCalTrackingView();
   else wrap.innerHTML=renderRulesView();
 }
 
@@ -2357,6 +2512,38 @@ function saveGoals(){
   save();
 }
 
+function renderCalTrackingView() {
+  var thresh = (typeof targets.calThreshold !== 'undefined') ? targets.calThreshold : 30;
+  var h = '';
+  h += '<div class="card">';
+  h += '<div style="font-family:DM Serif Display,serif;font-size:16px;font-weight:700;margin-bottom:4px">Monthly Planner Colours</div>';
+  h += '<div style="font-size:12px;color:var(--text3);margin-bottom:16px">Colour-code each day based on calorie intake vs your target.</div>';
+  h += '<div style="background:var(--surface2);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:14px;display:flex;flex-direction:column;gap:8px">';
+  h += '<div style="display:flex;align-items:center;gap:8px"><div style="width:12px;height:12px;border-radius:50%;background:var(--green);flex-shrink:0"></div><span style="font-size:13px;font-weight:600;color:var(--text2)">Green — within 5% of target</span></div>';
+  h += '<div style="display:flex;align-items:center;gap:8px"><div style="width:12px;height:12px;border-radius:50%;background:var(--yellow);flex-shrink:0"></div><span style="font-size:13px;font-weight:600;color:var(--text2)">Yellow — more than <strong id="thresh-display">' + thresh + '%</strong> below target</span></div>';
+  h += '<div style="display:flex;align-items:center;gap:8px"><div style="width:12px;height:12px;border-radius:50%;background:var(--red);flex-shrink:0"></div><span style="font-size:13px;font-weight:600;color:var(--text2)">Red — more than 5% over target</span></div>';
+  h += '</div>';
+  h += '<div class="form-group"><label>Yellow Threshold (% below target)</label>';
+  h += '<div style="display:flex;align-items:center;gap:10px">';
+  h += '<input type="range" min="10" max="50" step="5" value="' + thresh + '" '
+    + 'style="flex:1;accent-color:var(--accent)" '
+    + 'oninput="updateCalThreshold(this.value)">';
+  h += '<span id="thresh-val" style="font-family:DM Serif Display,serif;font-size:18px;font-weight:400;color:var(--accent);min-width:40px;text-align:right">' + thresh + '%</span>';
+  h += '</div></div>';
+  h += '<div style="font-size:11px;color:var(--text3)">Example: with target 2000 kcal and threshold 30%, intake below 1400 kcal = yellow.</div>';
+  h += '</div>';
+  return h;
+}
+
+function updateCalThreshold(val) {
+  targets.calThreshold = parseInt(val);
+  var el = document.getElementById('thresh-val');
+  if (el) el.textContent = val + '%';
+  var el2 = document.getElementById('thresh-display');
+  if (el2) el2.textContent = val + '%';
+  save();
+}
+
 function renderRulesView() {
   var h='';
   h+='<div class="card">';
@@ -2383,7 +2570,21 @@ function openRuleModal(){
   document.getElementById('rule-name').value='';
   document.getElementById('rule-note').value='';
   document.getElementById('rt-banned').checked=true;
+  var cc = document.getElementById('rule-cats');
+  if (cc) {
+    cc.innerHTML = FOOD_CATEGORY_NAMES.map(function(cat){
+      return '<button type="button" onclick="selectRuleCat(\'' + cat + '\')" class="cat-pill" id="rcat-' + cat.replace(/\s+/g,'_') + '">' + cat + '</button>';
+    }).join('');
+  }
   document.getElementById('m-rule').classList.add('open');
+}
+
+function selectRuleCat(cat) {
+  document.getElementById('rule-name').value = cat;
+  FOOD_CATEGORY_NAMES.forEach(function(c){
+    var el = document.getElementById('rcat-' + c.replace(/\s+/g,'_'));
+    if (el) el.classList.toggle('active', c === cat);
+  });
 }
 function saveRule(){
   var name=document.getElementById('rule-name').value.trim();
@@ -2402,14 +2603,13 @@ function checkMealWarnings(meal){
   if(!meal||!meal.ingredients)return{banned:[],warning:[]};
   var res={banned:[],warning:[]};
   meal.ingredients.forEach(function(ing){
-    var nl=ing.name.toLowerCase().trim();
     foodRules.banned.forEach(function(r){
-      if(nl.includes(r.name.toLowerCase())||r.name.toLowerCase().includes(nl))
-        if(!res.banned.includes(ing.name))res.banned.push(ing.name);
+      if(ruleMatchesIng(r, ing.name))
+        if(!res.banned.includes(ing.name)) res.banned.push(ing.name);
     });
     foodRules.warning.forEach(function(r){
-      if(nl.includes(r.name.toLowerCase())||r.name.toLowerCase().includes(nl))
-        if(!res.warning.includes(ing.name)&&!res.banned.includes(ing.name))res.warning.push(ing.name);
+      if(ruleMatchesIng(r, ing.name))
+        if(!res.warning.includes(ing.name) && !res.banned.includes(ing.name)) res.warning.push(ing.name);
     });
   });
   return res;
@@ -2423,6 +2623,33 @@ function warnBadges(meal){
 
 
 // == BARCODE SCANNER ==============================================
+// ── FOOD RULE CATEGORIES ──────────────────────────────────────────
+var FOOD_CATEGORIES = {
+  'Dairy':     ['milk','yogurt','yoghurt','cheese','butter','cream','whey','kefir','ghee','lactose','ricotta','mozzarella','cheddar','parmesan','custard'],
+  'Gluten':    ['wheat','bread','flour','pasta','oat','barley','rye','sourdough','couscous','noodle','cracker','cereal','malt','spelt'],
+  'Eggs':      ['egg'],
+  'Nuts':      ['almond','cashew','walnut','peanut','pistachio','pecan','hazelnut','nut butter','macadamia','pine nut'],
+  'Shellfish': ['shrimp','prawn','crab','lobster','oyster','mussel','scallop','clam','crayfish'],
+  'Soy':       ['soy','tofu','tempeh','edamame','miso','tamari'],
+  'Fish':      ['salmon','tuna','cod','tilapia','sardine','anchovy','mackerel','trout','halibut','snapper','fish'],
+  'Meat':      ['beef','chicken','pork','lamb','turkey','bacon','mince','steak','veal','duck','ham','sausage'],
+  'Sugar':     ['sugar','honey','syrup','glucose','fructose','sweetener','agave','molasses','dextrose'],
+  'Alcohol':   ['wine','beer','spirits','rum','vodka','whiskey','brandy','ale','lager','sake','mirin'],
+  'Nightshade':['tomato','pepper','capsicum','eggplant','aubergine','potato','paprika','chilli','chili'],
+  'Legumes':   ['lentil','chickpea','bean','pea','soy','peanut','hummus'],
+};
+var FOOD_CATEGORY_NAMES = Object.keys(FOOD_CATEGORIES);
+
+function ruleMatchesIng(rule, ingName) {
+  var nl = ingName.toLowerCase().trim();
+  var rl = rule.name.toLowerCase().trim();
+  if (nl.includes(rl) || rl.includes(nl)) return true;
+  if (FOOD_CATEGORIES[rule.name]) {
+    return FOOD_CATEGORIES[rule.name].some(function(kw){ return nl.includes(kw); });
+  }
+  return false;
+}
+
 var _scannerStream = null;
 var _scannerInterval = null;
 var _barcodeDetector = null;
