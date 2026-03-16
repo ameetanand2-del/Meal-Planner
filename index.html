@@ -694,27 +694,77 @@ select {
 </div>
 
 <!-- PICKER MODAL -->
-<div class="modal-overlay" id="m-picker">
-  <div class="modal">
+<div class="modal-overlay" id="m-picker" style="align-items:center">
+  <div class="modal" style="border-radius:var(--radius);max-height:85vh;margin:0 16px;width:calc(100% - 32px)">
     <div class="modal-handle"></div>
-    <div class="modal-title">Pick Ingredient</div>
-    <div style="background:var(--accent-light);border:1.5px solid rgba(193,98,47,0.25);border-radius:var(--radius-sm);padding:9px 13px;margin-bottom:10px;display:flex;align-items:center;gap:8px">
-      <svg width="13" height="13" fill="none" stroke="var(--accent)" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <span style="font-size:12px;font-weight:700;color:var(--accent)">Search USDA database &nbsp;·&nbsp; or scan below</span>
+    <div class="modal-title" style="margin-bottom:12px">Add Ingredient</div>
+
+    <!-- Tab bar: Search | Manual -->
+    <div class="tog-bar" style="margin-bottom:12px">
+      <button class="ctbtn active" id="ptab-search" onclick="setPickerTab('search')">🔍 Search</button>
+      <button class="ctbtn" id="ptab-manual" onclick="setPickerTab('manual')">✏️ Add Manually</button>
     </div>
-    <div style="position:relative;margin-bottom:8px">
-      <svg style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input type="text" id="picker-q" placeholder="e.g. Greek yogurt, oats, salmon…" style="padding-left:40px;font-size:15px" oninput="renderPicker()">
+
+    <!-- SEARCH TAB -->
+    <div id="picker-tab-search">
+      <div style="position:relative;margin-bottom:8px">
+        <svg style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="picker-q" placeholder="e.g. Greek yogurt, oats, salmon…" style="padding-left:40px;font-size:15px" oninput="renderPicker()">
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:8px;padding:0 2px">Type 2+ letters · results show calories &amp; macros per 100g</div>
+      <div id="picker-list" style="max-height:320px;overflow-y:auto;border-radius:var(--radius-sm);border:1px solid var(--border);overflow:hidden"></div>
     </div>
-    <!-- Hidden file input for barcode — works on iOS home screen -->    <input type="file" id="barcode-file-input" accept="image/*" capture="environment" style="display:none" onchange="handleBarcodeImage(event)">
-    <!-- Label scanner file input -->
-    <input type="file" id="label-scan-input" accept="image/*" capture="environment" style="display:none" onchange="handleLabelScan(event)">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px"><button onclick="startBarcodeScanner()" style="padding:11px 8px;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;font-family:DM Sans,sans-serif;font-size:12px;font-weight:700;color:var(--text2)"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="7" width="3" height="10" rx="0.5"/><rect x="7" y="5" width="2" height="14" rx="0.5"/><rect x="11" y="7" width="2" height="10" rx="0.5"/><rect x="15" y="5" width="2" height="14" rx="0.5"/><rect x="19" y="7" width="3" height="10" rx="0.5"/></svg>Scan Barcode</button><button onclick="startLabelScanner()" style="padding:11px 8px;background:var(--accent-light);border:1.5px solid rgba(193,98,47,0.3);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;font-family:DM Sans,sans-serif;font-size:12px;font-weight:700;color:var(--accent)"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 7h8M8 11h8M8 15h5"/><circle cx="17" cy="15" r="2.5"/><path d="M19 17l1.5 1.5"/></svg>Scan Label</button></div><div id="label-scan-result" style="display:none;margin-bottom:10px"></div>
-    <div id="scanner-wrap" style="display:none"></div></div><div style="position:absolute;bottom:0;left:0;right:0;padding:8px;text-align:center;background:rgba(0,0,0,0.55)"><span style="color:#fff;font-size:11px;font-weight:700">Point camera at barcode</span></div><button onclick="stopBarcodeScanner()" style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.55);border:none;color:#fff;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:16px;font-family:DM Sans,sans-serif">x</button></div>
-    <div id="barcode-result" style="display:none;margin-bottom:10px;border-radius:var(--radius-sm);padding:12px 14px;border:1.5px solid transparent"></div>
-    <div style="font-size:11px;color:var(--text3);margin-bottom:10px;padding:0 2px">Type 2+ letters to search · or scan a barcode</div>
-    <div id="picker-list" style="max-height:400px;overflow-y:auto;border-radius:var(--radius-sm);border:1px solid var(--border);overflow:hidden"></div>
-    <div class="row end" style="margin-top:14px"><button class="btn btn-ghost" onclick="closeM('m-picker')">Cancel</button></div>
+
+    <!-- MANUAL TAB -->
+    <div id="picker-tab-manual" style="display:none">
+      <div style="font-size:12px;color:var(--text3);margin-bottom:14px;line-height:1.6">
+        Can't find it? Add the nutrition info manually from the product label.
+      </div>
+      <div class="form-group">
+        <label>Food Name</label>
+        <input type="text" id="manual-ing-name" placeholder="e.g. Chobani Yogurt, Protein Bar">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="form-group" style="margin-bottom:10px">
+          <label>Calories (per 100g)</label>
+          <input type="number" id="manual-ing-kcal" placeholder="e.g. 120" min="0">
+        </div>
+        <div class="form-group" style="margin-bottom:10px">
+          <label>Protein (g)</label>
+          <input type="number" id="manual-ing-prot" placeholder="e.g. 10" min="0" step="0.1">
+        </div>
+        <div class="form-group" style="margin-bottom:10px">
+          <label>Carbs (g)</label>
+          <input type="number" id="manual-ing-carb" placeholder="e.g. 12" min="0" step="0.1">
+        </div>
+        <div class="form-group" style="margin-bottom:10px">
+          <label>Fat (g)</label>
+          <input type="number" id="manual-ing-fat" placeholder="e.g. 3" min="0" step="0.1">
+        </div>
+        <div class="form-group" style="margin-bottom:10px">
+          <label>Fiber (g)</label>
+          <input type="number" id="manual-ing-fiber" placeholder="e.g. 2" min="0" step="0.1">
+        </div>
+        <div class="form-group" style="margin-bottom:10px">
+          <label>Unit</label>
+          <select id="manual-ing-unit">
+            <option value="g">g (grams)</option>
+            <option value="ml">ml</option>
+            <option value="tbsp">tbsp</option>
+            <option value="tsp">tsp</option>
+            <option value="cup">cup</option>
+            <option value="whole">whole</option>
+          </select>
+        </div>
+      </div>
+      <button onclick="saveManualIngredient()" class="btn btn-primary btn-full" style="margin-bottom:8px">
+        + Add to Meal
+      </button>
+    </div>
+
+    <div class="row end" style="margin-top:10px">
+      <button class="btn btn-ghost btn-sm" onclick="closeM('m-picker')">Cancel</button>
+    </div>
   </div>
 </div>
 
@@ -1693,8 +1743,47 @@ function addIngRow(ing){
 }
 
 function openPicker(id){
-  _lastPickerQ = ''; // reset so re-search works
-pickRow=id;document.getElementById('picker-q').value='';renderPicker();document.getElementById('m-picker').classList.add('open');}
+  _lastPickerQ = '';
+  pickRow = id;
+  document.getElementById('picker-q').value = '';
+  // Reset manual fields
+  ['manual-ing-name','manual-ing-kcal','manual-ing-prot','manual-ing-carb',
+   'manual-ing-fat','manual-ing-fiber'].forEach(function(fid){
+    var el = document.getElementById(fid); if (el) el.value = '';
+  });
+  setPickerTab('search');
+  renderPicker();
+  document.getElementById('m-picker').classList.add('open');
+}
+
+function setPickerTab(tab) {
+  document.getElementById('ptab-search').classList.toggle('active', tab === 'search');
+  document.getElementById('ptab-manual').classList.toggle('active', tab === 'manual');
+  document.getElementById('picker-tab-search').style.display = tab === 'search' ? 'block' : 'none';
+  document.getElementById('picker-tab-manual').style.display = tab === 'manual' ? 'block' : 'none';
+}
+
+function saveManualIngredient() {
+  var name  = (document.getElementById('manual-ing-name')?.value  || '').trim();
+  var kcal  = parseFloat(document.getElementById('manual-ing-kcal')?.value)  || 0;
+  var prot  = parseFloat(document.getElementById('manual-ing-prot')?.value)  || 0;
+  var carb  = parseFloat(document.getElementById('manual-ing-carb')?.value)  || 0;
+  var fat   = parseFloat(document.getElementById('manual-ing-fat')?.value)   || 0;
+  var fiber = parseFloat(document.getElementById('manual-ing-fiber')?.value) || 0;
+  var unit  = document.getElementById('manual-ing-unit')?.value || 'g';
+
+  if (!name) { showToast('Please enter a food name'); return; }
+  if (!kcal && !prot && !carb && !fat) { showToast('Please enter at least calories'); return; }
+
+  // Save to MACRO_DB and custIngs
+  MACRO_DB[name] = { p: prot, c: carb, f: fat, fi: fiber };
+  if (!findFood(name)) {
+    custIngs.push({ n: name, cat: 'Manual', u: unit, c: kcal });
+    save();
+  }
+  pickFood(name, unit);
+  showToast(name + ' added ✓');
+}
 
 // ── LIVE FOOD SEARCH (Open Food Facts API) ────────────────────
 var _pickerTimer = null;
@@ -2735,63 +2824,7 @@ function warnBadges(meal){
 }
 
 
-// == BARCODE SCANNER ==============================================
-// Uses file input + capture="environment" — works on iOS home screen,
-// PWA mode, and all browsers without getUserMedia restrictions.
 
-var _scannerStream   = null;
-var _scannerInterval = null;
-var _barcodeDetector = null;
-
-function startBarcodeScanner() {
-  var input = document.getElementById('barcode-file-input');
-  if (input) { input.value = ''; input.click(); }
-}
-
-function handleBarcodeImage(e) {
-  var file = e.target.files && e.target.files[0];
-  if (!file) return;
-  var result = document.getElementById('barcode-result');
-  result.style.cssText = 'display:block;margin-bottom:10px;border-radius:var(--radius-sm);padding:12px 14px;border:1.5px solid var(--border-soft);background:var(--surface2)';
-  result.innerHTML = '<div style="display:flex;align-items:center;gap:8px;color:var(--text3)">'
-    + '<div style="width:16px;height:16px;border:2.5px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite;flex-shrink:0"></div>'
-    + '<span style="font-size:13px;font-weight:700">Reading barcode…</span></div>';
-
-  if ('BarcodeDetector' in window) {
-    var img = new Image();
-    var objUrl = URL.createObjectURL(file);
-    img.onload = function() {
-      new BarcodeDetector({ formats: ['ean_13','ean_8','upc_a','upc_e','code_128','code_39'] })
-        .detect(img)
-        .then(function(codes) {
-          URL.revokeObjectURL(objUrl);
-          if (codes && codes.length) { lookupBarcode(codes[0].rawValue); }
-          else { showBarcodeManualEntry(result); }
-        })
-        .catch(function() { URL.revokeObjectURL(objUrl); showBarcodeManualEntry(result); });
-    };
-    img.onerror = function() { URL.revokeObjectURL(objUrl); showBarcodeManualEntry(result); };
-    img.src = objUrl;
-  } else {
-    showBarcodeManualEntry(result);
-  }
-}
-
-function showBarcodeManualEntry(result) {
-  result.style.cssText = 'display:block;margin-bottom:10px;border-radius:var(--radius-sm);padding:12px 14px;border:1.5px solid var(--border-soft);background:var(--surface2)';
-  result.innerHTML = '<div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px">Enter barcode number</div>'
-    + '<div style="font-size:11px;color:var(--text3);margin-bottom:10px">Type the barcode digits from the packaging:</div>'
-    + '<div style="display:flex;gap:8px">'
-    + '<input id="manual-barcode" type="tel" placeholder="e.g. 9310015512095" '
-    + 'style="flex:1;padding:10px 12px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--surface);font-family:DM Sans,sans-serif;font-size:14px;color:var(--text);outline:none">'
-    + '<button onclick="lookupBarcode(document.getElementById(\'manual-barcode\').value.trim())" '
-    + 'style="padding:10px 16px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;font-weight:700;cursor:pointer">Search</button>'
-    + '</div>';
-}
-
-function stopBarcodeScanner() {}
-function scanFrame() {}
-// == END BARCODE ===================================================
 
 
 // ================================================================
@@ -3067,169 +3100,7 @@ function renderNutritionTrends() {
 // End Trends
 
 
-// ── NUTRITION LABEL SCANNER (AI Vision) ──────────────────────
-function startLabelScanner() {
-  var inp = document.getElementById('label-scan-input');
-  if (inp) { inp.value = ''; inp.click(); }
-}
 
-function handleLabelScan(e) {
-  var file = e.target.files && e.target.files[0];
-  if (!file) return;
-
-  var result = document.getElementById('label-scan-result');
-  result.style.display = 'block';
-  result.innerHTML = '<div style="background:var(--surface2);border:1.5px solid var(--border-soft);border-radius:var(--radius-sm);padding:14px">'
-    + '<div style="display:flex;align-items:center;gap:10px">'
-    + '<div style="width:20px;height:20px;border:2.5px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite;flex-shrink:0"></div>'
-    + '<div><div style="font-size:13px;font-weight:700;color:var(--text)">Reading nutrition label\u2026</div>'
-    + '<div style="font-size:11px;color:var(--text3);margin-top:2px">Claude AI is analysing the image</div>'
-    + '</div></div></div>';
-
-  // Convert image to base64
-  var reader = new FileReader();
-  reader.onload = function(ev) {
-    var base64 = ev.target.result.split(',')[1];
-    var mimeType = file.type || 'image/jpeg';
-    callClaudeVision(base64, mimeType, result);
-  };
-  reader.onerror = function() {
-    showLabelError(result, 'Could not read image file.');
-  };
-  reader.readAsDataURL(file);
-  e.target.value = '';
-}
-
-function callClaudeVision(base64, mimeType, result) {
-  fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 400,
-      messages: [{
-        role: 'user',
-        content: [
-          {
-            type: 'image',
-            source: { type: 'base64', media_type: mimeType, data: base64 }
-          },
-          {
-            type: 'text',
-            text: 'This is a nutrition label. Extract the following and respond ONLY with a JSON object, no explanation:\n'
-              + '{"name":"product name or best guess","serving":"serving size e.g. 30g","calories":0,"protein":0,"carbs":0,"fat":0,"fiber":0,"sodium":0}\n'
-              + 'All numeric values should be per 100g. If a value is not shown, use 0. Product name should be short and clear.'
-          }
-        ]
-      }]
-    })
-  })
-  .then(function(r) { return r.json(); })
-  .then(function(data) {
-    if (data.error) throw new Error(data.error.message);
-    var text = (data.content && data.content[0] && data.content[0].text) || '';
-    // Strip markdown code fences if present
-    text = text.replace(/```json|```/g, '').trim();
-    var parsed;
-    try { parsed = JSON.parse(text); } catch(e) { throw new Error('Could not parse response'); }
-    showLabelResult(result, parsed);
-  })
-  .catch(function(err) {
-    showLabelError(result, err.message || 'Could not read label. Try a clearer photo.');
-  });
-}
-
-function showLabelResult(container, data) {
-  var name    = data.name    || '';
-  var serving = data.serving || '100g';
-  var kcal    = parseInt(data.calories) || 0;
-  var prot    = parseInt(data.protein)  || 0;
-  var carb    = parseInt(data.carbs)    || 0;
-  var fat     = parseInt(data.fat)      || 0;
-  var fiber   = parseInt(data.fiber)    || 0;
-  var sodium  = parseInt(data.sodium)   || 0;
-
-  var id = 'lr-' + Date.now();
-
-  container.innerHTML =
-    '<div style="background:var(--surface);border:1.5px solid var(--border-soft);border-radius:var(--radius-sm);padding:14px">'
-    + '<div style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">'
-    + '\u2728 Label scanned \u2014 review and confirm</div>'
-
-    // Product name
-    + '<div class="form-group" style="margin-bottom:10px">'
-    + '<label>Product Name</label>'
-    + '<input id="' + id + '-name" type="text" value="' + name + '" '
-    + 'style="padding:8px 12px;font-size:13px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--surface2);width:100%;font-family:DM Sans,sans-serif;color:var(--text)">'
-    + '</div>'
-
-    // Serving size
-    + '<div class="form-group" style="margin-bottom:10px">'
-    + '<label>Serving Size (shown on label)</label>'
-    + '<input id="' + id + '-srv" type="text" value="' + serving + '" '
-    + 'style="padding:8px 12px;font-size:13px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--surface2);width:100%;font-family:DM Sans,sans-serif;color:var(--text)">'
-    + '</div>'
-
-    // Macro grid — per 100g
-    + '<div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Per 100g</div>'
-    + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:12px">'
-    + labelField(id+'-kcal', '\uD83D\uDD25 Calories', kcal, 'kcal')
-    + labelField(id+'-prot', 'Protein',  prot, 'g')
-    + labelField(id+'-carb', 'Carbs',    carb, 'g')
-    + labelField(id+'-fat',  'Fat',      fat,  'g')
-    + labelField(id+'-fib',  'Fiber',    fiber,'g')
-    + labelField(id+'-sod',  'Sodium',   sodium,'mg')
-    + '</div>'
-
-    // Confirm button
-    + '<button onclick="addLabelFood(\'' + id + '\')" '
-    + 'style="width:100%;padding:12px;background:linear-gradient(135deg,var(--accent2),var(--accent));color:#fff;border:none;'
-    + 'border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:14px;font-weight:700;cursor:pointer">'
-    + '\u2713 Add to Meal</button>'
-    + '</div>';
-}
-
-function labelField(id, label, val, unit) {
-  return '<div style="background:var(--surface2);border-radius:var(--radius-xs);padding:8px;border:1px solid var(--border-soft)">'
-    + '<div style="font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:4px">' + label + '</div>'
-    + '<div style="display:flex;align-items:baseline;gap:3px">'
-    + '<input id="' + id + '" type="number" value="' + val + '" min="0" '
-    + 'style="width:100%;padding:3px 4px;font-size:14px;font-weight:700;border:none;background:transparent;font-family:DM Sans,sans-serif;color:var(--text);outline:none;-webkit-appearance:none">'
-    + '<span style="font-size:10px;color:var(--text3);flex-shrink:0">' + unit + '</span>'
-    + '</div></div>';
-}
-
-function addLabelFood(id) {
-  var name  = (document.getElementById(id+'-name')?.value || '').trim();
-  if (!name) { showToast('Please enter a product name'); return; }
-  var kcal  = parseInt(document.getElementById(id+'-kcal')?.value) || 0;
-  var prot  = parseInt(document.getElementById(id+'-prot')?.value) || 0;
-  var carb  = parseInt(document.getElementById(id+'-carb')?.value) || 0;
-  var fat   = parseInt(document.getElementById(id+'-fat')?.value)  || 0;
-  var fiber = parseInt(document.getElementById(id+'-fib')?.value)  || 0;
-
-  // Save to MACRO_DB and custIngs
-  MACRO_DB[name] = { p: prot, c: carb, f: fat, fi: fiber };
-  if (!findFood(name)) {
-    custIngs.push({ n: name, cat: 'Scanned Label', u: 'g', c: kcal });
-    save();
-  }
-
-  // Hide result and add to picker
-  document.getElementById('label-scan-result').style.display = 'none';
-  pickFood(name, 'g');
-  showToast(name + ' added \u2713');
-}
-
-function showLabelError(container, msg) {
-  container.innerHTML =
-    '<div style="background:var(--red-light);border:1.5px solid rgba(196,56,56,0.25);border-radius:var(--radius-sm);padding:12px 14px">'
-    + '<div style="font-size:13px;font-weight:700;color:var(--red);margin-bottom:4px">\u274c Could not read label</div>'
-    + '<div style="font-size:12px;color:var(--text2);margin-bottom:10px">' + msg + '</div>'
-    + '<div style="font-size:11px;color:var(--text3)">Tips: good lighting, hold steady, label fills the frame.</div>'
-    + '</div>';
-}
-// ── END LABEL SCANNER ─────────────────────────────────────────
 
 // ── INIT ──────────────────────────────────────────────────────
 renderToday();
