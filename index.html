@@ -848,7 +848,7 @@ var MACRO_DB = {};
 // DEMO_KEY works for testing (rate limited to ~30 req/hour).
 // Get a free personal key at: https://fdc.nal.usda.gov/api-key-signup
 // Then replace 'DEMO_KEY' below with your key.
-var USDA_API_KEY = 'DEMO_KEY';
+var USDA_API_KEY = 'mbbhRKi6MAAU1blKdGRB61zMlYcO1rGG8XUsCxpr';
 
 // ── STATE ─────────────────────────────────────────────────────
 const DEMO_MEALS = [{"id": "demo01", "name": "Greek Yogurt & Berry Bowl", "tags": {"cuisine": [], "effort": ["Quick"], "diet": ["High Protein"]}, "ingredients": [{"name": "Greek Yogurt", "amount": "200", "unit": "g", "calories": 118}, {"name": "Mixed Berries", "amount": "80", "unit": "g", "calories": 46}, {"name": "Granola", "amount": "30", "unit": "g", "calories": 120}, {"name": "Honey", "amount": "10", "unit": "g", "calories": 30}]}, {"id": "demo02", "name": "Avocado Eggs on Toast", "tags": {"cuisine": [], "effort": ["Quick"], "diet": []}, "ingredients": [{"name": "Sourdough Bread", "amount": "80", "unit": "g", "calories": 198}, {"name": "Avocado", "amount": "100", "unit": "g", "calories": 160}, {"name": "Eggs", "amount": "2", "unit": "whole", "calories": 156}, {"name": "Chilli Flakes", "amount": "1", "unit": "g", "calories": 3}]}, {"id": "demo03", "name": "Grilled Chicken & Quinoa", "tags": {"cuisine": [], "effort": ["Medium"], "diet": ["High Protein", "Gluten Free"]}, "ingredients": [{"name": "Chicken Breast", "amount": "180", "unit": "g", "calories": 297}, {"name": "Quinoa", "amount": "80", "unit": "g", "calories": 292}, {"name": "Baby Spinach", "amount": "60", "unit": "g", "calories": 14}, {"name": "Olive Oil", "amount": "10", "unit": "g", "calories": 88}, {"name": "Lemon", "amount": "30", "unit": "g", "calories": 9}]}, {"id": "demo04", "name": "Salmon & Sweet Potato", "tags": {"cuisine": [], "effort": ["Medium"], "diet": ["Gluten Free", "Omega-3"]}, "ingredients": [{"name": "Salmon Fillet", "amount": "180", "unit": "g", "calories": 367}, {"name": "Sweet Potato", "amount": "200", "unit": "g", "calories": 172}, {"name": "Broccoli", "amount": "120", "unit": "g", "calories": 41}, {"name": "Olive Oil", "amount": "10", "unit": "g", "calories": 88}]}, {"id": "demo05", "name": "Overnight Oats", "tags": {"cuisine": [], "effort": ["Quick"], "diet": ["Vegetarian"]}, "ingredients": [{"name": "Rolled Oats", "amount": "80", "unit": "g", "calories": 304}, {"name": "Almond Milk", "amount": "200", "unit": "ml", "calories": 52}, {"name": "Banana", "amount": "100", "unit": "g", "calories": 89}, {"name": "Chia Seeds", "amount": "15", "unit": "g", "calories": 72}, {"name": "Peanut Butter", "amount": "20", "unit": "g", "calories": 119}]}, {"id": "demo06", "name": "Turkey & Veggie Stir Fry", "tags": {"cuisine": ["Asian"], "effort": ["Medium"], "diet": ["High Protein"]}, "ingredients": [{"name": "Turkey Mince", "amount": "180", "unit": "g", "calories": 234}, {"name": "Brown Rice", "amount": "80", "unit": "g", "calories": 286}, {"name": "Bell Pepper", "amount": "100", "unit": "g", "calories": 31}, {"name": "Broccoli", "amount": "100", "unit": "g", "calories": 34}, {"name": "Soy Sauce", "amount": "15", "unit": "ml", "calories": 9}]}, {"id": "demo07", "name": "Tuna Nicoise Salad", "tags": {"cuisine": ["Mediterranean"], "effort": ["Quick"], "diet": ["High Protein", "Gluten Free"]}, "ingredients": [{"name": "Tuna in Water", "amount": "150", "unit": "g", "calories": 159}, {"name": "Eggs", "amount": "2", "unit": "whole", "calories": 156}, {"name": "Green Beans", "amount": "80", "unit": "g", "calories": 25}, {"name": "Cherry Tomatoes", "amount": "80", "unit": "g", "calories": 14}, {"name": "Olive Oil", "amount": "10", "unit": "g", "calories": 88}]}, {"id": "demo08", "name": "Lentil & Vegetable Soup", "tags": {"cuisine": [], "effort": ["Batch Cook"], "diet": ["Vegan", "High Fiber"]}, "ingredients": [{"name": "Red Lentils", "amount": "100", "unit": "g", "calories": 353}, {"name": "Carrot", "amount": "100", "unit": "g", "calories": 41}, {"name": "Onion", "amount": "80", "unit": "g", "calories": 32}, {"name": "Diced Tomatoes", "amount": "200", "unit": "g", "calories": 36}, {"name": "Vegetable Stock", "amount": "400", "unit": "ml", "calories": 16}]}, {"id": "demo09", "name": "Protein Smoothie", "tags": {"cuisine": [], "effort": ["Quick"], "diet": ["High Protein"]}, "ingredients": [{"name": "Whey Protein", "amount": "30", "unit": "g", "calories": 120}, {"name": "Banana", "amount": "100", "unit": "g", "calories": 89}, {"name": "Almond Milk", "amount": "250", "unit": "ml", "calories": 65}, {"name": "Peanut Butter", "amount": "15", "unit": "g", "calories": 89}, {"name": "Spinach", "amount": "30", "unit": "g", "calories": 7}]}, {"id": "demo10", "name": "Beef & Broccoli Rice Bowl", "tags": {"cuisine": ["Asian"], "effort": ["Medium"], "diet": ["High Protein"]}, "ingredients": [{"name": "Lean Beef Strips", "amount": "180", "unit": "g", "calories": 270}, {"name": "Brown Rice", "amount": "80", "unit": "g", "calories": 286}, {"name": "Broccoli", "amount": "150", "unit": "g", "calories": 51}, {"name": "Garlic", "amount": "10", "unit": "g", "calories": 15}, {"name": "Soy Sauce", "amount": "15", "unit": "ml", "calories": 9}]}];
@@ -1692,7 +1692,9 @@ function addIngRow(ing){
   if(hn&&ing.amount)autoCalc(id);
 }
 
-function openPicker(id){pickRow=id;document.getElementById('picker-q').value='';renderPicker();document.getElementById('m-picker').classList.add('open');}
+function openPicker(id){
+  _lastPickerQ = ''; // reset so re-search works
+pickRow=id;document.getElementById('picker-q').value='';renderPicker();document.getElementById('m-picker').classList.add('open');}
 
 // ── LIVE FOOD SEARCH (Open Food Facts API) ────────────────────
 var _pickerTimer = null;
@@ -1725,83 +1727,82 @@ function liveSearch(q, el) {
   _lastPickerQ = q;
 
   el.innerHTML = '<div style="padding:24px;text-align:center">'
-    + '<div style="width:24px;height:24px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite;margin:0 auto 10px"></div>'
-    + '<div style="font-size:12px;color:var(--text3)">Searching USDA food database\u2026</div></div>';
+    + '<div style="width:24px;height:24px;border:3px solid var(--border);border-top-color:var(--accent);'
+    + 'border-radius:50%;animation:spin 0.7s linear infinite;margin:0 auto 10px"></div>'
+    + '<div style="font-size:12px;color:var(--text3)">Searching food database\u2026</div></div>';
 
-  // ── USDA FoodData Central API ─────────────────────────────────
-  // Free API key: https://fdc.nal.usda.gov/api-key-signup
-  // Replace DEMO_KEY below with your key for higher rate limits
-  var url = 'https://api.nal.usda.gov/fdc/v1/foods/search'
+  // Try USDA first, fall back to Open Food Facts if it fails
+  var usda_url = 'https://api.nal.usda.gov/fdc/v1/foods/search'
     + '?api_key=' + USDA_API_KEY
     + '&query=' + encodeURIComponent(q)
     + '&pageSize=20'
     + '&dataType=Foundation,SR%20Legacy,Branded';
 
-  fetch(url)
+  fetch(usda_url)
     .then(function(r) {
-      if (r.status === 403) throw new Error('RATE_LIMIT');
-      if (!r.ok) throw new Error('HTTP ' + r.status);
+      if (!r.ok) throw new Error('USDA_FAIL');
       return r.json();
     })
     .then(function(data) {
-      el.innerHTML = '';
-      var foods = (data.foods || []).filter(function(f) {
-        if (!f.foodNutrients) return false;
-        return f.foodNutrients.some(function(n){
-          // Search endpoint uses nutrientNumber (string), detail endpoint uses nutrientId
-          var id = n.nutrientId || parseInt(n.nutrientNumber);
-          return (id === 1008 || id === 208) && (n.value || n.amount) > 0;
-        });
-      });
+      if (!data.foods || !data.foods.length) throw new Error('USDA_EMPTY');
 
-      if (!foods.length) {
-        el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text3);font-size:13px">'
-          + 'No results for "<strong>' + q + '</strong>"<br>'
-          + '<span style="font-size:11px">Try a simpler search term</span></div>';
-        return;
+      // USDA returns nutrients with either nutrientId (number) or nutrientNumber (string)
+      function getNut(food, id, altStr) {
+        var n = (food.foodNutrients || []).find(function(n) {
+          return n.nutrientId === id
+            || n.nutrientId === parseInt(altStr)
+            || String(n.nutrientNumber) === altStr
+            || String(n.nutrientNumber) === String(id);
+        });
+        return n ? Math.round(parseFloat(n.value || n.amount) || 0) : 0;
       }
 
-      // Section header
+      // Filter to foods that have calorie data
+      var foods = data.foods.filter(function(f) {
+        var kcal = getNut(f, 1008, '208');
+        return kcal > 0;
+      });
+
+      if (!foods.length) throw new Error('USDA_EMPTY');
+
+      el.innerHTML = '';
       var hdr = document.createElement('div');
-      hdr.style.cssText = 'padding:7px 14px;font-size:10px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;background:var(--surface2);border-bottom:1px solid var(--border)';
+      hdr.style.cssText = 'padding:7px 14px;font-size:10px;font-weight:800;color:var(--text3);'
+        + 'text-transform:uppercase;letter-spacing:0.6px;background:var(--surface2);'
+        + 'border-bottom:1px solid var(--border)';
       hdr.textContent = 'USDA Food Database';
       el.appendChild(hdr);
 
       foods.slice(0, 20).forEach(function(f) {
-        // Pull macro nutrients from nutrient array
-        function getNut(id, altId) {
-          var n = (f.foodNutrients || []).find(function(n){
-            var nid = n.nutrientId || parseInt(n.nutrientNumber);
-            return nid === id || nid === altId;
-          });
-          return n ? Math.round(n.value || n.amount || 0) : 0;
-        }
-        // nutrientId for detail endpoint / nutrientNumber for search endpoint
-        var kcal  = getNut(1008, 208);  // Energy kcal
-        var prot  = getNut(1003, 203);  // Protein
-        var carb  = getNut(1005, 205);  // Carbohydrate
-        var fat   = getNut(1004, 204);  // Total fat
-        var fiber = getNut(1079, 291);  // Fiber
+        var kcal  = getNut(f, 1008, '208');
+        var prot  = getNut(f, 1003, '203');
+        var carb  = getNut(f, 1005, '205');
+        var fat   = getNut(f, 1004, '204');
+        var fiber = getNut(f, 1079, '291');
 
-        var name  = f.description || 'Unknown';
-        // Clean up USDA ALL-CAPS names → Title Case
-        name = name.split(',')[0].toLowerCase().replace(/\b\w/g, function(c){ return c.toUpperCase(); });
+        // Clean USDA ALL-CAPS names
+        var name = (f.description || 'Unknown').split(',')[0]
+          .toLowerCase().replace(/\b\w/g, function(c){ return c.toUpperCase(); }).trim();
         var brand = (f.brandOwner || f.brandName || '').split(',')[0].trim();
-        var badge = f.dataType === 'Foundation' ? 'USDA'
-                  : f.dataType === 'SR Legacy'  ? 'USDA'
-                  : brand ? brand : '';
+        var badge = (f.dataType === 'Foundation' || f.dataType === 'SR Legacy') ? 'USDA' : brand;
 
-        var div = document.createElement('div'); div.className = 'db-item';
+        var div = document.createElement('div');
+        div.className = 'db-item';
         div.innerHTML = '<div style="flex:1">'
           + '<div class="db-item-name">' + name
           + (badge ? '<span class="picker-source-badge">' + badge + '</span>' : '')
           + '</div>'
-          + '<div class="db-item-meta">' + kcal + ' kcal &nbsp;&middot;&nbsp; P:' + prot + 'g &nbsp;C:' + carb + 'g &nbsp;F:' + fat + 'g'
-          + (fiber ? ' &nbsp;Fi:' + fiber + 'g' : '') + '</div>'
-          + '</div>'
-          + '<div class="db-item-cal">' + kcal + '<span style="font-size:9px;color:var(--text3)">/100g</span></div>';
+          + '<div class="db-item-meta">'
+          + '<strong>' + kcal + '</strong> kcal'
+          + ' &nbsp;\u00b7&nbsp; P:<strong>' + prot + '</strong>g'
+          + ' &nbsp;C:<strong>' + carb + '</strong>g'
+          + ' &nbsp;F:<strong>' + fat + '</strong>g'
+          + (fiber ? ' &nbsp;Fi:' + fiber + 'g' : '')
+          + ' &nbsp;<span style="font-size:10px;color:var(--text4)">per 100g</span>'
+          + '</div></div>'
+          + '<div class="db-item-cal">' + kcal
+          + '<span style="font-size:9px;color:var(--text3)">/100g</span></div>';
 
-        // Store macro data and add to custIngs when picked
         (function(fn, fkcal, fp, fc, ff, ffi) {
           div.addEventListener('click', function() {
             MACRO_DB[fn] = { p: fp, c: fc, f: ff, fi: ffi };
@@ -1816,13 +1817,88 @@ function liveSearch(q, el) {
         el.appendChild(div);
       });
     })
-    .catch(function(err) {
-      var isRateLimit = err.message === 'RATE_LIMIT';
-      el.innerHTML = '<div style="padding:16px 14px;background:var(--yellow-light);border-radius:var(--radius-sm);margin:8px 0">'
-        + '<div style="font-size:13px;font-weight:700;color:var(--yellow);margin-bottom:4px">' + (isRateLimit ? '\u26a0\ufe0f Search limit reached' : '\u26a0\ufe0f Could not reach food database') + '</div>'
-        + '<div style="font-size:11px;color:var(--text2);line-height:1.6">Check your internet connection.<br>'
-        + 'If the problem continues, the DEMO_KEY rate limit may have been hit \u2014 '
-        + '<a href=\"https://fdc.nal.usda.gov/api-key-signup\" target=\"_blank\" style=\"color:var(--accent)\">get a free API key</a>.</div>'
+    .catch(function() {
+      // USDA failed or empty — fall back to Open Food Facts
+      searchOpenFoodFacts(q, el);
+    });
+}
+
+function searchOpenFoodFacts(q, el) {
+  var url = 'https://world.openfoodfacts.org/cgi/search.pl'
+    + '?search_terms=' + encodeURIComponent(q)
+    + '&search_simple=1&action=process&json=1&page_size=20'
+    + '&fields=product_name,nutriments,brands&lc=en';
+
+  fetch(url)
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      el.innerHTML = '';
+      var products = (data.products || []).filter(function(p) {
+        return p.product_name
+          && p.nutriments
+          && (p.nutriments['energy-kcal_100g'] || p.nutriments['energy-kcal']) > 0;
+      });
+
+      if (!products.length) {
+        el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text3);font-size:13px">'
+          + 'No results for \u201c<strong>' + q + '\u201d</strong><br>'
+          + '<span style="font-size:11px">Try a different search term</span></div>';
+        return;
+      }
+
+      var hdr = document.createElement('div');
+      hdr.style.cssText = 'padding:7px 14px;font-size:10px;font-weight:800;color:var(--text3);'
+        + 'text-transform:uppercase;letter-spacing:0.6px;background:var(--surface2);'
+        + 'border-bottom:1px solid var(--border)';
+      hdr.textContent = 'Food Database';
+      el.appendChild(hdr);
+
+      products.slice(0, 20).forEach(function(p) {
+        var n    = p.nutriments;
+        var kcal = Math.round(n['energy-kcal_100g'] || n['energy-kcal'] || 0);
+        var prot = Math.round(n['proteins_100g']       || n['proteins']       || 0);
+        var carb = Math.round(n['carbohydrates_100g']  || n['carbohydrates']  || 0);
+        var fat  = Math.round(n['fat_100g']            || n['fat']            || 0);
+        var fib  = Math.round(n['fiber_100g']          || n['fiber']          || 0);
+        var name = p.product_name;
+        var brand = p.brands ? p.brands.split(',')[0].trim() : '';
+
+        var div = document.createElement('div');
+        div.className = 'db-item';
+        div.innerHTML = '<div style="flex:1">'
+          + '<div class="db-item-name">' + name
+          + (brand ? '<span class="picker-source-badge">' + brand + '</span>' : '')
+          + '</div>'
+          + '<div class="db-item-meta">'
+          + '<strong>' + kcal + '</strong> kcal'
+          + ' &nbsp;\u00b7&nbsp; P:<strong>' + prot + '</strong>g'
+          + ' &nbsp;C:<strong>' + carb + '</strong>g'
+          + ' &nbsp;F:<strong>' + fat + '</strong>g'
+          + (fib ? ' &nbsp;Fi:' + fib + 'g' : '')
+          + ' &nbsp;<span style="font-size:10px;color:var(--text4)">per 100g</span>'
+          + '</div></div>'
+          + '<div class="db-item-cal">' + kcal
+          + '<span style="font-size:9px;color:var(--text3)">/100g</span></div>';
+
+        (function(fn, fkcal, fp, fc, ff, ffi) {
+          div.addEventListener('click', function() {
+            MACRO_DB[fn] = { p: fp, c: fc, f: ff, fi: ffi };
+            if (!findFood(fn)) {
+              custIngs.push({ n: fn, cat: 'Food DB', u: 'g', c: fkcal });
+              save();
+            }
+            pickFood(fn, 'g');
+          });
+        })(name, kcal, prot, carb, fat, fib);
+
+        el.appendChild(div);
+      });
+    })
+    .catch(function() {
+      el.innerHTML = '<div style="padding:16px 14px;background:var(--red-light);border-radius:var(--radius-sm)">'
+        + '<div style="font-size:13px;font-weight:700;color:var(--red);margin-bottom:4px">'
+        + 'Could not reach food database</div>'
+        + '<div style="font-size:12px;color:var(--text2)">Check your internet connection and try again.</div>'
         + '</div>';
     });
 }
