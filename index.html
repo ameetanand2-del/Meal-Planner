@@ -1069,11 +1069,11 @@ var MACRO_DB = {};
 var USDA_API_KEY = 'mbbhRKi6MAAU1blKdGRB61zMlYcO1rGG8XUsCxpr';
 
 // ── STATE ─────────────────────────────────────────────────────
-const DEMO_MEALS = [{"id":"meal_salmon_bfast","name":"Salmon Breakfast","tags":{"cuisine":[],"effort":["Quick"],"diet":["High Protein","Gluten Free"]},"ingredients":[{"name":"Salmon Portions Skin Off","amount":"115","unit":"g","calories":246},{"name":"Egg","amount":"180","unit":"g","calories":119},{"name":"Olive Oil","amount":"15","unit":"g","calories":884}]}];
+const DEMO_MEALS = [];
 
 
 const DEMO_PLAN  = {};
-let meals = (function(){ var s=localStorage.getItem('mp4_meals_v2'); return s?JSON.parse(s):DEMO_MEALS; })();
+let meals = [];
 let plan  = (function(){ var s=localStorage.getItem('mp4_plan');  return s?JSON.parse(s):DEMO_PLAN;  })();
 let mealPlans   = JSON.parse(localStorage.getItem('mp4_plans')   || '[]');
 let custIngs    = JSON.parse(localStorage.getItem('mp4_custom')  || '[]');
@@ -3936,150 +3936,26 @@ function shiftBarWeek(dir) {
 }
 
 
-// ── MY INGREDIENTS ───────────────────────────────────────────
-var MY_INGREDIENTS = [
-  {n:'Salmon Portions Skin Off',    cat:'Protein',    u:'g',     c:2.46},
-  {n:'Egg',                         cat:'Protein',    u:'g',     c:1.19},
-  {n:'Chicken Fillet',              cat:'Protein',    u:'g',     c:1.45},
-  {n:'Chicken Leg Fillet',          cat:'Protein',    u:'g',     c:1.18},
-  {n:'Minced Chicken',              cat:'Protein',    u:'g',     c:1.17},
-  {n:'Sardines in Spring Water',    cat:'Protein',    u:'g',     c:1.41},
-  {n:'Protein Powder',              cat:'Protein',    u:'scoop', c:120},
-  {n:'Greek Style Natural Yoghurt', cat:'Dairy',      u:'g',     c:0.57},
-  {n:'Greek Style Plain Yoghurt',   cat:'Dairy',      u:'g',     c:0.56},
-  {n:'Protein Yoghurt',             cat:'Dairy',      u:'g',     c:0.63},
-  {n:'Greek Style Light Yoghurt',   cat:'Dairy',      u:'g',     c:0.90},
-  {n:'Soy Milk',                    cat:'Dairy',      u:'ml',    c:0.58},
-  {n:'Mozzarella Cheese Grated',    cat:'Dairy',      u:'g',     c:3.00},
-  {n:'Shredded Tasty Cheese',       cat:'Dairy',      u:'g',     c:4.16},
-  {n:'Rolled Oats',                 cat:'Grains',     u:'g',     c:3.80},
-  {n:'Sourdough Bread',             cat:'Grains',     u:'g',     c:2.72},
-  {n:'Rice Uncooked',               cat:'Grains',     u:'g',     c:3.54},
-  {n:'Hand Stretched Pizza Base',   cat:'Grains',     u:'g',     c:2.35},
-  {n:'Olive Oil',                   cat:'Fats',       u:'g',     c:8.84},
-  {n:'Coconut Oil',                 cat:'Fats',       u:'g',     c:8.62},
-  {n:'Ghee',                        cat:'Fats',       u:'g',     c:8.76},
-  {n:'Butter',                      cat:'Fats',       u:'g',     c:7.17},
-  {n:'Peanut Butter',               cat:'Fats',       u:'g',     c:5.88},
-  {n:'Coconut Cream',               cat:'Fats',       u:'ml',    c:2.86},
-  {n:'Mango Frozen',                cat:'Fruit',      u:'g',     c:0.60},
-  {n:'Avocado',                     cat:'Fruit',      u:'g',     c:1.60},
-  {n:'Strawberry Slices Frozen',    cat:'Fruit',      u:'g',     c:0.25},
-  {n:'Capsicum',                    cat:'Veg',        u:'cup',   c:33},
-  {n:'Lentils',                     cat:'Legumes',    u:'g',     c:0.96},
-  {n:'Mayo Kewpie',                 cat:'Condiments', u:'g',     c:7.10},
-  {n:'Gochujang',                   cat:'Condiments', u:'g',     c:2.24},
-  {n:'Pizza Sauce',                 cat:'Condiments', u:'g',     c:0.72},
-  {n:'Honey',                       cat:'Condiments', u:'g',     c:3.04},
-  {n:'Black Chia Seeds',            cat:'Seeds',      u:'g',     c:4.86},
-  {n:'Acai Energy',                 cat:'Other',      u:'g',     c:1.06},
-];
+var MY_INGREDIENTS = [];
 
-// ── MY RECIPES ───────────────────────────────────────────────
+
 var MY_RECIPES = [
-  {id:'r_salmon_eggs',name:'Salmon and Eggs',mealType:'Breakfast',
+  {id:'r_salmon_eggs', name:'Salmon and Eggs', mealType:'Breakfast',
    tags:{cuisine:[],effort:['Quick'],diet:['High Protein','Low Carb']},
    ingredients:[
-    {name:'Salmon Portions Skin Off',amount:'115',unit:'g',   calories:283,protein:22,carbs:0, fat:21},
-    {name:'Egg',                     amount:'180',unit:'g',   calories:215,protein:19,carbs:1, fat:14},
-    {name:'Olive Oil',               amount:'15', unit:'g',   calories:133,protein:0, carbs:0, fat:15}]},
-  {id:'r_sardine_sandwich',name:'Sardine Sandwich',mealType:'Breakfast',
-   tags:{cuisine:[],effort:['Quick'],diet:['High Protein']},
-   ingredients:[
-    {name:'Sardines in Spring Water',amount:'150',unit:'g',   calories:212,protein:32,carbs:0, fat:9},
-    {name:'Avocado',                 amount:'75', unit:'g',   calories:144,protein:2, carbs:5, fat:13},
-    {name:'Sourdough Bread',         amount:'60', unit:'g',   calories:163,protein:6, carbs:31,fat:1},
-    {name:'Mayo Kewpie',             amount:'10', unit:'g',   calories:71, protein:1, carbs:0, fat:7},
-    {name:'Butter',                  amount:'15', unit:'g',   calories:108,protein:0, carbs:0, fat:12}]},
-  {id:'r_boiled_egg_sourdough',name:'Boiled Egg Spread and Sourdough',mealType:'Snack',
-   tags:{cuisine:[],effort:['Quick'],diet:['High Protein']},
-   ingredients:[
-    {name:'Egg',                     amount:'300',unit:'g',   calories:429,protein:38,carbs:2, fat:29},
-    {name:'Mayo Kewpie',             amount:'14', unit:'g',   calories:100,protein:1, carbs:0, fat:10},
-    {name:'Sourdough Bread',         amount:'60', unit:'g',   calories:163,protein:6, carbs:31,fat:1},
-    {name:'Butter',                  amount:'10', unit:'g',   calories:72, protein:0, carbs:0, fat:8}]},
-  {id:'r_mango_chia_oats',name:'Mango Chiaseed and Oats',mealType:'Snack',
-   tags:{cuisine:[],effort:['Quick'],diet:['High Protein']},
-   ingredients:[
-    {name:'Protein Powder',          amount:'1',  unit:'scoop',calories:120,protein:25,carbs:2, fat:2},
-    {name:'Soy Milk',                amount:'200',unit:'ml',  calories:116,protein:8, carbs:11,fat:4},
-    {name:'Black Chia Seeds',        amount:'15', unit:'g',   calories:67, protein:3, carbs:1, fat:5},
-    {name:'Rolled Oats',             amount:'30', unit:'g',   calories:114,protein:4, carbs:17,fat:3},
-    {name:'Mango Frozen',            amount:'100',unit:'g',   calories:60, protein:1, carbs:15,fat:0},
-    {name:'Peanut Butter',           amount:'15', unit:'g',   calories:87, protein:4, carbs:2, fat:7}]},
-  {id:'r_acai_bowl',name:'Acai Bowl Protein',mealType:'Snack',
-   tags:{cuisine:[],effort:['Quick'],diet:['High Protein']},
-   ingredients:[
-    {name:'Acai Energy',             amount:'100',unit:'g',   calories:106,protein:1, carbs:15,fat:4},
-    {name:'Strawberry Slices Frozen',amount:'150',unit:'g',   calories:38, protein:1, carbs:6, fat:0},
-    {name:'Soy Milk',                amount:'200',unit:'ml',  calories:115,protein:8, carbs:11,fat:4},
-    {name:'Greek Style Natural Yoghurt',amount:'480',unit:'g',calories:414,protein:41,carbs:19,fat:19},
-    {name:'Peanut Butter',           amount:'10', unit:'g',   calories:58, protein:3, carbs:1, fat:5}]},
-  {id:'r_mango_lassi',name:'Mango Lassi',mealType:'Snack',
-   tags:{cuisine:['Indian'],effort:['Quick'],diet:['High Protein']},
-   ingredients:[
-    {name:'Protein Yoghurt',         amount:'250',unit:'g',   calories:157,protein:25,carbs:12,fat:1},
-    {name:'Mango Frozen',            amount:'100',unit:'g',   calories:60, protein:1, carbs:15,fat:0},
-    {name:'Black Chia Seeds',        amount:'10', unit:'g',   calories:45, protein:2, carbs:0, fat:4}]},
-  {id:'r_korean_chicken_rice',name:'Korean Style Chicken and Rice',mealType:'Lunch',
-   tags:{cuisine:['Asian'],effort:['Moderate'],diet:['High Protein']},
-   ingredients:[
-    {name:'Chicken Leg Fillet',      amount:'250',unit:'g',   calories:295,protein:46,carbs:0, fat:12},
-    {name:'Rice Uncooked',           amount:'40', unit:'g',   calories:142,protein:4, carbs:31,fat:0},
-    {name:'Honey',                   amount:'7.5',unit:'g',   calories:23, protein:0, carbs:6, fat:0},
-    {name:'Coconut Oil',             amount:'12.5',unit:'g',  calories:104,protein:0, carbs:0, fat:13},
-    {name:'Gochujang',               amount:'20', unit:'g',   calories:45, protein:1, carbs:10,fat:0},
-    {name:'Capsicum',                amount:'1.75',unit:'cup',calories:58, protein:3, carbs:14,fat:1}]},
-  {id:'r_malai_afghani',name:'Malai Afghani Chicken',mealType:'Dinner',
-   tags:{cuisine:['Indian'],effort:['Moderate'],diet:['High Protein','Low Carb']},
-   ingredients:[
-    {name:'Chicken Fillet',          amount:'182',unit:'g',   calories:274,protein:56,carbs:0, fat:6},
-    {name:'Ghee',                    amount:'4.5',unit:'g',   calories:40, protein:0, carbs:0, fat:5},
-    {name:'Greek Style Natural Yoghurt',amount:'64',unit:'g', calories:79, protein:6, carbs:3, fat:6}]},
-  {id:'r_yogurt_rice',name:'Yogurt and Rice',mealType:'Dinner',
-   tags:{cuisine:['Indian'],effort:['Quick'],diet:['High Protein']},
-   ingredients:[
-    {name:'Rice Uncooked',           amount:'100',unit:'g',   calories:354,protein:9, carbs:78,fat:0},
-    {name:'Ghee',                    amount:'10', unit:'g',   calories:90, protein:0, carbs:0, fat:10},
-    {name:'Greek Style Plain Yoghurt',amount:'360',unit:'g',  calories:200,protein:33,carbs:15,fat:0},
-    {name:'Black Chia Seeds',        amount:'20', unit:'g',   calories:86, protein:4, carbs:0, fat:6}]},
-  {id:'r_lentils_rice',name:'Canned Lentils and Rice',mealType:'Dinner',
-   tags:{cuisine:[],effort:['Quick'],diet:['High Protein','Vegan']},
-   ingredients:[
-    {name:'Lentils',                 amount:'504',unit:'g',   calories:486,protein:39,carbs:66,fat:1},
-    {name:'Rice Uncooked',           amount:'40', unit:'g',   calories:142,protein:4, carbs:31,fat:0},
-    {name:'Ghee',                    amount:'10', unit:'g',   calories:88, protein:0, carbs:0, fat:10}]},
-  {id:'r_high_protein_pizza',name:'High Protein Pizza',mealType:'Dinner',
-   tags:{cuisine:['Italian'],effort:['Moderate'],diet:['High Protein']},
-   ingredients:[
-    {name:'Hand Stretched Pizza Base',amount:'125',unit:'g',  calories:294,protein:11,carbs:54,fat:4},
-    {name:'Pizza Sauce',             amount:'100',unit:'g',   calories:72, protein:3, carbs:12,fat:1},
-    {name:'Ghee',                    amount:'5',  unit:'g',   calories:44, protein:0, carbs:0, fat:5},
-    {name:'Minced Chicken',          amount:'125',unit:'g',   calories:147,protein:23,carbs:0, fat:6},
-    {name:'Shredded Tasty Cheese',   amount:'75', unit:'g',   calories:312,protein:19,carbs:3, fat:27},
-    {name:'Capsicum',                amount:'1',  unit:'cup', calories:33, protein:2, carbs:8, fat:1}]},
-  {id:'r_cheesy_handi',name:'Cheesy Handi',mealType:'Dinner',
-   tags:{cuisine:['Indian'],effort:['Moderate'],diet:['High Protein']},
-   ingredients:[
-    {name:'Ghee',                    amount:'1.9',unit:'ml',  calories:17, protein:0, carbs:0, fat:2},
-    {name:'Chicken Fillet',          amount:'163',unit:'g',   calories:235,protein:48,carbs:0, fat:5},
-    {name:'Greek Style Light Yoghurt',amount:'25',unit:'g',   calories:22, protein:1, carbs:2, fat:1},
-    {name:'Coconut Cream',           amount:'49', unit:'ml',  calories:141,protein:2, carbs:2, fat:14},
-    {name:'Mozzarella Cheese Grated',amount:'31', unit:'g',   calories:94, protein:8, carbs:0, fat:7}]}
+    {name:'Salmon Portions Skin Off', amount:'115', unit:'g',    calories:283, protein:22, carbs:0,  fat:21},
+    {name:'Egg',                      amount:'180', unit:'g',    calories:215, protein:19, carbs:1,  fat:14},
+    {name:'Olive Oil',                amount:'15',  unit:'g',    calories:133, protein:0,  carbs:0,  fat:15}
+   ]}
 ];
 
 function loadMyRecipes() {
-  var OLD_IDS = ['meal_salmon_bfast','recipe_mango_chia_oats','recipe_salmon_eggs',
-    'recipe_sardine_sandwich','recipe_boiled_egg_sourdough','recipe_korean_chicken_rice'];
-  meals = meals.filter(function(m){ return OLD_IDS.indexOf(m.id) === -1; });
+  // Always start fresh — ignore any cached meal data
+  localStorage.removeItem('mp4_meals_v2');
+  meals = [];
   MY_RECIPES.forEach(function(r){
-    if(!meals.find(function(m){ return m.id===r.id; })) meals.push(r);
+    meals.push(r);
   });
-  MY_INGREDIENTS.forEach(function(ing){
-    if(!custIngs.find(function(c){ return (c.n||c.name).toLowerCase()===ing.n.toLowerCase(); }))
-      custIngs.push({n:ing.n, cat:ing.cat, u:ing.u, c:ing.c});
-  });
-  save();
 }
 
 // ── INIT ──────────────────────────────────────────────────────
