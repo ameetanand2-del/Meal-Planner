@@ -1098,7 +1098,6 @@ var barWeekOffset = 0;  // 0 = current week, -1 = last week, etc
 
 // ── SAVE ──────────────────────────────────────────────────────
 function save() {
-  localStorage.setItem('mp4_meals_v2',   JSON.stringify(meals));
   localStorage.setItem('mp4_plan',    JSON.stringify(plan));
   localStorage.setItem('mp4_chk',     JSON.stringify(chkd));
   localStorage.setItem('mp4_custom',  JSON.stringify(custIngs));
@@ -1171,8 +1170,10 @@ function mealCals(meal, portions) {
     if (unit === 'tsp')       amt *= 5;
     else if (unit === 'tbsp') amt *= 15;
     else if (unit === 'cup')  amt *= 240;
-    // Use ing.calories (per 100g) if available — set by USDA, OFFs, or demo data
+    // Use ing.calories if available.
+    // If calTotal=true, calories is the total for the given amount (not per 100g).
     if (ing.calories && parseFloat(ing.calories) > 0) {
+      if (ing.calTotal) return s + Math.round(parseFloat(ing.calories));
       return s + Math.round((parseFloat(ing.calories) / 100) * amt);
     }
     // Fallback to lookup
@@ -1227,6 +1228,11 @@ function mealMacros(m, portions) {
       tot.c  += (db.c  || 0) * ratio;
       tot.f  += (db.f  || 0) * ratio;
       tot.fi += (db.fi || 0) * ratio;
+    } else if (ing.calTotal && (ing.protein != null || ing.carbs != null || ing.fat != null)) {
+      // Ingredients with pre-calculated total macros — use directly
+      tot.p  += parseFloat(ing.protein) || 0;
+      tot.c  += parseFloat(ing.carbs)   || 0;
+      tot.f  += parseFloat(ing.fat)     || 0;
     } else {
       var mac = getMacros(ing.name, ing.calories, ing.amount, ing.unit);
       tot.p += mac.p; tot.c += mac.c; tot.f += mac.f; tot.fi += (mac.fi||0);
@@ -1319,15 +1325,37 @@ function renderToday() {
           h += '<button onclick="rmSlotToday(\'' + dk + '\',\'' + mt + '\',\'' + sl.mealId + '\')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:13px;padding:2px 4px">✕</button>';
           h += '</div>';
           if (m.ingredients && m.ingredients.length) {
+            // Header row
+            h += '<div style="display:grid;grid-template-columns:1fr 52px 60px 52px;gap:4px;padding:3px 0 4px;border-bottom:1px solid var(--border-soft)">';
+            h += '<span style="font-size:9px;font-weight:700;color:var(--text4);text-transform:uppercase;letter-spacing:0.5px">Ingredient</span>';
+            h += '<span style="font-size:9px;font-weight:700;color:var(--text4);text-transform:uppercase;letter-spacing:0.5px;text-align:center">Qty</span>';
+            h += '<span style="font-size:9px;font-weight:700;color:var(--text4);text-transform:uppercase;letter-spacing:0.5px;text-align:center">Grams</span>';
+            h += '<span style="font-size:9px;font-weight:700;color:var(--text4);text-transform:uppercase;letter-spacing:0.5px;text-align:right">kcal</span>';
+            h += '</div>';
             m.ingredients.forEach(function(ing, ii) {
-              var ingCal = ing.calories > 0 ? Math.round(ing.calories / 100 * (parseFloat(ing.amount)||0)) : 0;
-              h += '<div style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid var(--border-soft)">';
-              h += '<span style="flex:1;font-size:12px;color:var(--text2)">' + ing.name + '</span>';
-              h += '<input type="number" value="' + ing.amount + '" min="0" step="1" '
-                + 'style="width:58px;padding:4px 6px;font-size:12px;text-align:center;border-radius:8px;border:1.5px solid var(--border);background:var(--surface2);color:var(--text);font-family:DM Sans,sans-serif" '
+              // base values per 1 unit
+              var baseAmt   = parseFloat(ing.amount) || 1;
+              var baseGrams = parseFloat(ing.grams)  || baseAmt;
+              var baseCals  = parseFloat(ing.calories) || 0;
+              var gramsPerUnit = baseGrams / baseAmt;
+              var calsPerUnit  = baseCals  / baseAmt;
+              var curCal  = Math.round(baseCals);
+              var curGrams = baseGrams % 1 === 0 ? baseGrams : parseFloat(baseGrams.toFixed(1));
+              var isGramUnit = (ing.unit === 'g' || ing.unit === 'ml');
+              h += '<div style="display:grid;grid-template-columns:1fr 52px 60px 52px;gap:4px;align-items:center;padding:5px 0;border-bottom:1px solid var(--border-soft)">';
+              h += '<span style="font-size:12px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + ing.name + '</span>';
+              // Qty input (portion or grams depending on unit)
+              h += '<input type="number" value="' + ing.amount + '" min="0" step="' + (isGramUnit ? '1' : '0.5') + '" '
+                + 'style="width:100%;padding:4px 4px;font-size:12px;text-align:center;border-radius:8px;border:1.5px solid var(--border);background:var(--surface2);color:var(--text);font-family:DM Sans,sans-serif" '
                 + 'oninput="updateTodayIng(\'' + sl.mealId + '\',' + ii + ',this.value)">';
-              h += '<span style="font-size:11px;color:var(--text3);min-width:16px">' + ing.unit + '</span>';
-              h += '<span style="font-size:11px;font-weight:700;color:var(--accent);min-width:36px;text-align:right" id="ingcal-' + sl.mealId + '-' + ii + '">' + ingCal + '</span>';
+              // Grams display (updates dynamically)
+              if (isGramUnit) {
+                h += '<span style="font-size:11px;color:var(--text3);text-align:center" id="inggrams-' + sl.mealId + '-' + ii + '">' + ing.unit + '</span>';
+              } else {
+                h += '<span style="font-size:11px;color:var(--text3);text-align:center" id="inggrams-' + sl.mealId + '-' + ii + '">' + curGrams + 'g</span>';
+              }
+              // Calories
+              h += '<span style="font-size:11px;font-weight:700;color:var(--accent);text-align:right" id="ingcal-' + sl.mealId + '-' + ii + '">' + curCal + '</span>';
               h += '</div>';
             });
           }
@@ -1364,14 +1392,39 @@ function rmSlotToday(dk, mt, mealId) {
 function updateTodayIng(mealId, ingIdx, newAmt) {
   var m = getMeal(mealId);
   if (!m || !m.ingredients[ingIdx]) return;
-  m.ingredients[ingIdx].amount = newAmt;
-  // Update ingredient calorie display inline
-  var cal = m.ingredients[ingIdx].calories;
-  var computed = cal > 0 ? Math.round(cal / 100 * (parseFloat(newAmt)||0)) : 0;
-  var el = document.getElementById('ingcal-' + mealId + '-' + ingIdx);
-  if (el) el.textContent = computed;
+  var ing = m.ingredients[ingIdx];
+  var newVal = parseFloat(newAmt) || 0;
+
+  // Work out grams and calories per original 1-unit
+  var baseAmt      = parseFloat(ing._baseAmount || ing.amount) || 1;
+  var baseGrams    = parseFloat(ing.grams) || baseAmt;
+  var baseCals     = parseFloat(ing._baseCals || ing.calories) || 0;
+
+  // Store base values on first edit so they don't drift
+  if (!ing._baseAmount) { ing._baseAmount = ing.amount; ing._baseCals = ing.calories; }
+
+  var ratio        = newVal / baseAmt;
+  var newGrams     = baseGrams * ratio;
+  var newCals      = Math.round(baseCals * ratio);
+
+  ing.amount   = newAmt;
+  ing.calories = newCals;
+
+  // Update grams display
+  var gramsEl = document.getElementById('inggrams-' + mealId + '-' + ingIdx);
+  var isGramUnit = (ing.unit === 'g' || ing.unit === 'ml');
+  if (gramsEl && !isGramUnit) {
+    var displayG = newGrams % 1 === 0 ? newGrams : parseFloat(newGrams.toFixed(1));
+    gramsEl.textContent = displayG + 'g';
+  }
+
+  // Update calorie display
+  var calEl = document.getElementById('ingcal-' + mealId + '-' + ingIdx);
+  if (calEl) calEl.textContent = newCals;
+
   save();
-  // Refresh header totals without full re-render (preserve input focus)
+
+  // Refresh header totals without full re-render
   var dk = dkey(new Date());
   var tc = dayCals(dk);
   var mac = dayMacros(dk);
@@ -3237,10 +3290,14 @@ function generateShoppingList() {
         (meal.ingredients || []).forEach(function(ing) {
           var key = ing.name + '|' + ing.unit;
           var amt = (parseFloat(ing.amount) || 0) * portions;
-          var kcalPer100 = ing.calories || 0;
-          var ingKcal = kcalPer100 > 0
-            ? Math.round(kcalPer100 / 100 * amt)
-            : calcCals(ing.name, amt, ing.unit);
+          var ingKcal = 0;
+          if (ing.calories > 0) {
+            ingKcal = ing.calTotal
+              ? Math.round(ing.calories * portions)
+              : Math.round(ing.calories / 100 * amt);
+          } else {
+            ingKcal = calcCals(ing.name, amt, ing.unit);
+          }
           if (!combined[key]) {
             combined[key] = { name: ing.name, unit: ing.unit, totalAmt: 0, totalKcal: 0, usedIn: [] };
           }
@@ -3943,12 +4000,105 @@ var MY_RECIPES = [
   {id:'r_salmon_eggs', name:'Salmon and Eggs', mealType:'Breakfast',
    tags:{cuisine:[],effort:['Quick'],diet:['High Protein','Low Carb']},
    ingredients:[
-    {name:'Salmon Portions Skin Off', amount:'115', unit:'g',    calories:283, protein:22, carbs:0,  fat:21},
-    {name:'Egg',                      amount:'180', unit:'g',    calories:215, protein:19, carbs:1,  fat:14},
-    {name:'Olive Oil',                amount:'15',  unit:'g',    calories:133, protein:0,  carbs:0,  fat:15}
+    {name:'Salmon Portions Skin Off', amount:'1',   unit:'portion',    grams:115,  calories:283, protein:22, carbs:0,  fat:21, calTotal:true},
+    {name:'Egg',                      amount:'3',   unit:'large eggs', grams:180,  calories:215, protein:19, carbs:1,  fat:14, calTotal:true},
+    {name:'Olive Oil',                amount:'15',  unit:'g',          grams:15,   calories:133, protein:0,  carbs:0,  fat:15, calTotal:true}
+   ]},
+  {id:'r_sardine_sandwich', name:'Sardine Sandwich', mealType:'Breakfast',
+   tags:{cuisine:[],effort:['Quick'],diet:['High Protein']},
+   ingredients:[
+    {name:'Sardines in Spring Water', amount:'150', unit:'g',          grams:150,  calories:212, protein:32, carbs:0,  fat:9,  calTotal:true},
+    {name:'Avocado',                  amount:'0.5', unit:'avocado',    grams:75,   calories:144, protein:2,  carbs:5,  fat:13, calTotal:true},
+    {name:'Sourdough Bread',          amount:'60',  unit:'g',          grams:60,   calories:163, protein:6,  carbs:31, fat:1,  calTotal:true},
+    {name:'Mayo Kewpie',              amount:'10',  unit:'g',          grams:10,   calories:71,  protein:1,  carbs:0,  fat:7,  calTotal:true},
+    {name:'Butter',                   amount:'15',  unit:'g',          grams:15,   calories:108, protein:0,  carbs:0,  fat:12, calTotal:true}
+   ]},
+  {id:'r_boiled_egg_sourdough', name:'Boiled Egg Spread and Sourdough', mealType:'Snack',
+   tags:{cuisine:[],effort:['Quick'],diet:['High Protein']},
+   ingredients:[
+    {name:'Egg',                      amount:'6',   unit:'large eggs', grams:300,  calories:429, protein:38, carbs:2,  fat:29, calTotal:true},
+    {name:'Mayo Kewpie',              amount:'14',  unit:'g',          grams:14,   calories:100, protein:1,  carbs:0,  fat:10, calTotal:true},
+    {name:'Sourdough Bread',          amount:'60',  unit:'g',          grams:60,   calories:163, protein:6,  carbs:31, fat:1,  calTotal:true},
+    {name:'Butter',                   amount:'10',  unit:'g',          grams:10,   calories:72,  protein:0,  carbs:0,  fat:8,  calTotal:true}
+   ]},
+  {id:'r_mango_chia_oats', name:'Mango Chiaseed and Oats', mealType:'Snack',
+   tags:{cuisine:[],effort:['Quick'],diet:['High Protein']},
+   ingredients:[
+    {name:'Protein Powder',           amount:'1',   unit:'scoop',      grams:30,   calories:120, protein:25, carbs:2,  fat:2,  calTotal:true},
+    {name:'Soy Milk',                 amount:'200', unit:'ml',         grams:200,  calories:116, protein:8,  carbs:11, fat:4,  calTotal:true},
+    {name:'Black Chia Seeds',         amount:'15',  unit:'g',          grams:15,   calories:67,  protein:3,  carbs:1,  fat:5,  calTotal:true},
+    {name:'Rolled Oats',              amount:'30',  unit:'g',          grams:30,   calories:114, protein:4,  carbs:17, fat:3,  calTotal:true},
+    {name:'Mango Frozen',             amount:'100', unit:'g',          grams:100,  calories:60,  protein:1,  carbs:15, fat:0,  calTotal:true},
+    {name:'Peanut Butter',            amount:'15',  unit:'g',          grams:15,   calories:87,  protein:4,  carbs:2,  fat:7,  calTotal:true}
+   ]},
+  {id:'r_acai_bowl', name:'Acai Bowl Protein', mealType:'Snack',
+   tags:{cuisine:[],effort:['Quick'],diet:['High Protein']},
+   ingredients:[
+    {name:'Acai Energy',              amount:'100', unit:'g',          grams:100,  calories:106, protein:1,  carbs:15, fat:4,  calTotal:true},
+    {name:'Strawberry Slices Frozen', amount:'150', unit:'g',          grams:150,  calories:38,  protein:1,  carbs:6,  fat:0,  calTotal:true},
+    {name:'Soy Milk',                 amount:'200', unit:'ml',         grams:200,  calories:115, protein:8,  carbs:11, fat:4,  calTotal:true},
+    {name:'Greek Style Natural Yoghurt', amount:'480', unit:'g',       grams:480,  calories:414, protein:41, carbs:19, fat:19, calTotal:true},
+    {name:'Peanut Butter',            amount:'10',  unit:'g',          grams:10,   calories:58,  protein:3,  carbs:1,  fat:5,  calTotal:true}
+   ]},
+  {id:'r_mango_lassi', name:'Mango Lassi', mealType:'Snack',
+   tags:{cuisine:['Indian'],effort:['Quick'],diet:['High Protein']},
+   ingredients:[
+    {name:'Protein Yoghurt',          amount:'250', unit:'g',          grams:250,  calories:157, protein:25, carbs:12, fat:1,  calTotal:true},
+    {name:'Mango Frozen',             amount:'100', unit:'g',          grams:100,  calories:60,  protein:1,  carbs:15, fat:0,  calTotal:true},
+    {name:'Black Chia Seeds',         amount:'10',  unit:'g',          grams:10,   calories:45,  protein:2,  carbs:0,  fat:4,  calTotal:true}
+   ]},
+  {id:'r_korean_chicken_rice', name:'Korean Style Chicken and Rice', mealType:'Lunch',
+   tags:{cuisine:['Asian'],effort:['Moderate'],diet:['High Protein']},
+   ingredients:[
+    {name:'Chicken Leg Fillet',       amount:'250', unit:'g',          grams:250,  calories:295, protein:46, carbs:0,  fat:12, calTotal:true},
+    {name:'Rice Uncooked',            amount:'40',  unit:'g',          grams:40,   calories:142, protein:4,  carbs:31, fat:0,  calTotal:true},
+    {name:'Honey',                    amount:'7.5', unit:'g',          grams:7.5,  calories:23,  protein:0,  carbs:6,  fat:0,  calTotal:true},
+    {name:'Coconut Oil',              amount:'12.5',unit:'g',          grams:12.5, calories:104, protein:0,  carbs:0,  fat:13, calTotal:true},
+    {name:'Gochujang',                amount:'20',  unit:'g',          grams:20,   calories:45,  protein:1,  carbs:10, fat:0,  calTotal:true},
+    {name:'Capsicum',                 amount:'7',   unit:'cups chopped',grams:420, calories:58,  protein:3,  carbs:14, fat:1,  calTotal:true}
+   ]},
+  {id:'r_malai_afghani', name:'Malai Afghani Chicken', mealType:'Dinner',
+   tags:{cuisine:['Indian'],effort:['Moderate'],diet:['High Protein','Low Carb']},
+   ingredients:[
+    {name:'Chicken Fillet',           amount:'182', unit:'g',          grams:182,  calories:274, protein:56, carbs:0,  fat:6,  calTotal:true},
+    {name:'Ghee',                     amount:'4.5', unit:'g',          grams:4.5,  calories:40,  protein:0,  carbs:0,  fat:5,  calTotal:true},
+    {name:'Greek Style Natural Yoghurt', amount:'64', unit:'g',        grams:64,   calories:79,  protein:6,  carbs:3,  fat:6,  calTotal:true}
+   ]},
+  {id:'r_yogurt_rice', name:'Yogurt and Rice', mealType:'Dinner',
+   tags:{cuisine:['Indian'],effort:['Quick'],diet:['High Protein']},
+   ingredients:[
+    {name:'Rice Uncooked',            amount:'100', unit:'g',          grams:100,  calories:354, protein:9,  carbs:78, fat:0,  calTotal:true},
+    {name:'Ghee',                     amount:'2',   unit:'tsp',        grams:10,   calories:90,  protein:0,  carbs:0,  fat:10, calTotal:true},
+    {name:'Greek Style Plain Yoghurt',amount:'360', unit:'g',          grams:360,  calories:200, protein:33, carbs:15, fat:0,  calTotal:true},
+    {name:'Black Chia Seeds',         amount:'20',  unit:'g',          grams:20,   calories:86,  protein:4,  carbs:0,  fat:6,  calTotal:true}
+   ]},
+  {id:'r_lentils_rice', name:'Canned Lentils and Rice', mealType:'Dinner',
+   tags:{cuisine:[],effort:['Quick'],diet:['High Protein','Vegan']},
+   ingredients:[
+    {name:'Lentils',                  amount:'504', unit:'g',          grams:504,  calories:486, protein:39, carbs:66, fat:1,  calTotal:true},
+    {name:'Rice Uncooked',            amount:'40',  unit:'g',          grams:40,   calories:142, protein:4,  carbs:31, fat:0,  calTotal:true},
+    {name:'Ghee',                     amount:'10',  unit:'g',          grams:10,   calories:88,  protein:0,  carbs:0,  fat:10, calTotal:true}
+   ]},
+  {id:'r_high_protein_pizza', name:'High Protein Pizza', mealType:'Dinner',
+   tags:{cuisine:['Italian'],effort:['Moderate'],diet:['High Protein']},
+   ingredients:[
+    {name:'Hand Stretched Pizza Base',amount:'1',   unit:'pizza base', grams:125,  calories:294, protein:11, carbs:54, fat:4,  calTotal:true},
+    {name:'Pizza Sauce',              amount:'200', unit:'g',          grams:200,  calories:72,  protein:3,  carbs:12, fat:1,  calTotal:true},
+    {name:'Ghee',                     amount:'10',  unit:'g',          grams:10,   calories:44,  protein:0,  carbs:0,  fat:5,  calTotal:true},
+    {name:'Minced Chicken',           amount:'125', unit:'g',          grams:125,  calories:147, protein:23, carbs:0,  fat:6,  calTotal:true},
+    {name:'Shredded Tasty Cheese',    amount:'75',  unit:'g',          grams:75,   calories:312, protein:19, carbs:3,  fat:27, calTotal:true},
+    {name:'Capsicum',                 amount:'2',   unit:'cups chopped',grams:120, calories:33,  protein:2,  carbs:8,  fat:1,  calTotal:true}
+   ]},
+  {id:'r_cheesy_handi', name:'Cheesy Handi', mealType:'Dinner',
+   tags:{cuisine:['Indian'],effort:['Moderate'],diet:['High Protein']},
+   ingredients:[
+    {name:'Ghee',                     amount:'15',  unit:'ml',         grams:15,   calories:17,  protein:0,  carbs:0,  fat:2,  calTotal:true},
+    {name:'Chicken Fillet',           amount:'1.3', unit:'kg',         grams:1300, calories:235, protein:48, carbs:0,  fat:5,  calTotal:true},
+    {name:'Greek Style Light Yoghurt',amount:'200', unit:'g',          grams:200,  calories:22,  protein:1,  carbs:2,  fat:1,  calTotal:true},
+    {name:'Coconut Cream',            amount:'394', unit:'ml',         grams:394,  calories:141, protein:2,  carbs:2,  fat:14, calTotal:true},
+    {name:'Mozzarella Cheese Grated', amount:'250', unit:'g',          grams:250,  calories:94,  protein:8,  carbs:0,  fat:7,  calTotal:true}
    ]}
 ];
-
 function loadMyRecipes() {
   // Always start fresh — ignore any cached meal data
   localStorage.removeItem('mp4_meals_v2');
