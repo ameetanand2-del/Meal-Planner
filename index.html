@@ -848,6 +848,38 @@ select {
   <div class="modal" style="max-height:92vh;overflow-y:auto">
     <div class="modal-handle"></div>
     <div class="modal-title" id="m-plan-title">New Day Plan</div>
+
+    <!-- Today-style calorie + macro header — updates as meals are added -->
+    <div id="plan-summary-card" style="background:linear-gradient(145deg,#3B6EE0 0%,#2353C4 50%,#173A9A 100%);color:#fff;border-radius:var(--radius);padding:16px;margin-bottom:16px;box-shadow:0 4px 16px rgba(35,83,196,0.28);position:relative;overflow:hidden">
+      <div style="position:absolute;top:-20px;right:-20px;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,0.06);pointer-events:none"></div>
+      <div style="font-size:10px;font-weight:700;opacity:0.7;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Plan Total</div>
+      <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:8px">
+        <span id="plan-total-val" style="font-family:'DM Serif Display',serif;font-size:42px;font-weight:400;line-height:1">0</span>
+        <span style="font-size:14px;font-weight:500;opacity:0.75">kcal</span>
+        <span id="plan-target-lbl" style="font-size:12px;opacity:0.55;margin-left:2px"></span>
+      </div>
+      <!-- Progress bar (visible only if calorie target set) -->
+      <div id="plan-prog-wrap" style="display:none;height:5px;background:rgba(255,255,255,0.15);border-radius:3px;overflow:hidden;margin-bottom:12px">
+        <div id="plan-prog-fill" style="height:100%;background:rgba(255,255,255,0.9);border-radius:3px;transition:width 0.4s cubic-bezier(0.34,1.56,0.64,1);width:0%"></div>
+      </div>
+      <!-- Macro pills -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+        <div style="background:rgba(255,255,255,0.10);border-radius:11px;padding:8px 6px;text-align:center;border:1px solid rgba(255,255,255,0.14)">
+          <div id="plan-mac-p" style="font-family:'DM Serif Display',serif;font-size:18px;font-weight:400">0g</div>
+          <div style="font-size:9.5px;font-weight:600;opacity:0.70;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px">Protein</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.10);border-radius:11px;padding:8px 6px;text-align:center;border:1px solid rgba(255,255,255,0.14)">
+          <div id="plan-mac-c" style="font-family:'DM Serif Display',serif;font-size:18px;font-weight:400">0g</div>
+          <div style="font-size:9.5px;font-weight:600;opacity:0.70;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px">Carbs</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.10);border-radius:11px;padding:8px 6px;text-align:center;border:1px solid rgba(255,255,255,0.14)">
+          <div id="plan-mac-f" style="font-family:'DM Serif Display',serif;font-size:18px;font-weight:400">0g</div>
+          <div style="font-size:9.5px;font-weight:600;opacity:0.70;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px">Fat</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Plan details -->
     <div class="form-group"><label>Plan Name</label><input type="text" id="plan-name" placeholder="e.g. High Protein Day"></div>
     <div class="form-group"><label>Goal / Focus</label>
       <select id="plan-goal">
@@ -861,17 +893,23 @@ select {
     <div class="divider"></div>
     <label style="margin-bottom:10px;display:block">Meals by Slot</label>
     <div id="plan-slot-builder"></div>
-    <div class="row end" style="gap:10px;margin-top:8px"><button class="btn btn-ghost" onclick="closeM('m-plan')">Cancel</button><button class="btn btn-primary" onclick="savePlan()">Save Plan</button></div>
+    <div class="row end" style="gap:10px;margin-top:8px">
+      <button class="btn btn-ghost" onclick="closeM('m-plan')">Cancel</button>
+      <button class="btn btn-primary" onclick="savePlan()">Save Plan</button>
+    </div>
   </div>
 </div>
 
 <!-- PLAN MEAL PICKER -->
 <div class="modal-overlay" id="m-plan-pick">
-  <div class="modal">
+  <div class="modal" style="max-height:90vh;display:flex;flex-direction:column;overflow:hidden;padding-bottom:20px">
     <div class="modal-handle"></div>
-    <div class="modal-title" id="m-plan-pick-title">Add Meal to Slot</div>
-    <div id="m-plan-pick-list" style="max-height:360px;overflow-y:auto"></div>
-    <div class="row end" style="margin-top:14px"><button class="btn btn-ghost" onclick="closeM('m-plan-pick')">Cancel</button></div>
+    <div class="modal-title" id="m-plan-pick-title" style="flex-shrink:0">Add Meal to Slot</div>
+    <!-- Scrollable list including filters -->
+    <div id="m-plan-pick-list" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch"></div>
+    <div style="flex-shrink:0;padding-top:10px;border-top:1px solid var(--border-soft)">
+      <button class="btn btn-ghost btn-full" onclick="closeM('m-plan-pick')">Cancel</button>
+    </div>
   </div>
 </div>
 
@@ -1859,7 +1897,10 @@ function renderDayDetail(dk, wrap) {
 
   var hdr = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">';
   hdr += '<div style="font-family:\'DM Serif Display\',serif;font-size:16px;font-weight:400">' + d.toLocaleDateString('en',{weekday:'long',month:'short',day:'numeric'}) + '</div>';
-  hdr += '<div style="font-size:13px;font-weight:700;color:var(--accent)">' + tc + ' kcal</div></div>';
+  hdr += '<div style="display:flex;align-items:center;gap:8px">';
+  hdr += '<div style="font-size:13px;font-weight:700;color:var(--accent)">' + tc + ' kcal</div>';
+  hdr += '<button onclick="weekAddFullPlan(\'' + dk + '\')" style="font-size:11px;font-weight:700;color:var(--green);background:var(--green-light);border:1px solid rgba(14,138,95,0.25);border-radius:20px;padding:4px 10px;cursor:pointer;font-family:DM Sans,sans-serif;white-space:nowrap">📋 Day Plan</button>';
+  hdr += '</div></div>';
 
   var body = '';
   MT.forEach(function(mt) {
@@ -1876,9 +1917,10 @@ function renderDayDetail(dk, wrap) {
       slots.forEach(function(sl) {
         var m = getMeal(sl.mealId); if (!m) return;
         var cal = mealCals(m, sl.portions||1);
+        var mac2 = mealMacros(m, sl.portions||1);
         body += '<div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface2);border-radius:8px;padding:7px 10px;margin-bottom:4px;border:1px solid var(--border-soft)">';
         body += '<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+m.name+'</div>';
-        body += '<div style="font-size:11px;color:var(--accent);font-weight:700;margin-top:1px">'+cal+' kcal</div></div>';
+        body += '<div style="font-size:11px;color:var(--text3);margin-top:1px">'+cal+' kcal · P:'+mac2.p+'g C:'+mac2.c+'g F:'+mac2.f+'g</div></div>';
         body += '<button onclick="weekRemoveMeal(\''+dk+'\',\''+mt+'\',\''+sl.mealId+'\')" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:16px;padding:0 4px;flex-shrink:0;font-weight:700">✕</button>';
         body += '</div>';
       });
@@ -1891,55 +1933,196 @@ function renderDayDetail(dk, wrap) {
 }
 
 function weekAddMeal(dk, mt) {
-  // Open the assign modal but stay in weekly when done
   _weekAssignDK = dk;
   _weekAssignMT = mt;
   openWeekMealPicker(dk, mt);
 }
 
 var _weekAssignDK = null, _weekAssignMT = null;
+var _weekPickFilter = [];  // active tag filters in week picker
+
+function weekAddFullPlan(dk) {
+  // Show a modal to pick a full day plan and apply it to this day
+  var overlay = document.getElementById('m-week-plan-pick');
+  if (!overlay) {
+    var mo = document.createElement('div');
+    mo.id = 'm-week-plan-pick';
+    mo.className = 'modal-overlay';
+    mo.style.alignItems = 'flex-end';
+    mo.innerHTML = '<div class="modal" style="max-height:85vh;overflow-y:auto"><div class="modal-handle"></div>'
+      + '<div class="modal-title">Apply Day Plan</div>'
+      + '<div style="font-size:12px;color:var(--text3);margin-bottom:12px;line-height:1.6">All meals from the plan will be added to this day.</div>'
+      + '<div id="m-week-plan-list"></div>'
+      + '<div class="row end" style="margin-top:14px"><button class="btn btn-ghost" onclick="closeM(\'m-week-plan-pick\')">Cancel</button></div>'
+      + '</div>';
+    document.body.appendChild(mo);
+  }
+  var list = document.getElementById('m-week-plan-list');
+  list.innerHTML = '';
+  if (!mealPlans.length) {
+    list.innerHTML = '<div class="empty"><div class="empty-icon">📋</div><div class="empty-title">No day plans yet</div><div class="empty-sub">Create day plans in the Meals tab first</div></div>';
+  } else {
+    mealPlans.forEach(function(mp) {
+      var totalCal = 0;
+      var totalMeals = 0;
+      MT.forEach(function(mt) {
+        ((mp.slots && mp.slots[mt]) || []).forEach(function(entry) {
+          var m = getMeal(entry.mealId || entry);
+          if (m) { totalCal += mealCals(m); totalMeals++; }
+        });
+      });
+      var macTot = {p:0,c:0,f:0};
+      MT.forEach(function(mt) {
+        ((mp.slots && mp.slots[mt]) || []).forEach(function(entry) {
+          var m = getMeal(entry.mealId || entry);
+          if (m) { var mac2 = mealMacros(m); macTot.p+=mac2.p; macTot.c+=mac2.c; macTot.f+=mac2.f; }
+        });
+      });
+      var card = document.createElement('div');
+      card.style.cssText = 'background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:13px 14px;margin-bottom:8px;cursor:pointer';
+      card.innerHTML = '<div style="font-family:\'DM Serif Display\',serif;font-size:16px;font-weight:400;margin-bottom:4px">' + mp.name + '</div>'
+        + '<div style="font-size:12px;color:var(--text2)">' + totalMeals + ' meals · ' + totalCal + ' kcal</div>'
+        + '<div style="font-size:11px;color:var(--text3);margin-top:2px">P:' + macTot.p + 'g C:' + macTot.c + 'g F:' + macTot.f + 'g' + (mp.goal ? ' · ' + mp.goal : '') + '</div>';
+      card.onclick = function() {
+        applyWeekPlan(dk, mp);
+        closeM('m-week-plan-pick');
+      };
+      list.appendChild(card);
+    });
+  }
+  document.getElementById('m-week-plan-pick').classList.add('open');
+}
+
+function applyWeekPlan(dk, mp) {
+  if (!plan[dk]) plan[dk] = {};
+  MT.forEach(function(mt) {
+    if (!plan[dk][mt]) plan[dk][mt] = [];
+    ((mp.slots && mp.slots[mt]) || []).forEach(function(entry) {
+      var mealId = entry.mealId || entry;
+      plan[dk][mt].push({mealId: mealId, portions: entry.portions || 1});
+    });
+  });
+  save();
+  renderWeek();
+  showToast(mp.name + ' applied ✓');
+}
 
 function openWeekMealPicker(dk, mt) {
+  _weekPickFilter = [];
   var existing = (plan[dk] && plan[dk][mt]) ? plan[dk][mt].map(function(s){ return s.mealId; }) : [];
   var overlay = document.getElementById('m-week-pick');
   if (!overlay) {
-    // Create modal if not exists
     var mo = document.createElement('div');
     mo.id = 'm-week-pick';
     mo.className = 'modal-overlay';
     mo.style.alignItems = 'flex-end';
-    mo.innerHTML = '<div class="modal"><div class="modal-handle"></div>'
+    mo.innerHTML = '<div class="modal" style="max-height:90vh;overflow-y:auto"><div class="modal-handle"></div>'
       + '<div class="modal-title" id="m-week-pick-title">Add to Slot</div>'
-      + '<div id="m-week-pick-list" style="max-height:340px;overflow-y:auto"></div>'
+      + '<div id="m-week-pick-filters" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:10px;scrollbar-width:none"></div>'
+      + '<div id="m-week-pick-list"></div>'
       + '<div class="row end" style="margin-top:14px"><button class="btn btn-ghost" onclick="closeM(\'m-week-pick\')">Cancel</button></div>'
       + '</div>';
     document.body.appendChild(mo);
   }
   document.getElementById('m-week-pick-title').textContent = 'Add to ' + mt;
-  var list = document.getElementById('m-week-pick-list');
-  list.innerHTML = '';
   var d = parseDK(dk);
   var dateStr = d.toLocaleDateString('en',{weekday:'short',month:'short',day:'numeric'});
+  renderWeekPickerFilters(dk, mt, existing, dateStr);
+  document.getElementById('m-week-pick').classList.add('open');
+}
+
+function renderWeekPickerFilters(dk, mt, existing, dateStr) {
+  // Build tag set from all meals
+  var tags = new Set(['All']);
   meals.forEach(function(m) {
+    var t = m.tags || {};
+    if (t.mealType) tags.add(t.mealType);
+    if (t.cuisine)  tags.add(t.cuisine);
+    if (t.effort)   tags.add(t.effort);
+    (t.diet || []).forEach(function(d){ tags.add(d); });
+  });
+  // Also add mealType as a tag based on meal's mealType field
+  meals.forEach(function(m){ if (m.mealType) tags.add(m.mealType); });
+
+  var filtersEl = document.getElementById('m-week-pick-filters');
+  filtersEl.innerHTML = '';
+  Array.from(tags).forEach(function(tag) {
+    var isAll = tag === 'All';
+    var isActive = isAll ? _weekPickFilter.length === 0 : _weekPickFilter.indexOf(tag) >= 0;
+    var pill = document.createElement('button');
+    pill.style.cssText = 'flex-shrink:0;padding:6px 13px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif;white-space:nowrap;border:1.5px solid;transition:all 0.14s;'
+      + (isActive
+        ? 'background:var(--accent);color:#fff;border-color:var(--accent);'
+        : 'background:var(--surface);color:var(--text3);border-color:var(--border);');
+    pill.textContent = tag;
+    pill.onclick = function() {
+      if (isAll) {
+        _weekPickFilter = [];
+      } else {
+        var idx = _weekPickFilter.indexOf(tag);
+        if (idx >= 0) _weekPickFilter.splice(idx, 1);
+        else _weekPickFilter.push(tag);
+      }
+      renderWeekPickerFilters(dk, mt, existing, dateStr);
+    };
+    filtersEl.appendChild(pill);
+  });
+
+  renderWeekPickerMeals(dk, mt, existing, dateStr);
+}
+
+function renderWeekPickerMeals(dk, mt, existing, dateStr) {
+  var list = document.getElementById('m-week-pick-list');
+  list.innerHTML = '';
+
+  // Filter meals by active tags
+  var filtered = meals.filter(function(m) {
+    if (_weekPickFilter.length === 0) return true;
+    var t = m.tags || {};
+    return _weekPickFilter.every(function(tag) {
+      return (m.mealType === tag)
+        || (t.cuisine === tag)
+        || (t.effort === tag)
+        || ((t.diet || []).indexOf(tag) >= 0);
+    });
+  });
+
+  if (!filtered.length) {
+    list.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text3);font-size:13px">No meals match these filters</div>';
+    return;
+  }
+
+  filtered.forEach(function(m) {
     var alreadyAdded = existing.indexOf(m.id) >= 0;
     var cal = mealCals(m);
     var mac = mealMacros(m);
     var card = document.createElement('div');
     card.style.cssText = 'padding:12px 14px;border-bottom:1px solid var(--border-soft);cursor:pointer;'
-      + (alreadyAdded ? 'opacity:0.5;' : '');
+      + (alreadyAdded ? 'opacity:0.55;' : '');
     card.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between">'
-      + '<div style="flex:1"><div style="font-size:13.5px;font-weight:600;color:var(--text)">' + m.name + (alreadyAdded ? ' <span style="font-size:10px;color:var(--yellow);font-weight:700">already added</span>' : '') + '</div>'
-      + '<div style="font-size:11.5px;color:var(--text3);margin-top:2px">' + cal + ' kcal · P:' + mac.p + 'g C:' + mac.c + 'g F:' + mac.f + 'g</div></div>'
-      + '<div style="font-size:11px;font-weight:700;color:var(--accent);margin-left:8px">' + (alreadyAdded ? 'Add again?' : '+ Add') + '</div></div>';
+      + '<div style="flex:1;min-width:0">'
+      + '<div style="font-size:13.5px;font-weight:600;color:var(--text)">' + m.name
+      + (alreadyAdded ? ' <span style="font-size:10px;color:var(--yellow);font-weight:700">already added</span>' : '') + '</div>'
+      + '<div style="font-size:11.5px;color:var(--text3);margin-top:3px">'
+      + cal + ' kcal &nbsp;·&nbsp; P:<strong>' + mac.p + '</strong>g C:<strong>' + mac.c + '</strong>g F:<strong>' + mac.f + '</strong>g</div>'
+      + '</div>'
+      + '<div style="font-size:11px;font-weight:700;color:var(--accent);margin-left:10px;flex-shrink:0">'
+      + (alreadyAdded ? 'Add again?' : '+ Add') + '</div></div>';
     card.onclick = function() {
       if (alreadyAdded) {
-        if (!confirm('"' + m.name + '" is already in ' + mt + ' on ' + dateStr + '. Add another one?')) return;
+        // Use inline confirm modal instead of confirm()
+        document.getElementById('m-confirm-msg').textContent = '"' + m.name + '" is already in ' + mt + ' on ' + dateStr + '. Add another one?';
+        document.getElementById('m-confirm-yes').onclick = function() {
+          closeM('m-confirm');
+          weekAssignMeal(dk, mt, m.id);
+        };
+        document.getElementById('m-confirm').classList.add('open');
+        return;
       }
       weekAssignMeal(dk, mt, m.id);
     };
     list.appendChild(card);
   });
-  document.getElementById('m-week-pick').classList.add('open');
 }
 
 function weekAssignMeal(dk, mt, mealId) {
@@ -2563,6 +2746,7 @@ function openNewPlan(){
   document.getElementById('plan-notes').value='';
   planSlotState={Breakfast:[],Lunch:[],Dinner:[],Snack:[]};
   buildPlanSlotUI();
+  updatePlanTotals();
   document.getElementById('m-plan').classList.add('open');
 }
 
@@ -2577,6 +2761,7 @@ function openEditPlan(id){
   planSlotState={Breakfast:[],Lunch:[],Dinner:[],Snack:[]};
   MT.forEach(function(mt){ planSlotState[mt]=(mp.slots[mt]||[]).map(function(e){return Object.assign({},e);}); });
   buildPlanSlotUI();
+  updatePlanTotals();
   document.getElementById('m-plan').classList.add('open');
 }
 
@@ -2601,10 +2786,15 @@ function renderPlanSlotMeals(mt){
   var entries=planSlotState[mt]||[];
   entries.forEach(function(entry,i){
     var m=getMeal(entry.mealId); if(!m)return;
+    var cal=mealCals(m,entry.portions||1);
+    var mac=mealMacros(m,entry.portions||1);
     var row=document.createElement('div'); row.className='mp-meal-row'; row.style.marginBottom='4px';
-    row.innerHTML='<div class="mp-meal-name">'+m.name+'</div><div class="mp-meal-kcal">'+mealCals(m,entry.portions||1)+' kcal</div>';
+    row.innerHTML='<div style="flex:1;min-width:0">'
+      +'<div class="mp-meal-name">'+m.name+'</div>'
+      +'<div style="font-size:10.5px;color:var(--text3);margin-top:1px">'+cal+' kcal · P:'+mac.p+'g C:'+mac.c+'g F:'+mac.f+'g</div>'
+      +'</div>';
     var rm=document.createElement('button'); rm.className='mp-meal-rm'; rm.textContent='\u2715';
-    (function(slot,idx){rm.addEventListener('click',function(){ planSlotState[slot].splice(idx,1); renderPlanSlotMeals(slot); });})(mt,i);
+    (function(slot,idx){rm.addEventListener('click',function(){ planSlotState[slot].splice(idx,1); renderPlanSlotMeals(slot); updatePlanTotals(); });})(mt,i);
     row.appendChild(rm); area.appendChild(row);
   });
   var addBtn=document.createElement('button'); addBtn.className='mp-add-meal-btn';
@@ -2613,21 +2803,89 @@ function renderPlanSlotMeals(mt){
   area.appendChild(addBtn);
 }
 
+var _planPickFilter = [];
+
 function openPlanMealPicker(mt){
-  planPickSlot=mt;
-  document.getElementById('m-plan-pick-title').textContent='Add to '+mt;
-  var list=document.getElementById('m-plan-pick-list'); list.innerHTML='';
-  if(!meals.length){
-    list.innerHTML='<div class="empty"><div class="empty-icon">\uD83C\uDF7D\uFE0F</div><div class="empty-title">No meals yet</div></div>';
-  } else {
-    meals.forEach(function(m){
-      var card=document.createElement('div'); card.className='card'; card.style.cssText='cursor:pointer;margin-bottom:8px;padding:12px 14px';
-      card.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-family:DM Serif Display,serif;font-size:14px;font-weight:700">'+m.name+'</div><div style="font-size:11px;color:var(--text3);margin-top:2px">'+m.ingredients.length+' ingredients</div></div><span class="badge">'+mealCals(m)+' kcal</span></div>';
-      (function(mid){ card.addEventListener('click',function(){ addMealToPlanSlot(mid); }); })(m.id);
-      list.appendChild(card);
-    });
-  }
+  _planPickFilter = [];
+  planPickSlot = mt;
+  document.getElementById('m-plan-pick-title').textContent = 'Add to ' + mt;
+  renderPlanPickList();
   document.getElementById('m-plan-pick').classList.add('open');
+}
+
+function renderPlanPickList() {
+  var list = document.getElementById('m-plan-pick-list');
+  list.innerHTML = '';
+
+  if (!meals.length) {
+    list.innerHTML = '<div class="empty"><div class="empty-icon">🍽️</div><div class="empty-title">No meals yet</div></div>';
+    return;
+  }
+
+  // Build tag filters
+  var tags = new Set(['All']);
+  meals.forEach(function(m) {
+    var t = m.tags || {};
+    if (m.mealType) tags.add(m.mealType);
+    if (t.cuisine)  tags.add(t.cuisine);
+    if (t.effort)   tags.add(t.effort);
+    (t.diet || []).forEach(function(d){ tags.add(d); });
+  });
+
+  // Filter row
+  var filterRow = document.createElement('div');
+  filterRow.style.cssText = 'display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:10px;scrollbar-width:none';
+  Array.from(tags).forEach(function(tag) {
+    var isActive = tag === 'All' ? _planPickFilter.length === 0 : _planPickFilter.indexOf(tag) >= 0;
+    var pill = document.createElement('button');
+    pill.style.cssText = 'flex-shrink:0;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif;white-space:nowrap;border:1.5px solid;'
+      + (isActive ? 'background:var(--accent);color:#fff;border-color:var(--accent);' : 'background:var(--surface);color:var(--text3);border-color:var(--border);');
+    pill.textContent = tag;
+    pill.onclick = function() {
+      if (tag === 'All') { _planPickFilter = []; }
+      else {
+        var idx = _planPickFilter.indexOf(tag);
+        if (idx >= 0) _planPickFilter.splice(idx, 1); else _planPickFilter.push(tag);
+      }
+      renderPlanPickList();
+    };
+    filterRow.appendChild(pill);
+  });
+  list.appendChild(filterRow);
+
+  // Filter meals
+  var filtered = meals.filter(function(m) {
+    if (_planPickFilter.length === 0) return true;
+    var t = m.tags || {};
+    return _planPickFilter.every(function(tag) {
+      return (m.mealType === tag) || (t.cuisine === tag) || (t.effort === tag) || ((t.diet||[]).indexOf(tag) >= 0);
+    });
+  });
+
+  if (!filtered.length) {
+    var empty = document.createElement('div');
+    empty.style.cssText = 'text-align:center;padding:20px;color:var(--text3);font-size:13px';
+    empty.textContent = 'No meals match these filters';
+    list.appendChild(empty);
+    return;
+  }
+
+  filtered.forEach(function(m) {
+    var cal  = mealCals(m);
+    var mac  = mealMacros(m);
+    var card = document.createElement('div');
+    card.style.cssText = 'padding:12px 14px;border-bottom:1px solid var(--border-soft);cursor:pointer';
+    card.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between">'
+      + '<div style="flex:1;min-width:0">'
+      + '<div style="font-size:13.5px;font-weight:600;color:var(--text)">' + m.name + '</div>'
+      + '<div style="font-size:11.5px;color:var(--text3);margin-top:3px">'
+      + cal + ' kcal &nbsp;·&nbsp; P:<strong>' + mac.p + '</strong>g C:<strong>' + mac.c + '</strong>g F:<strong>' + mac.f + '</strong>g</div>'
+      + '</div>'
+      + '<div style="font-size:11px;font-weight:700;color:var(--accent);flex-shrink:0;margin-left:10px">+ Add</div>'
+      + '</div>';
+    (function(mid){ card.addEventListener('click', function(){ addMealToPlanSlot(mid); }); })(m.id);
+    list.appendChild(card);
+  });
 }
 
 function addMealToPlanSlot(mealId){
@@ -2635,6 +2893,46 @@ function addMealToPlanSlot(mealId){
   planSlotState[planPickSlot].push({mealId:mealId,portions:1});
   closeM('m-plan-pick');
   renderPlanSlotMeals(planPickSlot);
+  updatePlanTotals();
+}
+
+function updatePlanTotals() {
+  var totalCal = 0, totalP = 0, totalC = 0, totalF = 0;
+  MT.forEach(function(mt) {
+    (planSlotState[mt] || []).forEach(function(entry) {
+      var m = getMeal(entry.mealId); if (!m) return;
+      totalCal += mealCals(m, entry.portions||1);
+      var mac = mealMacros(m, entry.portions||1);
+      totalP += mac.p; totalC += mac.c; totalF += mac.f;
+    });
+  });
+
+  // Update big calorie number
+  var tv = document.getElementById('plan-total-val');
+  if (tv) tv.textContent = totalCal;
+
+  // Update macro pills
+  var mp = document.getElementById('plan-mac-p');
+  var mc = document.getElementById('plan-mac-c');
+  var mf = document.getElementById('plan-mac-f');
+  if (mp) mp.textContent = totalP + 'g';
+  if (mc) mc.textContent = totalC + 'g';
+  if (mf) mf.textContent = totalF + 'g';
+
+  // Update progress bar vs calorie target
+  var tgtCal = targets.kcal || 0;
+  var tgtLbl = document.getElementById('plan-target-lbl');
+  var progWrap = document.getElementById('plan-prog-wrap');
+  var progFill = document.getElementById('plan-prog-fill');
+  if (tgtCal > 0) {
+    if (tgtLbl) tgtLbl.textContent = '/ ' + tgtCal + ' target';
+    var pct = Math.min(100, Math.round(totalCal / tgtCal * 100));
+    if (progWrap) progWrap.style.display = 'block';
+    if (progFill) progFill.style.width = pct + '%';
+  } else {
+    if (tgtLbl) tgtLbl.textContent = '';
+    if (progWrap) progWrap.style.display = 'none';
+  }
 }
 
 function savePlan(){
