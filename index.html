@@ -603,6 +603,7 @@ select {
   <div class="tog-bar" style="margin-bottom:10px">
     <button class="ctbtn active" id="trendtog-nutrition" onclick="setTrendsTab('nutrition')">&#x1F4CA; Nutrition</button>
     <button class="ctbtn" id="trendtog-weight" onclick="setTrendsTab('weight')">&#x2696;&#xFE0F; Weight</button>
+    <button class="ctbtn" id="trendtog-notes" onclick="setTrendsTab('notes')">&#x1F4D3; Notes</button>
   </div>
   <!-- Nutrition controls -->
   <div id="nutrition-controls" style="display:flex;gap:8px;margin-bottom:12px;align-items:center;flex-wrap:wrap">
@@ -1007,6 +1008,44 @@ select {
   </div>
 </div>
 
+<!-- COMPLETE DAY MODAL -->
+<div class="modal-overlay" id="m-complete-day" style="align-items:flex-end">
+  <div class="modal" style="overflow-y:auto;max-height:90vh">
+    <div class="modal-handle"></div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+      <div style="width:36px;height:36px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">✓</div>
+      <div>
+        <div style="font-family:'DM Serif Display',serif;font-size:20px;font-weight:400">Complete your day</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:1px" id="m-cd-date"></div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.65">
+      Reflect on how today went. What worked? What didn't? What would you change next time?
+    </div>
+
+    <!-- Prompts -->
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px" id="cd-prompts">
+      <button onclick="cdAddPrompt('✅ What worked well today')" style="padding:6px 12px;background:var(--green-light);color:var(--green);border:1px solid rgba(14,138,95,0.25);border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif">✅ What worked</button>
+      <button onclick="cdAddPrompt('❌ What didn\'t work')" style="padding:6px 12px;background:var(--red-light);color:var(--red);border:1px solid rgba(196,56,56,0.2);border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif">❌ What didn't work</button>
+      <button onclick="cdAddPrompt('🔄 What to change next time')" style="padding:6px 12px;background:var(--yellow-light);color:var(--yellow);border:1px solid rgba(176,120,0,0.2);border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif">🔄 Change next time</button>
+      <button onclick="cdAddPrompt('💡 Notes')" style="padding:6px 12px;background:var(--blue-light);color:var(--blue);border:1px solid rgba(35,83,196,0.2);border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif">💡 Notes</button>
+    </div>
+
+    <div class="form-group">
+      <label>Your notes</label>
+      <textarea id="cd-notes" placeholder="e.g. Salmon and eggs kept me full until lunch. Skipped the snack — wasn't hungry. Should prep the Korean chicken the night before..." style="height:160px;resize:none;font-size:14px;line-height:1.65"></textarea>
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:4px">
+      <button class="btn btn-ghost" style="flex:1" onclick="closeM('m-complete-day')">Cancel</button>
+      <button class="btn btn-primary" style="flex:1" onclick="saveCompleteDay()">✓ Save & Complete</button>
+    </div>
+  </div>
+</div>
+
 <!-- CONFIRM SAVE MODAL -->
 <div class="modal-overlay" id="m-confirm" style="align-items:center;justify-content:center">
   <div class="modal" style="border-radius:var(--radius);margin:0 24px;width:calc(100% - 48px);padding:28px 24px 24px">
@@ -1111,6 +1150,7 @@ function save() {
   localStorage.setItem('mos_goal',    JSON.stringify(userGoal));
   localStorage.setItem('mp4_mood',    JSON.stringify(moodLogs));
   localStorage.setItem('mp4_journal', JSON.stringify(journalLogs));
+  localStorage.setItem('mp4_daynotes',JSON.stringify(dayNotes));
 }
 
 // ── UTILITIES ─────────────────────────────────────────────────
@@ -1408,12 +1448,66 @@ function renderToday() {
     h += '</div></div>';
   });
 
+  // ── Complete Day card
+  var note = dayNotes[dk] || null;
+  var isCompleted = note && note.completed;
+  h += '<div style="margin-top:14px;background:var(--surface);border-radius:var(--radius);border:1.5px solid ' + (isCompleted ? 'var(--green)' : 'var(--border-soft)') + ';box-shadow:var(--shadow);overflow:hidden">';
+  h += '<div style="padding:14px 15px">';
+  h += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:' + (isCompleted ? '10px' : '0') + '">';
+  h += '<div style="display:flex;align-items:center;gap:8px">';
+  h += '<div style="width:32px;height:32px;border-radius:50%;background:' + (isCompleted ? 'var(--green)' : 'var(--surface2)') + ';border:1.5px solid ' + (isCompleted ? 'var(--green)' : 'var(--border)') + ';display:flex;align-items:center;justify-content:center;font-size:15px">' + (isCompleted ? '✓' : '📝') + '</div>';
+  h += '<div><div style="font-size:14px;font-weight:700;color:' + (isCompleted ? 'var(--green)' : 'var(--text)') + '">' + (isCompleted ? 'Day completed' : 'Complete your day') + '</div>';
+  h += '<div style="font-size:11px;color:var(--text3);margin-top:1px">' + (isCompleted ? 'Tap to edit your notes' : 'Add notes on what worked and what to change') + '</div></div>';
+  h += '</div>';
+  h += '<button onclick="openCompleteDay(\'' + dk + '\')" style="padding:8px 14px;background:' + (isCompleted ? 'var(--green-light)' : 'linear-gradient(135deg,var(--accent2),var(--accent))') + ';color:' + (isCompleted ? 'var(--green)' : '#fff') + ';border:' + (isCompleted ? '1.5px solid rgba(14,138,95,0.3)' : 'none') + ';border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">' + (isCompleted ? '✎ Edit' : '✓ Complete Day') + '</button>';
+  h += '</div>';
+  if (isCompleted && note.text) {
+    h += '<div style="padding:10px 14px;background:var(--green-light);border-top:1px solid rgba(14,138,95,0.15)">';
+    h += '<div style="font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:4px">Your notes</div>';
+    h += '<div style="font-size:13px;color:var(--text);line-height:1.6;white-space:pre-wrap">' + note.text + '</div>';
+    h += '</div>';
+  }
+  h += '</div>';
+
   document.getElementById('today-wrap').innerHTML = h;
 }
 
 function shiftToday(dir) {
   todayOffset += dir;
   renderToday();
+}
+
+// ── COMPLETE DAY ──────────────────────────────────────────────
+var _completeDayDK = null;
+
+function openCompleteDay(dk) {
+  _completeDayDK = dk;
+  var d = parseDK(dk);
+  var label = d.toLocaleDateString('en', {weekday:'long', month:'long', day:'numeric', year:'numeric'});
+  document.getElementById('m-cd-date').textContent = label;
+  // Pre-fill existing note if any
+  var existing = dayNotes[dk];
+  document.getElementById('cd-notes').value = existing ? existing.text || '' : '';
+  document.getElementById('m-complete-day').classList.add('open');
+}
+
+function cdAddPrompt(text) {
+  var ta = document.getElementById('cd-notes');
+  var cur = ta.value.trim();
+  ta.value = cur ? cur + '\n\n' + text + ':\n' : text + ':\n';
+  ta.focus();
+  ta.setSelectionRange(ta.value.length, ta.value.length);
+}
+
+function saveCompleteDay() {
+  var dk = _completeDayDK;
+  if (!dk) return;
+  var text = document.getElementById('cd-notes').value.trim();
+  dayNotes[dk] = { completed: true, text: text, savedAt: new Date().toISOString() };
+  save();
+  closeM('m-complete-day');
+  renderToday();
+  showToast('Day completed ✓');
 }
 
 
@@ -2003,6 +2097,7 @@ let userGoal   = JSON.parse(localStorage.getItem('mos_goal')    || '{"goalType":
 let libTab       = 'meals';
 let moodLogs    = JSON.parse(localStorage.getItem('mp4_mood')    || '[]');
 let journalLogs = JSON.parse(localStorage.getItem('mp4_journal') || '[]');
+let dayNotes    = JSON.parse(localStorage.getItem('mp4_daynotes') || '{}');
 var _selectedMood = '';
 let mFilter      = 'All';
 let dbCat        = 'All';
@@ -2891,18 +2986,78 @@ function renderWeightView() {
 function renderTrends() {
   var wrap = document.getElementById('trends-wrap');
   if (!wrap) return;
-  // Sync controls visibility
   var nc = document.getElementById('nutrition-controls');
   var wc = document.getElementById('weight-controls');
   if (nc) nc.style.display = trendsTab === 'nutrition' ? 'flex' : 'none';
   if (wc) wc.style.display = trendsTab === 'weight'   ? 'block' : 'none';
-  // Sync tab buttons
-  ['nutrition','weight'].forEach(function(t){
+  ['nutrition','weight','notes'].forEach(function(t){
     var el = document.getElementById('trendtog-' + t);
     if (el) el.classList.toggle('active', t === trendsTab);
   });
   if (trendsTab === 'weight') { wrap.innerHTML = renderWeightView(); return; }
+  if (trendsTab === 'notes')  { wrap.innerHTML = renderTrendsNotes(); return; }
   wrap.innerHTML = renderNutritionTrends();
+}
+
+function renderTrendsNotes() {
+  // Collect all completed days that have notes, sorted newest first
+  var entries = Object.keys(dayNotes)
+    .filter(function(dk) { return dayNotes[dk] && dayNotes[dk].completed; })
+    .sort(function(a, b) { return b.localeCompare(a); });
+
+  if (!entries.length) {
+    return '<div class="empty" style="padding:50px 20px">'
+      + '<div class="empty-icon">📓</div>'
+      + '<div class="empty-title">No day notes yet</div>'
+      + '<div class="empty-sub">Complete a day from the Today tab to start building your notes log</div>'
+      + '</div>';
+  }
+
+  var h = '<div style="font-size:12px;color:var(--text3);margin-bottom:12px">'
+    + entries.length + ' completed day' + (entries.length > 1 ? 's' : '') + ' with notes</div>';
+
+  entries.forEach(function(dk) {
+    var note = dayNotes[dk];
+    var d = parseDK(dk);
+    var isToday = dk === dkey(new Date());
+    var dateLabel = isToday
+      ? 'Today — ' + d.toLocaleDateString('en', {month:'long', day:'numeric', year:'numeric'})
+      : d.toLocaleDateString('en', {weekday:'long', month:'long', day:'numeric', year:'numeric'});
+
+    // Day summary stats
+    var tc  = dayCals(dk);
+    var mac = dayMacros(dk);
+
+    h += '<div style="background:var(--surface);border-radius:var(--radius);border:1px solid var(--border-soft);box-shadow:var(--shadow);margin-bottom:10px;overflow:hidden">';
+
+    // Header
+    h += '<div style="padding:12px 14px;border-bottom:1px solid var(--border-soft);display:flex;align-items:center;justify-content:space-between">';
+    h += '<div>';
+    h += '<div style="font-family:\'DM Serif Display\',serif;font-size:15px;font-weight:400">' + dateLabel + '</div>';
+    if (tc > 0) {
+      h += '<div style="font-size:11px;color:var(--text3);margin-top:2px">'
+        + tc + ' kcal · P:' + mac.p + 'g C:' + mac.c + 'g F:' + mac.f + 'g</div>';
+    }
+    h += '</div>';
+    h += '<div style="display:flex;align-items:center;gap:6px">';
+    h += '<div style="width:24px;height:24px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;flex-shrink:0">✓</div>';
+    h += '<button onclick="openCompleteDay(\'' + dk + '\')" style="font-size:11px;font-weight:700;color:var(--text3);background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:3px 10px;cursor:pointer;font-family:DM Sans,sans-serif">Edit</button>';
+    h += '</div>';
+    h += '</div>';
+
+    // Note body
+    if (note.text) {
+      h += '<div style="padding:12px 14px">';
+      h += '<div style="font-size:13px;color:var(--text);line-height:1.7;white-space:pre-wrap">' + note.text + '</div>';
+      h += '</div>';
+    } else {
+      h += '<div style="padding:12px 14px;font-size:12px;color:var(--text3);font-style:italic">No notes written</div>';
+    }
+
+    h += '</div>';
+  });
+
+  return h;
 }
 
 function renderNutritionTrends() {
@@ -3529,11 +3684,10 @@ function delWeightLog(date) {
 // ── TREND CONTROLS ───────────────────────────────────────────
 function setTrendsTab(tab) {
   trendsTab = tab;
-  ['nutrition','weight'].forEach(function(t){
+  ['nutrition','weight','notes'].forEach(function(t){
     var el = document.getElementById('trendtog-' + t);
     if (el) el.classList.toggle('active', t === tab);
   });
-  // Show correct controls
   var nc = document.getElementById('nutrition-controls');
   var wc = document.getElementById('weight-controls');
   if (nc) nc.style.display = tab === 'nutrition' ? 'flex'  : 'none';
