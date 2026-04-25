@@ -327,28 +327,32 @@ select {
 .cal-nav    { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
 .cal-nav-lbl { font-family:'DM Serif Display',serif; font-size:17px; font-weight:400; }
 
-.dhdr-row   { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; margin-bottom:5px; }
-.dhdr       { font-size:9px; font-weight:700; text-align:center; color:var(--text4); text-transform:uppercase; letter-spacing:0.5px; }
-.week-grid  { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; margin-bottom:14px; }
+.dhdr-row   { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; margin-bottom:5px; }
+.dhdr       { font-size:10px; font-weight:800; text-align:center; color:var(--text3); text-transform:uppercase; letter-spacing:0.5px; }
+.week-grid  { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; margin-bottom:14px; }
 .wcell {
   background:var(--surface); border:1.5px solid var(--border-soft);
-  border-radius:11px; padding:4px 3px 5px; cursor:pointer;
-  min-height:78px; box-shadow:var(--shadow-xs);
+  border-radius:11px; padding:6px 4px 6px; cursor:pointer;
+  min-height:110px; box-shadow:var(--shadow-xs);
   display:flex; flex-direction:column; overflow:hidden;
   transition:border-color 0.15s, box-shadow 0.15s;
 }
-.wcell.today { border-color:var(--accent); background:var(--accent-light); }
+.wcell.today { border-color:var(--accent); background:rgba(193,98,47,0.06); }
 .wcell.sel   { border-color:var(--accent); border-width:2.5px; box-shadow:0 2px 10px var(--accent-glow); }
 .wcell.pm    { border-color:var(--blue); background:var(--blue-light); }
-.wnum        { font-size:11px; font-weight:700; color:var(--text); text-align:center; margin-bottom:3px; flex-shrink:0; }
+.wnum        { font-size:12px; font-weight:800; color:var(--text); text-align:center; margin-bottom:4px; flex-shrink:0; }
 .wcell.today .wnum,.wcell.sel .wnum { color:var(--accent); }
-.wchips      { display:flex; flex-direction:column; gap:2px; flex:1; overflow:hidden; }
-.wchip       { border-radius:3px; padding:2px 3px; font-size:7px; font-weight:700; line-height:1.3; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:#fff; }
-.wchip-B { background:var(--accent); }
-.wchip-L { background:var(--blue); }
-.wchip-D { background:var(--green); }
-.wchip-S { background:var(--purple); }
-.wmore   { font-size:7px; color:var(--text3); font-weight:700; text-align:center; margin-top:1px; }
+.wchips      { display:flex; flex-direction:column; gap:3px; flex:1; overflow:hidden; }
+.wchip       { border-radius:4px; padding:3px 4px; font-size:8px; font-weight:700; line-height:1.25; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; display:flex; align-items:center; gap:2px; }
+.wchip-B { background:#fff3e6; color:#c1622f; border:1px solid rgba(193,98,47,0.2); }
+.wchip-L { background:#e8f4fd; color:#2a7ab5; border:1px solid rgba(42,122,181,0.2); }
+.wchip-D { background:#eaf5ee; color:#2e7d52; border:1px solid rgba(46,125,82,0.2); }
+.wchip-S { background:#f3eafa; color:#7c5a9e; border:1px solid rgba(124,90,158,0.2); }
+.wchip-try { background:#fde8e8 !important; color:#c94040 !important; border:1px solid rgba(201,64,64,0.25) !important; }
+.wmore   { font-size:8px; color:var(--text3); font-weight:700; text-align:center; margin-top:1px; }
+.wchip-emoji { font-size:9px; flex-shrink:0; }
+.wchip-new   { position:relative; }
+.wchip-new::after { content:'✨'; font-size:7px; position:absolute; top:-2px; right:1px; }
 
 .dv-panel { background:var(--surface); border:1.5px solid var(--border-soft); border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow-md); }
 .dv-row   { display:grid; grid-template-columns:82px 1fr; min-height:56px; }
@@ -592,8 +596,7 @@ select {
 <!-- ═══ PLANNER ═══ -->
 <div id="sec-planner" class="section">
   <div class="cal-toggle">
-    <button class="ctbtn active" id="ctog-day"   onclick="setCalView('day')">Daily</button>
-    <button class="ctbtn"        id="ctog-week"  onclick="setCalView('week')">Weekly</button>
+    <button class="ctbtn active" id="ctog-week"  onclick="setCalView('week')">Weekly</button>
     <button class="ctbtn"        id="ctog-month" onclick="setCalView('month')">Monthly</button>
   </div>
   <div class="cal-nav">
@@ -758,6 +761,17 @@ select {
 
     <!-- Notes -->
     <div class="form-group"><label>Notes <span style="font-weight:400;color:var(--text3);text-transform:none;letter-spacing:0">(optional)</span></label><textarea id="meal-notes" placeholder="e.g. good post-workout meal..." style="height:55px;resize:none;font-size:13px"></textarea></div>
+
+    <!-- Recipe Status -->
+    <div class="form-group">
+      <label>Status</label>
+      <div id="meal-status-pills" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px">
+        <button type="button" class="mood-pill" data-status="" onclick="setMealStatus('')">Regular</button>
+        <button type="button" class="mood-pill" data-status="New Recipe" onclick="setMealStatus('New Recipe')">✨ New Recipe</button>
+        <button type="button" class="mood-pill" data-status="Need to Try" onclick="setMealStatus('Need to Try')">🧪 Need to Try</button>
+        <button type="button" class="mood-pill" data-status="Tried & Loved" onclick="setMealStatus('Tried & Loved')">💚 Tried & Loved</button>
+      </div>
+    </div>
 
     <div class="divider"></div>
 
@@ -1168,7 +1182,7 @@ let targets = (function(){
 })();
 
 // UI state
-let calView = 'day', calOff = 0, selDate = dkey(new Date());
+let calView = 'week', calOff = 0, selDate = dkey(new Date());
 let assignMode = null, curPort = 1, _assignDK = null, _assignMT = null;
 var todayOffset = 0; // 0 = today, -1 = yesterday, +1 = tomorrow etc.
 
@@ -1471,27 +1485,38 @@ function renderToday() {
   h += '</div>';
 
   // ── Meal slots
+  var SLOT_EMOJI = {Breakfast:'🌅',Lunch:'☀️',Dinner:'🌙',Snack:'🍿'};
+  var SLOT_BG = {Breakfast:'#fff3e6',Lunch:'#e8f4fd',Dinner:'#eaf5ee',Snack:'#f3eafa'};
+  var SLOT_FG = {Breakfast:'#c1622f',Lunch:'#2a7ab5',Dinner:'#2e7d52',Snack:'#7c5a9e'};
+  var SLOT_BORDER = {Breakfast:'rgba(193,98,47,0.2)',Lunch:'rgba(42,122,181,0.2)',Dinner:'rgba(46,125,82,0.2)',Snack:'rgba(124,90,158,0.2)'};
+
   MT.forEach(function(mt) {
     var slots = getSlots(dk, mt);
     var slotCal = slots.reduce(function(s,sl){ return s + mealCals(getMeal(sl.mealId), sl.portions||1); }, 0);
-    h += '<div class="today-slot">';
-    h += '<div class="slot-hdr">';
-    h += '<div class="row" style="gap:8px"><div class="slot-dot" style="background:' + SLOT_COLORS[mt] + '"></div><span class="slot-name">' + mt + '</span></div>';
-    h += '<span class="slot-kcal">' + (slotCal > 0 ? slotCal + ' kcal' : '') + '</span>';
+    h += '<div class="today-slot" style="border-left:3px solid ' + SLOT_FG[mt] + ';background:' + SLOT_BG[mt] + ';border-radius:var(--radius-sm);margin-bottom:8px;padding:0">';
+    h += '<div class="slot-hdr" style="padding:10px 12px 6px">';
+    h += '<div class="row" style="gap:8px"><span style="font-size:16px">' + SLOT_EMOJI[mt] + '</span><span class="slot-name" style="color:' + SLOT_FG[mt] + ';font-weight:800">' + mt + '</span></div>';
+    h += '<span class="slot-kcal" style="color:' + SLOT_FG[mt] + '">' + (slotCal > 0 ? slotCal + ' kcal' : '') + '</span>';
     h += '</div>';
-    h += '<div class="slot-body">';
+    h += '<div class="slot-body" style="padding:0 12px 8px">';
     if (slots.length === 0) {
       h += '<div style="font-size:12px;color:var(--text3);padding:4px 0;font-style:italic">Nothing planned</div>';
     } else {
       slots.forEach(function(sl) {
         var m = getMeal(sl.mealId); if (!m) return;
+        var mStatus = (m.tags && m.tags.status) || '';
+        var statusBadge = '';
+        if (mStatus === 'Need to Try') statusBadge = '<span style="font-size:9px;font-weight:800;color:#c94040;background:#fde8e8;border:1px solid rgba(201,64,64,0.25);border-radius:12px;padding:1px 6px;margin-left:6px;white-space:nowrap">🧪 Try</span>';
+        else if (mStatus === 'New Recipe') statusBadge = '<span style="font-size:9px;font-weight:800;color:#c1622f;background:#fff3e6;border:1px solid rgba(193,98,47,0.25);border-radius:12px;padding:1px 6px;margin-left:6px;white-space:nowrap">✨ New</span>';
+        else if (mStatus === 'Tried & Loved') statusBadge = '<span style="font-size:9px;font-weight:800;color:#2e7d52;background:#eaf5ee;border:1px solid rgba(46,125,82,0.25);border-radius:12px;padding:1px 6px;margin-left:6px;white-space:nowrap">💚</span>';
+
         if (window._todayView === 'ingredient') {
           // Use a session copy so edits don't bleed back into the meal library
           var mc = getTodayCopy(sl.mealId);
           // ── Ingredient view
           h += '<div style="padding:6px 0;border-bottom:1px solid var(--border-soft)">';
           h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">';
-          h += '<span style="font-size:13px;font-weight:700;color:var(--text)">' + mc.name + '</span>';
+          h += '<span style="font-size:13px;font-weight:700;color:var(--text)">' + mc.name + statusBadge + '</span>';
           h += '<div style="display:flex;gap:6px;align-items:center">';
           h += '<button onclick="promptSaveMealChanges(\'' + sl.mealId + '\')" style="font-size:10px;font-weight:700;color:var(--green);background:var(--green-light);border:1px solid rgba(14,138,95,0.25);border-radius:20px;padding:3px 9px;cursor:pointer;font-family:DM Sans,sans-serif;white-space:nowrap">💾 Save to meal</button>';
           h += '<button onclick="rmSlotToday(\'' + dk + '\',\'' + mt + '\',\'' + sl.mealId + '\')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:13px;padding:2px 4px">✕</button>';
@@ -1528,7 +1553,7 @@ function renderToday() {
         } else {
           // ── Meal view — simple row
           h += '<div class="slot-meal-row">';
-          h += '<span class="slot-meal-name">' + m.name + (sl.portions > 1 ? ' <span style="color:var(--text3);font-size:11px">×' + sl.portions + '</span>' : '') + '</span>';
+          h += '<span class="slot-meal-name">' + m.name + (sl.portions > 1 ? ' <span style="color:var(--text3);font-size:11px">×' + sl.portions + '</span>' : '') + statusBadge + '</span>';
           h += '<div style="display:flex;align-items:center;gap:8px">';
           h += '<span class="slot-meal-kcal">' + mealCals(m, sl.portions||1) + ' kcal</span>';
           h += '<button onclick="rmSlotToday(\'' + dk + '\',\'' + mt + '\',\'' + sl.mealId + '\')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:13px;padding:2px">✕</button>';
@@ -1750,7 +1775,7 @@ function updateTodayIng(mealId, ingIdx, newAmt) {
 // ── PLANNER ───────────────────────────────────────────────────
 function setCalView(v) {
   calView = v;
-  ['day','week','month'].forEach(function(x){
+  ['week','month'].forEach(function(x){
     var el = document.getElementById('ctog-' + x);
     if (el) el.classList.toggle('active', x === v);
   });
@@ -1758,19 +1783,12 @@ function setCalView(v) {
 }
 
 function calNav(dir) {
-  if (calView === 'day') {
-    var d = parseDK(selDate); d.setDate(d.getDate() + dir); selDate = dkey(d);
-  } else if (calView === 'week') {
-    calOff += dir;
-  } else {
-    calOff += dir;
-  }
+  calOff += dir;
   renderCal();
 }
 
 function renderCal() {
   if (calView === 'week')  renderWeek();
-  else if (calView === 'day') renderDayView();
   else renderMonth();
 }
 
@@ -1798,6 +1816,9 @@ function renderWeek() {
   DS.forEach(function(d){ var h=document.createElement('div'); h.className='dhdr'; h.textContent=d; hdrRow.appendChild(h); });
   wrap.appendChild(hdrRow);
 
+  var slotEmojis = {Breakfast:'🌅',Lunch:'☀️',Dinner:'🌙',Snack:'🍿'};
+  var slotLetters = {Breakfast:'B',Lunch:'L',Dinner:'D',Snack:'S'};
+
   var grid = document.createElement('div'); grid.className = 'week-grid';
   dates.forEach(function(d) {
     var dk = dkey(d);
@@ -1808,22 +1829,23 @@ function renderWeek() {
     var numDiv = document.createElement('div'); numDiv.className = 'wnum'; numDiv.textContent = d.getDate(); cell.appendChild(numDiv);
     var chips = document.createElement('div'); chips.className = 'wchips';
 
-    var slotLetters = {Breakfast:'B',Lunch:'L',Dinner:'D',Snack:'S'};
     var shown = 0;
     MT.forEach(function(mt) {
       getSlots(dk,mt).forEach(function(sl) {
-        if (shown >= 3) return;
+        if (shown >= 4) return;
         var m = getMeal(sl.mealId); if (!m) return;
         var ch = document.createElement('div');
-        ch.className = 'wchip wchip-' + slotLetters[mt];
-        ch.textContent = m.name;
+        var isNewRecipe = m.tags && m.tags.status && (m.tags.status === 'New Recipe');
+        var isNeedTry = m.tags && m.tags.status && (m.tags.status === 'Need to Try');
+        ch.className = 'wchip wchip-' + slotLetters[mt] + (isNewRecipe ? ' wchip-new' : '') + (isNeedTry ? ' wchip-try' : '');
+        ch.innerHTML = '<span class="wchip-emoji">' + slotEmojis[mt] + '</span>' + (isNeedTry ? '🧪 ' : '') + m.name;
         chips.appendChild(ch);
         shown++;
       });
     });
     var total = MT.reduce(function(s,mt){ return s+getSlots(dk,mt).length; },0);
-    if (total > shown && shown === 3) {
-      var more = document.createElement('div'); more.className='wmore'; more.textContent='+' + (total-3); chips.appendChild(more);
+    if (total > shown && shown >= 4) {
+      var more = document.createElement('div'); more.className='wmore'; more.textContent='+' + (total-4); chips.appendChild(more);
     }
     cell.appendChild(chips);
     grid.appendChild(cell);
@@ -2486,7 +2508,14 @@ function renderMeals(){
   if(!list.length){el.innerHTML=`<div class="empty"><div class="empty-icon">🍽️</div><div class="empty-title">No meals yet</div><div class="empty-sub">Create your first meal or import a recipe</div></div>`;return;}
   el.innerHTML=list.map(m=>{
     const cal=mealCals(m),t=m.tags||{};
-    const tp=[t.cuisine?`<span class="tpill cuisine">${t.cuisine}</span>`:'',t.effort?`<span class="tpill effort">${t.effort}</span>`:'',...(t.diet||[]).map(d=>`<span class="tpill diet">${d}</span>`)].filter(Boolean).join('');
+    const statusColors = {
+      'New Recipe': {bg:'#fff3e6',fg:'#c1622f',border:'rgba(193,98,47,0.25)'},
+      'Need to Try': {bg:'#fde8e8',fg:'#c94040',border:'rgba(201,64,64,0.25)'},
+      'Tried & Loved': {bg:'#eaf5ee',fg:'#2e7d52',border:'rgba(46,125,82,0.25)'}
+    };
+    const statusEmojis = {'New Recipe':'✨ ','Need to Try':'🧪 ','Tried & Loved':'💚 '};
+    const tp=[t.cuisine?`<span class="tpill cuisine">${t.cuisine}</span>`:'',t.effort?`<span class="tpill effort">${t.effort}</span>`:'',...(t.diet||[]).map(d=>`<span class="tpill diet">${d}</span>`),t.status&&statusColors[t.status]?`<span class="tpill" style="background:${statusColors[t.status].bg};color:${statusColors[t.status].fg};border:1px solid ${statusColors[t.status].border};font-weight:800">${statusEmojis[t.status]||''}${t.status}</span>`:''
+    ].filter(Boolean).join('');
     // Build ingredient list
     const ingList = (m.ingredients||[]).map(ing => {
       const ingCal = ing.calories > 0
@@ -2599,7 +2628,15 @@ function getSelTags(){
   };
 }
 
-function openAddMeal(){editId=null;document.getElementById('m-meal-title').textContent='New Meal';document.getElementById('meal-name').value='';buildTags();document.getElementById('ing-inputs').innerHTML='';addIngRow();addIngRow();updTotalCal();document.getElementById('m-meal').classList.add('open');}
+var _mealStatus = '';
+function setMealStatus(s) {
+  _mealStatus = s;
+  document.querySelectorAll('#meal-status-pills .mood-pill').forEach(function(btn){
+    btn.classList.toggle('active', btn.dataset.status === s);
+  });
+}
+
+function openAddMeal(){editId=null;_mealStatus='';document.getElementById('m-meal-title').textContent='New Meal';document.getElementById('meal-name').value='';buildTags();document.getElementById('ing-inputs').innerHTML='';addIngRow();addIngRow();updTotalCal();setMealStatus('');document.getElementById('m-meal').classList.add('open');}
 
 function openEditMeal(id){
   const m=getMeal(id);if(!m)return;
@@ -2608,12 +2645,12 @@ function openEditMeal(id){
   document.getElementById('meal-name').value=m.name;
   var ne=document.getElementById('meal-notes');if(ne)ne.value=m.notes||'';
   buildTags(m.tags||{});
+  setMealStatus((m.tags && m.tags.status) || '');
   document.getElementById('ing-inputs').innerHTML='';
   m.ingredients.forEach(i=>addIngRow(i));
   if(!m.ingredients.length)addIngRow();
   updTotalCal();
   document.getElementById('m-meal').classList.add('open');
-  // Scroll the modal sheet to top after it opens
   setTimeout(function(){
     var modal = document.querySelector('#m-meal .modal');
     if(modal) modal.scrollTop = 0;
@@ -2737,7 +2774,9 @@ function updTotalCal(){
 
 function saveMeal(){
   const name=document.getElementById('meal-name').value.trim();if(!name){alert('Please enter a meal name');return;}
-  const tags=getSelTags();const ings=[];
+  const tags=getSelTags();
+  tags.status = _mealStatus || '';
+  const ings=[];
   document.querySelectorAll('#ing-inputs .ing-row').forEach(r=>{
     const rid=r.id,n=document.getElementById('in-'+rid)?.value.trim()||'';
     const a=document.getElementById('ia-'+rid)?.value||'',u=document.getElementById('iu-'+rid)?.value||'g';
