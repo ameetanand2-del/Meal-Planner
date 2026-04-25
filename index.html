@@ -527,6 +527,37 @@ select {
 
 .mood-pill{padding:10px 4px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--surface2);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;color:var(--text2);cursor:pointer;text-align:center;}
 .mood-pill.active{border-color:var(--accent);background:var(--accent-light);color:var(--accent);}
+
+/* ═══════════════════════════════════════════════
+   DAY PLAN CARDS — improved design
+   ═══════════════════════════════════════════════ */
+.mp-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px;}
+.mp-stat{background:var(--surface2);border-radius:var(--radius-xs);padding:8px 6px;text-align:center;border:1px solid var(--border-soft);}
+.mp-stat-val{font-family:'DM Serif Display',serif;font-size:17px;font-weight:400;color:var(--text);}
+.mp-stat-lbl{font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-top:2px;}
+.mp-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;}
+.mp-badge{display:inline-flex;align-items:center;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid;}
+.mp-badge.goal-hp{background:var(--green-light);color:var(--green);border-color:rgba(14,138,95,0.2);}
+.mp-badge.goal-other{background:var(--surface2);color:var(--text3);border-color:var(--border);}
+.mp-meals-body{border-top:1px solid var(--border-soft);}
+.mp-slot{padding:8px 15px;border-bottom:1px solid var(--border-soft);}
+.mp-slot:last-child{border-bottom:none;}
+.mp-slot-hdr{display:flex;align-items:center;gap:6px;margin-bottom:4px;}
+.mp-slot-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.mp-slot-lbl{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;flex:1;}
+.mp-slot-cal{font-size:11px;font-weight:600;color:var(--accent);}
+.mp-empty-slot{font-size:12px;color:var(--text3);font-style:italic;padding:2px 0 2px 14px;}
+.mp-meal-row{display:flex;align-items:center;justify-content:space-between;padding:5px 0 5px 14px;}
+.mp-meal-name{font-size:13px;font-weight:600;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.mp-meal-kcal{font-size:12px;font-weight:700;color:var(--accent);white-space:nowrap;margin-left:8px;}
+.mp-meal-rm{background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px;padding:2px 4px;flex-shrink:0;}
+.mp-card-foot{display:flex;align-items:center;gap:8px;padding:10px 15px;border-top:1px solid var(--border-soft);background:var(--surface2);}
+.mp-slot-row-hdr{display:flex;align-items:center;gap:6px;margin-bottom:6px;}
+.mp-slot-row-meals{margin-bottom:4px;}
+
+/* Plan builder ingredient view */
+.plan-ing-grid{display:grid;grid-template-columns:1fr 52px 60px 52px;gap:4px;padding:3px 0 4px;border-bottom:1px solid var(--border-soft);}
+.plan-ing-hdr{font-size:9px;font-weight:700;color:var(--text4);text-transform:uppercase;letter-spacing:0.5px;}
 </style>
 
 </head>
@@ -602,7 +633,6 @@ select {
   <div style="font-family:DM Serif Display,serif;font-size:21px;font-weight:700;margin-bottom:12px;letter-spacing:-0.3px">My <em style="color:var(--accent);font-style:italic">Trends</em></div>
   <div class="tog-bar" style="margin-bottom:10px">
     <button class="ctbtn active" id="trendtog-nutrition" onclick="setTrendsTab('nutrition')">&#x1F4CA; Nutrition</button>
-    <button class="ctbtn" id="trendtog-weight" onclick="setTrendsTab('weight')">&#x2696;&#xFE0F; Weight</button>
     <button class="ctbtn" id="trendtog-notes" onclick="setTrendsTab('notes')">&#x1F4D3; Notes</button>
   </div>
   <!-- Nutrition controls -->
@@ -619,39 +649,14 @@ select {
     </div>
     <button onclick="openTrendTargets()" style="flex-shrink:0;padding:7px 11px;background:var(--accent-light);border:1.5px solid rgba(193,98,47,0.3);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;font-weight:700;color:var(--accent);cursor:pointer;white-space:nowrap">&#127919; Set Targets</button>
   </div>
-  <!-- Weight controls -->
-  <div id="weight-controls" style="display:none;margin-bottom:12px">
-    <div style="display:flex;gap:8px;align-items:center">
-      <select id="weight-period-sel" onchange="setWeightPeriod(parseInt(this.value))" style="flex:1;padding:8px 10px;font-size:13px;font-weight:700;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--surface);color:var(--text);font-family:DM Sans,sans-serif">
-        <option value="7">1 Week</option>
-        <option value="14">2 Weeks</option>
-        <option value="21">3 Weeks</option>
-        <option value="28">4 Weeks</option>
-        <option value="42">6 Weeks</option>
-        <option value="56">8 Weeks</option>
-        <option value="70">10 Weeks</option>
-        <option value="84">12 Weeks</option>
-      </select>
-      <div class="tog-bar" style="margin-bottom:0;flex-shrink:0">
-        <button class="ctbtn active" id="wview-daily"  onclick="setTrendView('daily')"  style="padding:7px 12px;font-size:12px">Daily</button>
-        <button class="ctbtn"        id="wview-weekly" onclick="setTrendView('weekly')" style="padding:7px 12px;font-size:12px">Weekly</button>
-      </div>
-    </div>
-  </div>
   <div id="trends-wrap"></div>
 </div>
 <div id="sec-ingredients" class="section">
   <div id="ingredients-wrap"></div>
 </div>
 
-<div id="sec-settings" class="section">
-  <div style="font-family:DM Serif Display,serif;font-size:21px;font-weight:700;margin-bottom:14px;letter-spacing:-0.3px">My <em style="color:var(--accent);font-style:italic">Settings</em></div>
-  <div class="tog-bar">
-    <button class="ctbtn active" id="settog-goals" onclick="setSettingsTab('goals')">🎯 Goals</button>
-    <button class="ctbtn" id="settog-rules" onclick="setSettingsTab('rules')">🚫 Rules</button>
-    <button class="ctbtn" id="settog-caltrack" onclick="setSettingsTab('caltrack')">📊 Calories</button>
-  </div>
-  <div id="settings-wrap"></div>
+<div id="sec-shopping" class="section">
+  <div id="shopping-wrap"></div>
 </div>
 
 <!-- ═══ BOTTOM NAV ═══ -->
@@ -673,24 +678,18 @@ select {
     Trends<div class="ndot"></div>
   </button>
   <button class="nav-btn" id="nav-ingredients" onclick="showSec('ingredients',this)">
-    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>
-    List<div class="ndot"></div>
+    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 2a5 5 0 00-5 5c0 3.5 5 9 5 9s5-5.5 5-9a5 5 0 00-5-5z"/><circle cx="12" cy="7" r="1.5" fill="currentColor"/></svg>
+    Pantry<div class="ndot"></div>
   </button>
-  <button class="nav-btn" id="nav-settings" onclick="showSec('settings',this)">
-    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
-    Settings<div class="ndot"></div>
+  <button class="nav-btn" id="nav-shopping" onclick="showSec('shopping',this)">
+    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+    Shop<div class="ndot"></div>
   </button>
 </nav>
 
 <!-- FLOATING ACTION BUTTON -->
 <div id="fab-wrap" style="position:fixed;right:20px;bottom:90px;z-index:190">
   <div id="fab-menu" style="position:absolute;bottom:58px;right:0;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius-sm);box-shadow:0 6px 24px rgba(0,0,0,0.14);min-width:155px;overflow:hidden;display:none">
-    <button class="fab-item" onclick="fabAction('weight')">
-      <div class="fab-icon" style="background:#edf3fa;color:#3a6b9e">&#x2696;</div>Log Weight
-    </button>
-    <button class="fab-item" onclick="fabAction('target')">
-      <div class="fab-icon" style="background:#edf5f0;color:#4a7c59">&#x1F3AF;</div>Set Target
-    </button>
     <button class="fab-item" onclick="fabAction('mood')">
       <div class="fab-icon" style="background:#f3eefa;color:#7c5a9e">&#x1F4DD;</div>Log Mood
     </button>
@@ -891,6 +890,11 @@ select {
     </div>
     <div class="form-group"><label>Notes <span style="font-weight:400;color:var(--text3);text-transform:none;letter-spacing:0">(optional)</span></label><input type="text" id="plan-notes" placeholder="e.g. good for training days"></div>
     <div class="divider"></div>
+    <!-- Meal/Ingredient view toggle -->
+    <div style="display:flex;background:var(--surface2);border-radius:14px;padding:3px;margin-bottom:12px;border:1px solid var(--border-soft);gap:2px">
+      <button class="ctbtn active" id="plan-view-meal" onclick="setPlanViewMode('meal')">🍽 Meal View</button>
+      <button class="ctbtn" id="plan-view-ing" onclick="setPlanViewMode('ingredient')">🥦 Ingredient View</button>
+    </div>
     <label style="margin-bottom:10px;display:block">Meals by Slot</label>
     <div id="plan-slot-builder"></div>
     <div class="row end" style="gap:10px;margin-top:8px">
@@ -1231,7 +1235,7 @@ function showSec(n, btn) {
   if (n === 'library')     renderLibTab();
   if (n === 'trends')      renderTrends();
   if (n === 'ingredients') renderIngredients();
-  if (n === 'settings')    renderSettings();
+  if (n === 'shopping')    renderShopping();
 }
 
 // ── MACRO / CALORIE ENGINE ────────────────────────────────────
@@ -1376,6 +1380,56 @@ function renderToday() {
   var isActualToday = (todayOffset === 0);
   var h = '';
 
+  // ── Weekly date strip
+  var weekStart = new Date(base);
+  var dayOfWeek = (weekStart.getDay() + 6) % 7; // Monday=0
+  weekStart.setDate(weekStart.getDate() - dayOfWeek);
+  h += '<div style="display:flex;gap:4px;margin-bottom:12px;justify-content:space-between">';
+  var dayLabels = ['M','T','W','T','F','S','S'];
+  for (var wi = 0; wi < 7; wi++) {
+    var wd = new Date(weekStart);
+    wd.setDate(weekStart.getDate() + wi);
+    var wdk = dkey(wd);
+    var isSelected = (wdk === dk);
+    var isCompletedDay = dayNotes[wdk] && dayNotes[wdk].completed;
+    var hasMealsOnDay = MT.some(function(mt){ return getSlots(wdk, mt).length > 0; });
+
+    var circBg = 'var(--surface)';
+    var circBorder = 'var(--border-soft)';
+    var circColor = 'var(--text)';
+    var labelColor = 'var(--text3)';
+
+    if (isSelected) {
+      circBg = 'var(--accent)';
+      circBorder = 'var(--accent)';
+      circColor = '#fff';
+      labelColor = 'var(--accent)';
+    } else if (isCompletedDay) {
+      circBg = 'var(--green)';
+      circBorder = 'var(--green)';
+      circColor = '#fff';
+    } else if (hasMealsOnDay) {
+      circBg = 'var(--surface2)';
+      circBorder = 'var(--border)';
+    }
+
+    var dayOffset = Math.round((wd - new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate())) / 86400000);
+    h += '<div onclick="todayOffset=' + dayOffset + ';renderToday()" style="display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;flex:1">';
+    h += '<div style="font-size:10px;font-weight:700;color:' + labelColor + ';text-transform:uppercase">' + dayLabels[wi] + '</div>';
+    h += '<div style="width:36px;height:36px;border-radius:50%;background:' + circBg + ';border:2px solid ' + circBorder + ';display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:' + circColor + ';transition:all 0.15s">';
+    h += wd.getDate();
+    h += '</div>';
+    if (isCompletedDay && !isSelected) {
+      h += '<div style="width:5px;height:5px;border-radius:50%;background:var(--green)"></div>';
+    } else if (isSelected) {
+      h += '<div style="width:5px;height:5px;border-radius:50%;background:var(--accent)"></div>';
+    } else {
+      h += '<div style="width:5px;height:5px"></div>';
+    }
+    h += '</div>';
+  }
+  h += '</div>';
+
   // ── Date navigation bar
   var dateLabel = isActualToday
     ? 'Today — ' + base.toLocaleDateString('en',{month:'long',day:'numeric',year:'numeric'})
@@ -1485,6 +1539,14 @@ function renderToday() {
     h += '<button class="slot-add-btn" onclick="openAssign(\'' + dk + '\',\'' + mt + '\')">+ Add to ' + mt + '</button>';
     h += '</div></div>';
   });
+
+  // ── New Day Plan button on Today
+  h += '<div style="margin-top:10px;margin-bottom:4px">';
+  h += '<button onclick="openNewPlan()" style="width:100%;padding:12px;background:var(--surface);border:1.5px dashed var(--accent);border-radius:var(--radius);font-family:DM Sans,sans-serif;font-size:13px;font-weight:700;color:var(--accent);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background 0.15s">';
+  h += '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
+  h += 'Create New Day Plan';
+  h += '</button>';
+  h += '</div>';
 
   // ── Complete Day card
   var note = dayNotes[dk] || null;
@@ -2168,18 +2230,107 @@ function populateAssignPlanList() {
   }
   el.innerHTML = '';
   mealPlans.forEach(function(mp) {
-    var totalMeals = MT.reduce(function(s,mt){ return s + ((mp.slots&&mp.slots[mt])||[]).length; }, 0);
-    var totalCal = 0;
+    var totalCal = 0, totalP = 0, totalC = 0, totalF = 0, totalMeals = 0;
     MT.forEach(function(mt) {
-      ((mp.slots&&mp.slots[mt])||[]).forEach(function(mid) {
-        totalCal += mealCals(getMeal(mid));
+      ((mp.slots && mp.slots[mt]) || []).forEach(function(entry) {
+        var mid = entry.mealId || entry;
+        var m = getMeal(mid); if (!m) return;
+        var port = entry.portions || 1;
+        totalCal += mealCals(m, port);
+        var mac = mealMacros(m, port);
+        totalP += mac.p; totalC += mac.c; totalF += mac.f;
+        totalMeals++;
       });
     });
-    var row = document.createElement('div'); row.className = 'plan-assign-row';
-    row.innerHTML = '<div><div class="plan-assign-name">' + mp.name + '</div>'
-      + '<div class="plan-assign-meta">' + totalMeals + ' meals · ' + totalCal + ' kcal' + (mp.goal?' · '+mp.goal:'') + '</div></div>';
-    row.onclick = function(){ applyPlanToDayFromAssign(mp, _assignDK); };
-    el.appendChild(row);
+
+    var card = document.createElement('div');
+    card.style.cssText = 'background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);margin-bottom:10px;overflow:hidden';
+
+    // ── Header: name + macros + calories (always visible)
+    var hdr = document.createElement('div');
+    hdr.style.cssText = 'padding:13px 14px;cursor:pointer';
+
+    var hdrHtml = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">';
+    hdrHtml += '<div style="font-family:\'DM Serif Display\',serif;font-size:16px;font-weight:400;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + mp.name + '</div>';
+    hdrHtml += '<span style="font-family:\'DM Serif Display\',serif;font-size:18px;font-weight:700;color:var(--accent);flex-shrink:0;margin-left:10px">' + totalCal + ' kcal</span>';
+    hdrHtml += '</div>';
+
+    // Macro row
+    hdrHtml += '<div style="display:flex;align-items:center;gap:8px">';
+    hdrHtml += '<span style="font-size:11px;font-weight:700;color:#2e7d52">P ' + totalP + 'g</span>';
+    hdrHtml += '<span style="font-size:11px;font-weight:700;color:var(--blue)">C ' + totalC + 'g</span>';
+    hdrHtml += '<span style="font-size:11px;font-weight:700;color:var(--purple)">F ' + totalF + 'g</span>';
+    hdrHtml += '<span style="font-size:11px;color:var(--text3)">' + totalMeals + ' meals</span>';
+    if (mp.goal) {
+      hdrHtml += '<span style="font-size:10px;font-weight:700;color:var(--green);background:var(--green-light);border:1px solid rgba(14,138,95,0.2);border-radius:20px;padding:2px 8px;margin-left:auto">' + mp.goal + '</span>';
+    }
+    hdrHtml += '</div>';
+
+    // Expand arrow hint
+    hdrHtml += '<div style="display:flex;align-items:center;gap:4px;margin-top:6px">';
+    hdrHtml += '<span class="assign-plan-arrow" style="font-size:10px;color:var(--text4)">▶</span>';
+    hdrHtml += '<span style="font-size:10px;color:var(--text4)">Tap to see meals</span>';
+    hdrHtml += '</div>';
+
+    hdr.innerHTML = hdrHtml;
+
+    // ── Collapsible meal breakdown
+    var details = document.createElement('div');
+    details.style.cssText = 'display:none;border-top:1px solid var(--border-soft)';
+
+    var detailsHtml = '';
+    MT.forEach(function(mt) {
+      var entries = (mp.slots && mp.slots[mt]) || [];
+      if (!entries.length) return;
+      var slotCal = 0;
+      entries.forEach(function(entry) {
+        var mid = entry.mealId || entry;
+        var m = getMeal(mid); if (!m) return;
+        slotCal += mealCals(m, entry.portions || 1);
+      });
+      detailsHtml += '<div style="padding:6px 14px;border-bottom:1px solid var(--border-soft)">';
+      detailsHtml += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">';
+      detailsHtml += '<div style="width:7px;height:7px;border-radius:50%;background:' + MTC[mt] + '"></div>';
+      detailsHtml += '<span style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.4px;flex:1">' + mt + '</span>';
+      detailsHtml += '<span style="font-size:10px;font-weight:600;color:var(--accent)">' + slotCal + ' kcal</span>';
+      detailsHtml += '</div>';
+      entries.forEach(function(entry) {
+        var mid = entry.mealId || entry;
+        var m = getMeal(mid); if (!m) return;
+        var cal = mealCals(m, entry.portions || 1);
+        detailsHtml += '<div style="display:flex;align-items:center;justify-content:space-between;padding:3px 0 3px 13px">';
+        detailsHtml += '<span style="font-size:12px;font-weight:600;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + m.name + '</span>';
+        detailsHtml += '<span style="font-size:11px;font-weight:700;color:var(--accent);white-space:nowrap;margin-left:8px">' + cal + '</span>';
+        detailsHtml += '</div>';
+      });
+      detailsHtml += '</div>';
+    });
+    details.innerHTML = detailsHtml;
+
+    // Toggle expand/collapse on header tap
+    hdr.addEventListener('click', function(e) {
+      var open = details.style.display !== 'none';
+      details.style.display = open ? 'none' : 'block';
+      var arrow = hdr.querySelector('.assign-plan-arrow');
+      if (arrow) arrow.textContent = open ? '▶' : '▼';
+    });
+
+    // ── Apply button
+    var applyBtn = document.createElement('button');
+    applyBtn.className = 'btn btn-primary btn-full';
+    applyBtn.style.cssText = 'margin:10px 14px 12px;width:calc(100% - 28px)';
+    applyBtn.textContent = '✓ Use This Plan';
+    (function(plan) {
+      applyBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        applyPlanToDayFromAssign(plan, _assignDK);
+      });
+    })(mp);
+
+    card.appendChild(hdr);
+    card.appendChild(details);
+    card.appendChild(applyBtn);
+    el.appendChild(card);
   });
 }
 
@@ -2188,12 +2339,14 @@ function applyPlanToDayFromAssign(mp, dk) {
   if (!plan[dk]) plan[dk] = {};
   MT.forEach(function(mt) {
     if (!plan[dk][mt]) plan[dk][mt] = [];
-    ((mp.slots&&mp.slots[mt])||[]).forEach(function(mid) {
-      plan[dk][mt].push({mealId: mid, portions: 1});
+    ((mp.slots&&mp.slots[mt])||[]).forEach(function(entry) {
+      var mealId = entry.mealId || entry;
+      var portions = entry.portions || 1;
+      plan[dk][mt].push({mealId: mealId, portions: portions});
     });
   });
-  save(); closeM('m-assign'); renderCal();
-  showToast(mp.name + ' assigned ✓');
+  save(); closeM('m-assign'); renderCal(); renderToday();
+  showToast(mp.name + ' applied ✓');
 }
 
 function openAssign(dk, mt) {
@@ -2614,6 +2767,7 @@ function delMeal(id){
 // ══════ CALENDAR ══════
 var MT_LETTER={Breakfast:'B',Lunch:'L',Dinner:'D',Snack:'S'};
 
+var GOAL_CLASS={'High Protein':'goal-hp','Anti-Inflammatory':'goal-ai','Fat Loss':'goal-fl','Gut Health':'goal-gh','Keto':'goal-keto','Whole Foods':'goal-wf','Omega-3 Rich':'goal-o3','Plant-Based':'goal-pb','Low Carb':'goal-lc'};
 function goalClass(g){ return GOAL_CLASS[g]||'goal-other'; }
 
 // ── estimate protein (g) per 100kcal as rough proxy ──
@@ -2648,89 +2802,121 @@ function planStats(mp){
 function renderPlans(){
   var el=document.getElementById('plans-list'); el.innerHTML='';
   if(!mealPlans.length){
-    el.innerHTML='<div class="empty"><div class="empty-icon">\uD83D\uDCCB</div><div class="empty-title">No meal plans yet</div><div class="empty-sub">Create a plan — like "High Protein Day" — then assign it to any day in your calendar in one tap.</div></div>';
+    el.innerHTML='<div class="empty"><div class="empty-icon">\uD83D\uDCCB</div><div class="empty-title">No day plans yet</div><div class="empty-sub">Create a plan — like "High Protein Day" — then assign it to any day in your calendar in one tap.</div></div>';
     return;
   }
   mealPlans.forEach(function(mp){
-    var stats=planStats(mp);
+    // Calculate totals
+    var totalCal=0, totalP=0, totalC=0, totalF=0, mealCount=0;
+    MT.forEach(function(mt){
+      (mp.slots[mt]||[]).forEach(function(entry){
+        var m=getMeal(entry.mealId); if(!m)return;
+        totalCal+=mealCals(m,entry.portions||1);
+        var mac=mealMacros(m,entry.portions||1);
+        totalP+=mac.p; totalC+=mac.c; totalF+=mac.f;
+        mealCount++;
+      });
+    });
+
     var card=document.createElement('div'); card.className='mp-card';
 
-    // header
-    var hdr=document.createElement('div'); hdr.className='mp-card-hdr';
-    var nameEl=document.createElement('div'); nameEl.className='mp-name'; nameEl.textContent=mp.name;
-    hdr.appendChild(nameEl);
-
-    // stats row
-    var statsRow=document.createElement('div'); statsRow.className='mp-stats';
-    var statDefs=[
-      {val:stats.cal,lbl:'kcal'},
-      {val:'~'+stats.prot+'g',lbl:'protein'},
-      {val:stats.meals,lbl:'meals'}
-    ];
-    statDefs.forEach(function(s){
-      var box=document.createElement('div'); box.className='mp-stat';
-      var v=document.createElement('div'); v.className='mp-stat-val'; v.textContent=s.val;
-      var l=document.createElement('div'); l.className='mp-stat-lbl'; l.textContent=s.lbl;
-      box.appendChild(v); box.appendChild(l); statsRow.appendChild(box);
-    });
-    hdr.appendChild(statsRow);
-
-    // goal badge + notes
-    if(mp.goal||mp.notes){
-      var tagsRow=document.createElement('div'); tagsRow.className='mp-tags';
-      if(mp.goal){
-        var gb=document.createElement('span'); gb.className='mp-badge '+goalClass(mp.goal); gb.textContent=mp.goal;
-        tagsRow.appendChild(gb);
+    // ── Clickable header with name + macros + calories
+    var hdr=document.createElement('div');
+    hdr.style.cssText='padding:14px 15px;cursor:pointer';
+    hdr.onclick=function(){
+      var body=card.querySelector('.mp-collapse-body');
+      var arrow=hdr.querySelector('.mp-arrow');
+      if(body){
+        var open=body.style.display!=='none';
+        body.style.display=open?'none':'block';
+        if(arrow)arrow.innerHTML=open?'&#9654;':'&#9660;';
       }
-      if(mp.notes){
-        var nb=document.createElement('span'); nb.className='mp-badge goal-other'; nb.textContent=mp.notes;
-        tagsRow.appendChild(nb);
-      }
-      hdr.appendChild(tagsRow);
+    };
+
+    var hdrTop='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">';
+    hdrTop+='<div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">';
+    hdrTop+='<span class="mp-arrow" style="font-size:12px;color:var(--text3);flex-shrink:0">&#9654;</span>';
+    hdrTop+='<div style="font-family:\'DM Serif Display\',serif;font-size:17px;font-weight:400;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+mp.name+'</div>';
+    hdrTop+='</div>';
+    hdrTop+='<div style="display:flex;align-items:center;gap:6px;flex-shrink:0">';
+    hdrTop+='<button class="icon-btn" style="width:30px;height:30px" data-edit-plan="'+mp.id+'"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>';
+    hdrTop+='</div></div>';
+
+    // Macro + calorie summary row
+    var hdrStats='<div style="display:flex;align-items:center;justify-content:space-between">';
+    hdrStats+='<div style="display:flex;gap:10px">';
+    hdrStats+='<span style="font-size:11px;font-weight:700;color:#2e7d52">P '+totalP+'g</span>';
+    hdrStats+='<span style="font-size:11px;font-weight:700;color:var(--blue)">C '+totalC+'g</span>';
+    hdrStats+='<span style="font-size:11px;font-weight:700;color:var(--purple)">F '+totalF+'g</span>';
+    hdrStats+='<span style="font-size:11px;color:var(--text3)">'+mealCount+' meals</span>';
+    hdrStats+='</div>';
+    hdrStats+='<span style="font-family:\'DM Serif Display\',serif;font-size:17px;font-weight:700;color:var(--accent)">'+totalCal+' kcal</span>';
+    hdrStats+='</div>';
+
+    if(mp.goal){
+      hdrStats+='<div style="margin-top:6px"><span class="mp-badge '+goalClass(mp.goal)+'">'+mp.goal+'</span></div>';
     }
+
+    hdr.innerHTML=hdrTop+hdrStats;
     card.appendChild(hdr);
 
-    // meal slots body
-    var body=document.createElement('div'); body.className='mp-meals-body';
+    // Wire up edit button (stop propagation so it doesn't toggle collapse)
+    var editBtnEl=hdr.querySelector('[data-edit-plan]');
+    if(editBtnEl){
+      (function(pid){
+        editBtnEl.addEventListener('click',function(e){
+          e.stopPropagation();
+          openEditPlan(pid);
+        });
+      })(mp.id);
+    }
+
+    // ── Collapsible body — meals by slot
+    var body=document.createElement('div');
+    body.className='mp-collapse-body';
+    body.style.cssText='display:none;border-top:1px solid var(--border-soft)';
+
     MT.forEach(function(mt){
       var entries=(mp.slots[mt]||[]);
-      var slotEl=document.createElement('div'); slotEl.className='mp-slot';
-      var slotHdr=document.createElement('div'); slotHdr.className='mp-slot-hdr';
-      var dot=document.createElement('div'); dot.className='mp-slot-dot'; dot.style.background=MTC[mt];
-      var lbl=document.createElement('div'); lbl.className='mp-slot-lbl'; lbl.textContent=mt;
+      if(!entries.length)return; // Only show slots that have meals
+      var slotHtml='<div style="padding:8px 15px;border-bottom:1px solid var(--border-soft)">';
+      slotHtml+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">';
+      slotHtml+='<div style="width:8px;height:8px;border-radius:50%;background:'+MTC[mt]+'"></div>';
+      slotHtml+='<span style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;flex:1">'+mt+'</span>';
       var slotCal=entries.reduce(function(s,e){var m=getMeal(e.mealId);return s+mealCals(m,e.portions||1);},0);
-      var calLbl=document.createElement('div'); calLbl.className='mp-slot-cal'; calLbl.textContent=slotCal?slotCal+' kcal':'';
-      slotHdr.appendChild(dot); slotHdr.appendChild(lbl); slotHdr.appendChild(calLbl);
-      slotEl.appendChild(slotHdr);
-
-      if(!entries.length){
-        var emp=document.createElement('div'); emp.className='mp-empty-slot'; emp.textContent='Nothing planned';
-        slotEl.appendChild(emp);
-      } else {
-        entries.forEach(function(entry){
-          var m=getMeal(entry.mealId); if(!m)return;
-          var row=document.createElement('div'); row.className='mp-meal-row';
-          row.innerHTML='<div class="mp-meal-name">'+m.name+'</div><div class="mp-meal-kcal">'+mealCals(m,entry.portions||1)+' kcal</div>';
-          slotEl.appendChild(row);
-        });
-      }
-      body.appendChild(slotEl);
+      slotHtml+='<span style="font-size:11px;font-weight:600;color:var(--accent)">'+slotCal+' kcal</span>';
+      slotHtml+='</div>';
+      entries.forEach(function(entry){
+        var m=getMeal(entry.mealId); if(!m)return;
+        var cal=mealCals(m,entry.portions||1);
+        var mac2=mealMacros(m,entry.portions||1);
+        slotHtml+='<div style="display:flex;align-items:center;justify-content:space-between;padding:5px 0 5px 14px">';
+        slotHtml+='<div style="flex:1;min-width:0">';
+        slotHtml+='<div style="font-size:13px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+m.name+'</div>';
+        slotHtml+='<div style="font-size:10.5px;color:var(--text3);margin-top:1px">P:'+mac2.p+'g C:'+mac2.c+'g F:'+mac2.f+'g</div>';
+        slotHtml+='</div>';
+        slotHtml+='<span style="font-size:12px;font-weight:700;color:var(--accent);white-space:nowrap;margin-left:8px">'+cal+' kcal</span>';
+        slotHtml+='</div>';
+      });
+      slotHtml+='</div>';
+      body.innerHTML+=slotHtml;
     });
+
+    // Footer buttons inside collapsible
+    var foot='<div style="display:flex;align-items:center;gap:8px;padding:10px 15px;background:var(--surface2)">';
+    foot+='<button class="btn btn-sm" style="background:var(--red-light);color:var(--red);border:1px solid rgba(201,64,64,0.2)" data-del-plan="'+mp.id+'">Delete</button>';
+    foot+='<button class="btn btn-primary btn-sm" style="margin-left:auto" data-assign-plan="'+mp.id+'">📅 Assign to Day</button>';
+    foot+='</div>';
+    body.innerHTML+=foot;
+
     card.appendChild(body);
 
-    // footer buttons
-    var foot=document.createElement('div'); foot.className='mp-card-foot';
-    var editBtn=document.createElement('button'); editBtn.className='btn btn-ghost btn-sm'; editBtn.textContent='Edit';
-    (function(pid){editBtn.addEventListener('click',function(){openEditPlan(pid);});})(mp.id);
+    // Wire up footer buttons
+    var delBtn2=body.querySelector('[data-del-plan]');
+    if(delBtn2){(function(pid){delBtn2.addEventListener('click',function(){deletePlan(pid);});})(mp.id);}
+    var assignBtn2=body.querySelector('[data-assign-plan]');
+    if(assignBtn2){(function(pid){assignBtn2.addEventListener('click',function(){openPlanApply(pid);});})(mp.id);}
 
-    var delBtn=document.createElement('button'); delBtn.className='btn btn-sm'; delBtn.style.cssText='background:var(--red-light);color:var(--red);border:1px solid rgba(201,64,64,0.2)'; delBtn.textContent='Delete';
-    (function(pid){delBtn.addEventListener('click',function(){deletePlan(pid);});})(mp.id);
-
-    var assignBtn=document.createElement('button'); assignBtn.className='btn btn-primary btn-sm'; assignBtn.style.marginLeft='auto'; assignBtn.textContent='\u{1F4C5} Assign to Day';
-    (function(pid){assignBtn.addEventListener('click',function(){openPlanApply(pid);});})(mp.id);
-
-    foot.appendChild(editBtn); foot.appendChild(delBtn); foot.appendChild(assignBtn);
-    card.appendChild(foot);
     el.appendChild(card);
   });
 }
@@ -2740,7 +2926,11 @@ function renderPlans(){
 
 function openNewPlan(){
   editPlanId=null;
-  document.getElementById('m-plan-title').textContent='New Meal Plan';
+  _planViewMode='meal';
+  _planMealCopies={};
+  document.getElementById('plan-view-meal').classList.add('active');
+  document.getElementById('plan-view-ing').classList.remove('active');
+  document.getElementById('m-plan-title').textContent='New Day Plan';
   document.getElementById('plan-name').value='';
   document.getElementById('plan-goal').value='';
   document.getElementById('plan-notes').value='';
@@ -2753,6 +2943,10 @@ function openNewPlan(){
 function openEditPlan(id){
   var mp=mealPlans.find(function(p){return p.id===id;}); if(!mp)return;
   editPlanId=id;
+  _planViewMode='meal';
+  _planMealCopies={};
+  document.getElementById('plan-view-meal').classList.add('active');
+  document.getElementById('plan-view-ing').classList.remove('active');
   document.getElementById('m-plan-title').textContent='Edit Plan';
   document.getElementById('plan-name').value=mp.name;
   document.getElementById('plan-goal').value=mp.goal||'';
@@ -2788,14 +2982,73 @@ function renderPlanSlotMeals(mt){
     var m=getMeal(entry.mealId); if(!m)return;
     var cal=mealCals(m,entry.portions||1);
     var mac=mealMacros(m,entry.portions||1);
-    var row=document.createElement('div'); row.className='mp-meal-row'; row.style.marginBottom='4px';
-    row.innerHTML='<div style="flex:1;min-width:0">'
-      +'<div class="mp-meal-name">'+m.name+'</div>'
-      +'<div style="font-size:10.5px;color:var(--text3);margin-top:1px">'+cal+' kcal · P:'+mac.p+'g C:'+mac.c+'g F:'+mac.f+'g</div>'
-      +'</div>';
-    var rm=document.createElement('button'); rm.className='mp-meal-rm'; rm.textContent='\u2715';
-    (function(slot,idx){rm.addEventListener('click',function(){ planSlotState[slot].splice(idx,1); renderPlanSlotMeals(slot); updatePlanTotals(); });})(mt,i);
-    row.appendChild(rm); area.appendChild(row);
+
+    if (_planViewMode === 'ingredient') {
+      // ── Ingredient view with editable quantities (same as Today)
+      var mc = getPlanMealCopy(entry.mealId);
+      var ingCal = mealCals(mc, entry.portions||1);
+      var ingMac = mealMacros(mc, entry.portions||1);
+
+      var div = document.createElement('div');
+      div.style.cssText = 'padding:8px 0;border-bottom:1px solid var(--border-soft)';
+
+      var hdr = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">';
+      hdr += '<span style="font-size:13px;font-weight:700;color:var(--text)">' + mc.name + '</span>';
+      hdr += '<div style="display:flex;gap:6px;align-items:center">';
+      hdr += '<button onclick="savePlanMealChanges(\'' + entry.mealId + '\')" style="font-size:10px;font-weight:700;color:var(--green);background:var(--green-light);border:1px solid rgba(14,138,95,0.25);border-radius:20px;padding:3px 9px;cursor:pointer;font-family:DM Sans,sans-serif;white-space:nowrap">💾 Save to meal</button>';
+      hdr += '<button style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:13px;padding:2px 4px" data-rm-slot="' + mt + '" data-rm-idx="' + i + '">✕</button>';
+      hdr += '</div></div>';
+
+      // Ingredient grid header
+      var grid = '<div style="display:grid;grid-template-columns:1fr 52px 60px 52px;gap:4px;padding:3px 0 4px;border-bottom:1px solid var(--border-soft)">';
+      grid += '<span style="font-size:9px;font-weight:700;color:var(--text4);text-transform:uppercase;letter-spacing:0.5px">Ingredient</span>';
+      grid += '<span style="font-size:9px;font-weight:700;color:var(--text4);text-transform:uppercase;letter-spacing:0.5px;text-align:center">Qty</span>';
+      grid += '<span style="font-size:9px;font-weight:700;color:var(--text4);text-transform:uppercase;letter-spacing:0.5px;text-align:center">Grams</span>';
+      grid += '<span style="font-size:9px;font-weight:700;color:var(--text4);text-transform:uppercase;letter-spacing:0.5px;text-align:right">kcal</span>';
+      grid += '</div>';
+
+      // Ingredient rows
+      var rows = '';
+      if (mc.ingredients && mc.ingredients.length) {
+        mc.ingredients.forEach(function(ing, ii) {
+          var baseCals = parseFloat(ing.calories) || 0;
+          var baseGrams = parseFloat(ing.grams) || parseFloat(ing.amount) || 0;
+          var isGramUnit = (ing.unit === 'g' || ing.unit === 'ml');
+          rows += '<div style="display:grid;grid-template-columns:1fr 52px 60px 52px;gap:4px;align-items:center;padding:5px 0;border-bottom:1px solid var(--border-soft)">';
+          rows += '<span style="font-size:12px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + ing.name + '</span>';
+          rows += '<input type="number" value="' + ing.amount + '" min="0" step="' + (isGramUnit ? '1' : '0.5') + '" '
+            + 'style="width:100%;padding:4px 4px;font-size:12px;text-align:center;border-radius:8px;border:1.5px solid var(--border);background:var(--surface2);color:var(--text);font-family:DM Sans,sans-serif" '
+            + 'oninput="updatePlanIng(\'' + entry.mealId + '\',' + ii + ',this.value)">';
+          if (isGramUnit) {
+            rows += '<span style="font-size:11px;color:var(--text3);text-align:center" id="planinggrams-' + entry.mealId + '-' + ii + '">' + ing.unit + '</span>';
+          } else {
+            rows += '<span style="font-size:11px;color:var(--text3);text-align:center" id="planinggrams-' + entry.mealId + '-' + ii + '">' + (baseGrams % 1 === 0 ? baseGrams : parseFloat(baseGrams.toFixed(1))) + 'g</span>';
+          }
+          rows += '<span style="font-size:11px;font-weight:700;color:var(--accent);text-align:right" id="planingcal-' + entry.mealId + '-' + ii + '">' + Math.round(baseCals) + '</span>';
+          rows += '</div>';
+        });
+      }
+
+      div.innerHTML = hdr + grid + rows;
+      // Wire up remove button
+      var rmBtn = div.querySelector('[data-rm-slot]');
+      if (rmBtn) {
+        (function(slot, idx) {
+          rmBtn.addEventListener('click', function() { planSlotState[slot].splice(idx, 1); renderPlanSlotMeals(slot); updatePlanTotalsFromCopies(); });
+        })(mt, i);
+      }
+      area.appendChild(div);
+    } else {
+      // ── Meal view (existing)
+      var row=document.createElement('div'); row.className='mp-meal-row'; row.style.marginBottom='4px';
+      row.innerHTML='<div style="flex:1;min-width:0">'
+        +'<div class="mp-meal-name">'+m.name+'</div>'
+        +'<div style="font-size:10.5px;color:var(--text3);margin-top:1px">'+cal+' kcal · P:'+mac.p+'g C:'+mac.c+'g F:'+mac.f+'g</div>'
+        +'</div>';
+      var rm=document.createElement('button'); rm.className='mp-meal-rm'; rm.textContent='\u2715';
+      (function(slot,idx){rm.addEventListener('click',function(){ planSlotState[slot].splice(idx,1); renderPlanSlotMeals(slot); updatePlanTotals(); });})(mt,i);
+      row.appendChild(rm); area.appendChild(row);
+    }
   });
   var addBtn=document.createElement('button'); addBtn.className='mp-add-meal-btn';
   addBtn.textContent='+ Add '+mt+' meal';
@@ -2804,6 +3057,115 @@ function renderPlanSlotMeals(mt){
 }
 
 var _planPickFilter = [];
+var _planViewMode = 'meal'; // 'meal' or 'ingredient'
+var _planMealCopies = {}; // session copies for ingredient editing in plan builder
+
+function setPlanViewMode(mode) {
+  _planViewMode = mode;
+  document.getElementById('plan-view-meal').classList.toggle('active', mode === 'meal');
+  document.getElementById('plan-view-ing').classList.toggle('active', mode === 'ingredient');
+  buildPlanSlotUI();
+}
+
+function getPlanMealCopy(mealId) {
+  if (!_planMealCopies[mealId]) {
+    _planMealCopies[mealId] = getMealCopy(mealId);
+  }
+  return _planMealCopies[mealId];
+}
+
+function updatePlanIng(mealId, ingIdx, newAmt) {
+  var mc = getPlanMealCopy(mealId);
+  if (!mc || !mc.ingredients[ingIdx]) return;
+  var ing = mc.ingredients[ingIdx];
+  var newVal = parseFloat(newAmt) || 0;
+
+  if (!ing._baseAmount) {
+    ing._baseAmount = ing.amount;
+    ing._baseCals = ing.calories || 0;
+    ing._baseProt = ing.protein || 0;
+    ing._baseCarbs = ing.carbs || 0;
+    ing._baseFat = ing.fat || 0;
+  }
+
+  var baseAmt = parseFloat(ing._baseAmount) || 1;
+  var baseGrams = parseFloat(ing.grams) || baseAmt;
+  var ratio = newVal / baseAmt;
+
+  ing.amount = newAmt;
+  ing.calories = Math.round((ing._baseCals || 0) * ratio);
+  ing.protein = Math.round((ing._baseProt || 0) * ratio * 10) / 10;
+  ing.carbs = Math.round((ing._baseCarbs || 0) * ratio * 10) / 10;
+  ing.fat = Math.round((ing._baseFat || 0) * ratio * 10) / 10;
+
+  // Update inline displays
+  var gramsEl = document.getElementById('planinggrams-' + mealId + '-' + ingIdx);
+  var isGramUnit = (ing.unit === 'g' || ing.unit === 'ml');
+  if (gramsEl && !isGramUnit) {
+    var newGrams = baseGrams * ratio;
+    gramsEl.textContent = (newGrams % 1 === 0 ? newGrams : parseFloat(newGrams.toFixed(1))) + 'g';
+  }
+  var calEl = document.getElementById('planingcal-' + mealId + '-' + ingIdx);
+  if (calEl) calEl.textContent = ing.calories;
+
+  updatePlanTotalsFromCopies();
+}
+
+function updatePlanTotalsFromCopies() {
+  var totalCal = 0, totalP = 0, totalC = 0, totalF = 0;
+  MT.forEach(function(mt) {
+    (planSlotState[mt] || []).forEach(function(entry) {
+      var mc = _planMealCopies[entry.mealId] || getMeal(entry.mealId);
+      if (!mc) return;
+      totalCal += mealCals(mc, entry.portions || 1);
+      var mac = mealMacros(mc, entry.portions || 1);
+      totalP += mac.p; totalC += mac.c; totalF += mac.f;
+    });
+  });
+  var tv = document.getElementById('plan-total-val'); if (tv) tv.textContent = totalCal;
+  var mp = document.getElementById('plan-mac-p'); if (mp) mp.textContent = totalP + 'g';
+  var mc2 = document.getElementById('plan-mac-c'); if (mc2) mc2.textContent = totalC + 'g';
+  var mf = document.getElementById('plan-mac-f'); if (mf) mf.textContent = totalF + 'g';
+  var tgtCal = targets.kcal || 0;
+  var tgtLbl = document.getElementById('plan-target-lbl');
+  var progWrap = document.getElementById('plan-prog-wrap');
+  var progFill = document.getElementById('plan-prog-fill');
+  if (tgtCal > 0) {
+    if (tgtLbl) tgtLbl.textContent = '/ ' + tgtCal + ' target';
+    var pct = Math.min(100, Math.round(totalCal / tgtCal * 100));
+    if (progWrap) progWrap.style.display = 'block';
+    if (progFill) progFill.style.width = pct + '%';
+  } else {
+    if (tgtLbl) tgtLbl.textContent = '';
+    if (progWrap) progWrap.style.display = 'none';
+  }
+}
+
+function savePlanMealChanges(mealId) {
+  var mc = _planMealCopies[mealId];
+  if (!mc) { showToast('No changes to save'); return; }
+  document.getElementById('m-confirm-msg').textContent =
+    'Save your updated amounts for "' + mc.name + '" back to the meal library?';
+  var yesBtn = document.getElementById('m-confirm-yes');
+  yesBtn.onclick = function() {
+    closeM('m-confirm');
+    var m = getMeal(mealId);
+    var idx = meals.findIndex(function(x){ return x.id === mealId; });
+    if (idx >= 0) {
+      var cleanIngs = mc.ingredients.map(function(ing) {
+        var i = Object.assign({}, ing);
+        delete i._baseAmount; delete i._baseCals;
+        delete i._baseProt; delete i._baseCarbs; delete i._baseFat;
+        return i;
+      });
+      meals[idx].ingredients = cleanIngs;
+    }
+    delete _planMealCopies[mealId];
+    save(); renderMeals();
+    showToast(mc.name + ' updated ✓');
+  };
+  document.getElementById('m-confirm').classList.add('open');
+}
 
 function openPlanMealPicker(mt){
   _planPickFilter = [];
@@ -3292,7 +3654,6 @@ function renderTrends() {
     var el = document.getElementById('trendtog-' + t);
     if (el) el.classList.toggle('active', t === trendsTab);
   });
-  if (trendsTab === 'weight') { wrap.innerHTML = renderWeightView(); return; }
   if (trendsTab === 'notes')  { wrap.innerHTML = renderTrendsNotes(); return; }
   wrap.innerHTML = renderNutritionTrends();
 }
@@ -3412,6 +3773,36 @@ function renderNutritionTrends() {
       };
     });
   }
+
+  // ── Completion streak
+  var streak = 0;
+  var streakDate = new Date();
+  // Start from yesterday if today isn't completed yet
+  if (!(dayNotes[dkey(streakDate)] && dayNotes[dkey(streakDate)].completed)) {
+    streakDate.setDate(streakDate.getDate() - 1);
+  }
+  while (true) {
+    var sdk = dkey(streakDate);
+    if (dayNotes[sdk] && dayNotes[sdk].completed) {
+      streak++;
+      streakDate.setDate(streakDate.getDate() - 1);
+    } else {
+      break;
+    }
+  }
+
+  h += '<div class="card" style="margin-bottom:10px;display:flex;align-items:center;gap:14px">';
+  h += '<div style="width:48px;height:48px;border-radius:50%;background:' + (streak > 0 ? 'linear-gradient(135deg,#ff9500,#ff5e3a)' : 'var(--surface2)') + ';display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:' + (streak > 0 ? '0 3px 12px rgba(255,94,58,0.3)' : 'none') + '">';
+  h += '<span style="font-size:22px">' + (streak > 0 ? '🔥' : '⏸') + '</span>';
+  h += '</div>';
+  h += '<div style="flex:1">';
+  h += '<div style="font-family:\'DM Serif Display\',serif;font-size:28px;font-weight:400;color:var(--text);line-height:1">' + streak + '</div>';
+  h += '<div style="font-size:12px;font-weight:700;color:var(--text3);margin-top:2px">day' + (streak !== 1 ? 's' : '') + ' completed in a row</div>';
+  h += '</div>';
+  if (streak >= 3) {
+    h += '<div style="font-size:11px;font-weight:700;color:#ff5e3a;background:rgba(255,94,58,0.1);border:1px solid rgba(255,94,58,0.2);border-radius:20px;padding:4px 10px;white-space:nowrap">Keep it up!</div>';
+  }
+  h += '</div>';
 
   // Avg calories KPI
   var calPct=tgtCal>0?Math.min(100,Math.round(avgCal/tgtCal*100)):0;
@@ -3659,76 +4050,119 @@ function renderIngredients() {
   var wrap = document.getElementById('ingredients-wrap');
   if (!wrap) return;
 
-  if (typeof window._ingTab === 'undefined') window._ingTab = 'myings';
-
-  // Build header with two tabs
-  var h = '<div style="font-family:DM Serif Display,serif;font-size:21px;font-weight:400;margin-bottom:14px;letter-spacing:-0.3px">My <em style="color:var(--accent);font-style:italic">Ingredients</em></div>';
-  h += '<div style="display:flex;background:var(--surface2);border-radius:14px;padding:3px;margin-bottom:14px;border:1px solid var(--border-soft);gap:2px">';
-  h += '<button class="ctbtn' + (window._ingTab==='myings'?' active':'') + '" onclick="window._ingTab=\'myings\';renderIngredients()">🥦 All Ingredients</button>';
-  h += '<button class="ctbtn' + (window._ingTab==='shopping'?' active':'') + '" onclick="window._ingTab=\'shopping\';renderIngredients()">🛒 Shopping List</button>';
-  h += '</div>';
-  h += '<div id="ing-tab-content"></div>';
-  wrap.innerHTML = h;
-
-  if (window._ingTab === 'myings') renderMyIngredients();
-  else renderShoppingListTab();
-}
-
-function renderMyIngredients() {
-  var el = document.getElementById('ing-tab-content');
-  if (!el) return;
-
-  // Collect all unique ingredients across all meals
+  // Collect unique ingredients from all meals + standalone MY_INGREDIENTS
   var byName = {};
+
+  // From meals
   meals.forEach(function(m) {
     (m.ingredients || []).forEach(function(ing) {
       var key = ing.name.toLowerCase().trim();
       if (!byName[key]) {
         byName[key] = {
           name: ing.name,
-          unit: ing.unit,
-          grams: ing.grams || null,
-          calories: ing.calories || 0,
-          protein: ing.protein || 0,
-          carbs: ing.carbs || 0,
-          fat: ing.fat || 0,
+          unit: ing.unit || 'g',
+          calories: parseFloat(ing.calories) || 0,
+          protein: parseFloat(ing.protein) || 0,
+          carbs: parseFloat(ing.carbs) || 0,
+          fat: parseFloat(ing.fat) || 0,
           calTotal: ing.calTotal || false,
-          amount: ing.amount,
-          usedIn: []
+          amount: parseFloat(ing.amount) || 0,
+          grams: parseFloat(ing.grams) || parseFloat(ing.amount) || 0,
+          standalone: false
         };
       }
-      if (!byName[key].usedIn.includes(m.name)) byName[key].usedIn.push(m.name);
     });
+  });
+
+  // From standalone ingredient database
+  (MY_INGREDIENTS || []).forEach(function(ing) {
+    var key = ing.name.toLowerCase().trim();
+    byName[key] = {
+      name: ing.name,
+      unit: 'g',
+      per100cal: parseFloat(ing.per100cal) || 0,
+      per100p: parseFloat(ing.per100p) || 0,
+      per100c: parseFloat(ing.per100c) || 0,
+      per100f: parseFloat(ing.per100f) || 0,
+      per100fi: parseFloat(ing.per100fi) || 0,
+      standalone: true
+    };
   });
 
   var items = Object.values(byName).sort(function(a,b){ return a.name.localeCompare(b.name); });
 
+  var h = '<div style="font-family:DM Serif Display,serif;font-size:21px;font-weight:400;margin-bottom:14px;letter-spacing:-0.3px">My <em style="color:var(--accent);font-style:italic">Pantry</em></div>';
+
+  // Add ingredient button
+  h += '<button onclick="openAddIngredient()" class="btn btn-primary btn-full" style="margin-bottom:14px">';
+  h += '<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
+  h += 'Add Ingredient</button>';
+
   if (!items.length) {
-    el.innerHTML = '<div class="empty"><div class="empty-icon">🥦</div><div class="empty-title">No ingredients yet</div><div class="empty-sub">Ingredients from your meals will appear here</div></div>';
+    h += '<div class="empty"><div class="empty-icon">🥦</div><div class="empty-title">No ingredients yet</div><div class="empty-sub">Add ingredients to your pantry or create meals with ingredients</div></div>';
+    wrap.innerHTML = h;
     return;
   }
 
-  var h = '<div style="font-size:12px;color:var(--text3);margin-bottom:10px">' + items.length + ' unique ingredients across all your meals</div>';
-  h += '<div style="background:var(--surface);border:1px solid var(--border-soft);border-radius:var(--radius-sm);overflow:hidden">';
+  h += '<div style="font-size:12px;color:var(--text3);margin-bottom:10px">' + items.length + ' ingredients</div>';
+  h += '<div style="background:var(--surface);border:1px solid var(--border-soft);border-radius:var(--radius);overflow:hidden">';
 
   items.forEach(function(ing, idx) {
-    var cal = ing.calTotal ? Math.round(parseFloat(ing.calories)) : Math.round(ing.calories / 100 * (parseFloat(ing.amount)||0));
-    var unitDisplay = (ing.unit === 'g' || ing.unit === 'ml') ? ing.amount + ing.unit : ing.amount + ' ' + ing.unit + (ing.grams ? ' (' + ing.grams + 'g)' : '');
-    h += '<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;' + (idx > 0 ? 'border-top:1px solid var(--border-soft);' : '') + '">';
+    var pStr, cStr, fStr, calStr;
+
+    if (ing.standalone) {
+      pStr = ing.per100p + 'g';
+      cStr = ing.per100c + 'g';
+      fStr = ing.per100f + 'g';
+      calStr = ing.per100cal;
+    } else {
+      pStr = Math.round(ing.protein) + 'g';
+      cStr = Math.round(ing.carbs) + 'g';
+      fStr = Math.round(ing.fat) + 'g';
+      calStr = ing.calTotal ? Math.round(ing.calories) : Math.round(ing.calories / 100 * ing.amount);
+    }
+
+    h += '<div style="display:flex;align-items:center;padding:14px 14px;' + (idx > 0 ? 'border-top:1px solid var(--border-soft);' : '') + '">';
+
+    // Left: Name + per100g label
     h += '<div style="flex:1;min-width:0">';
-    h += '<div style="font-size:14px;font-weight:700;color:var(--text)">' + ing.name + '</div>';
-    h += '<div style="font-size:11px;color:var(--text3);margin-top:2px">' + unitDisplay + '</div>';
-    h += '<div style="font-size:11px;color:var(--text3);margin-top:1px;font-style:italic">' + ing.usedIn.join(' · ') + '</div>';
+    h += '<div style="font-size:14px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + ing.name + '</div>';
+    if (ing.standalone) {
+      h += '<div style="font-size:10px;color:var(--text4);margin-top:2px;font-weight:600">per 100g</div>';
+    }
     h += '</div>';
-    h += '<div style="text-align:right;flex-shrink:0;margin-left:10px">';
-    h += '<div style="font-size:14px;font-weight:700;color:var(--accent)">' + cal + ' kcal</div>';
-    h += '<div style="font-size:10px;color:var(--text3);margin-top:2px">P:' + ing.protein + 'g C:' + ing.carbs + 'g F:' + ing.fat + 'g</div>';
+
+    // Right: Macros bold + Calories
+    h += '<div style="display:flex;align-items:center;gap:10px;flex-shrink:0;margin-left:10px">';
+    h += '<div style="display:flex;gap:6px">';
+    h += '<span style="font-size:12px;font-weight:800;color:#2e7d52">P ' + pStr + '</span>';
+    h += '<span style="font-size:12px;font-weight:800;color:var(--blue)">C ' + cStr + '</span>';
+    h += '<span style="font-size:12px;font-weight:800;color:var(--purple)">F ' + fStr + '</span>';
     h += '</div>';
+    h += '<div style="font-family:\'DM Serif Display\',serif;font-size:16px;font-weight:700;color:var(--accent);min-width:55px;text-align:right">' + calStr + ' <span style="font-size:10px;font-weight:600;color:var(--text3)">kcal</span></div>';
+    h += '</div>';
+
+    // Delete button for standalone ingredients
+    if (ing.standalone) {
+      h += '<button onclick="deleteStandaloneIng(\'' + ing.name.replace(/'/g,"\\'") + '\')" style="background:none;border:none;color:var(--text4);cursor:pointer;font-size:14px;padding:2px 0 2px 8px;flex-shrink:0">✕</button>';
+    }
+
     h += '</div>';
   });
 
   h += '</div>';
-  el.innerHTML = h;
+  wrap.innerHTML = h;
+}
+
+// ── Shopping tab (now its own section) ───────────────────────
+function renderShopping() {
+  var wrap = document.getElementById('shopping-wrap');
+  if (!wrap) return;
+
+  var h = '<div style="font-family:DM Serif Display,serif;font-size:21px;font-weight:400;margin-bottom:14px;letter-spacing:-0.3px">Shopping <em style="color:var(--accent);font-style:italic">List</em></div>';
+  h += '<div id="ing-tab-content"></div>';
+  wrap.innerHTML = h;
+  renderShoppingListTab();
 }
 
 function renderShoppingListTab() {
@@ -3982,14 +4416,12 @@ function delWeightLog(date) {
 // ── TREND CONTROLS ───────────────────────────────────────────
 function setTrendsTab(tab) {
   trendsTab = tab;
-  ['nutrition','weight','notes'].forEach(function(t){
+  ['nutrition','notes'].forEach(function(t){
     var el = document.getElementById('trendtog-' + t);
     if (el) el.classList.toggle('active', t === tab);
   });
   var nc = document.getElementById('nutrition-controls');
-  var wc = document.getElementById('weight-controls');
   if (nc) nc.style.display = tab === 'nutrition' ? 'flex'  : 'none';
-  if (wc) wc.style.display = tab === 'weight'    ? 'block' : 'none';
   renderTrends();
 }
 
@@ -4346,6 +4778,20 @@ function saveCustom() {
   var fat=parseFloat(document.getElementById('ci-fat')&&document.getElementById('ci-fat').value)||0;
   var fiber=parseFloat(document.getElementById('ci-fiber')&&document.getElementById('ci-fiber').value)||0;
   if(!n){showToast('Enter a name');return;}
+
+  // If opened from the Ingredients tab "Add Ingredient" button, add to MY_INGREDIENTS
+  if (window._addIngMode) {
+    window._addIngMode = false;
+    // Remove duplicate by name
+    MY_INGREDIENTS = MY_INGREDIENTS.filter(function(i){ return i.name.toLowerCase() !== n.toLowerCase(); });
+    MY_INGREDIENTS.push({name:n, per100cal:cal, per100p:pro, per100c:carb, per100f:fat, per100fi:fiber});
+    localStorage.setItem('mp4_my_ings', JSON.stringify(MY_INGREDIENTS));
+    // Also add to MACRO_DB so it can be used in meals
+    if(pro||carb||fat||fiber) MACRO_DB[n]={p:pro,c:carb,f:fat,fi:fiber};
+    closeM('m-custom');showToast(n+' added ✓');renderIngredients();
+    return;
+  }
+
   custIngs=custIngs.filter(function(c){return(c.n||c.name).toLowerCase()!==n.toLowerCase();});
   custIngs.push({n:n,cat:cat,u:unit,c:cal});
   if(pro||carb||fat||fiber) MACRO_DB[n]={p:pro,c:carb,f:fat,fi:fiber};
@@ -4511,7 +4957,7 @@ function shiftBarWeek(dir) {
 }
 
 
-var MY_INGREDIENTS = [];
+var MY_INGREDIENTS = JSON.parse(localStorage.getItem('mp4_my_ings') || '[]');
 
 
 var MY_RECIPES = [
