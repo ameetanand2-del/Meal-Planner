@@ -1804,18 +1804,11 @@ function confirmSaveMealChanges(mealId) {
   delete _todayMealCopies[mealId];
   save();
   renderMeals();
-  var toast = document.getElementById('toast');
-  toast.innerHTML = m.name + ' updated ✓';
-  toast.style.whiteSpace = 'nowrap';
-  setTimeout(function(){ toast.classList.remove('show'); }, 2000);
+  renderToday();
+  showToast(m.name + ' updated ✓');
 }
 
 function updateTodayIng(mealId, ingIdx, newAmt) {
-  // Work on the session copy ONLY — never touch the real meal
-  var mc = getTodayCopy(mealId);
-  if (!mc || !mc.ingredients[ingIdx]) return;
-  var ing = mc.ingredients[ingIdx];
-  var newVal = parseFloat(newAmt) || 0;
   // Work on the session copy ONLY — never touch the real meal
   var mc = getTodayCopy(mealId);
   if (!mc || !mc.ingredients[ingIdx]) return;
@@ -5532,22 +5525,33 @@ var MY_RECIPES = [
    ]}
 ];
 function loadMyRecipes() {
-  // Start with built-in recipes
-  var builtInIds = {};
-  meals = [];
-  MY_RECIPES.forEach(function(r){
-    meals.push(r);
-    builtInIds[r.id] = true;
-  });
-  // Merge any user-created meals from localStorage (meals not in MY_RECIPES)
+  // Load saved meals from localStorage first
+  var saved = {};
   try {
-    var saved = JSON.parse(localStorage.getItem('mp4_meals_v2') || '[]');
-    saved.forEach(function(m) {
-      if (!builtInIds[m.id]) {
-        meals.push(m);
-      }
-    });
+    var savedArr = JSON.parse(localStorage.getItem('mp4_meals_v2') || '[]');
+    savedArr.forEach(function(m) { saved[m.id] = m; });
   } catch(e) {}
+
+  meals = [];
+  var loadedIds = {};
+
+  // For each built-in recipe, use the saved version if it exists (user may have edited it),
+  // otherwise use the hardcoded default
+  MY_RECIPES.forEach(function(r) {
+    if (saved[r.id]) {
+      meals.push(saved[r.id]); // User-edited version takes priority
+    } else {
+      meals.push(r); // First time — use hardcoded default
+    }
+    loadedIds[r.id] = true;
+  });
+
+  // Also load any user-created meals that aren't in MY_RECIPES
+  for (var sid in saved) {
+    if (!loadedIds[sid]) {
+      meals.push(saved[sid]);
+    }
+  }
 }
 
 // ── INIT ──────────────────────────────────────────────────────
