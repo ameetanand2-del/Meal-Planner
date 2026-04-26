@@ -1240,6 +1240,7 @@ var barWeekOffset = 0;  // 0 = current week, -1 = last week, etc
 
 // ── SAVE ──────────────────────────────────────────────────────
 function save() {
+  localStorage.setItem('mp4_meals_v2', JSON.stringify(meals));
   localStorage.setItem('mp4_plan',    JSON.stringify(plan));
   localStorage.setItem('mp4_chk',     JSON.stringify(chkd));
   localStorage.setItem('mp4_custom',  JSON.stringify(custIngs));
@@ -5365,16 +5366,27 @@ var MY_RECIPES = [
    ]}
 ];
 function loadMyRecipes() {
-  // Always start fresh — ignore any cached meal data
-  localStorage.removeItem('mp4_meals_v2');
+  // Start with built-in recipes
+  var builtInIds = {};
   meals = [];
   MY_RECIPES.forEach(function(r){
     meals.push(r);
+    builtInIds[r.id] = true;
   });
+  // Merge any user-created meals from localStorage (meals not in MY_RECIPES)
+  try {
+    var saved = JSON.parse(localStorage.getItem('mp4_meals_v2') || '[]');
+    saved.forEach(function(m) {
+      if (!builtInIds[m.id]) {
+        meals.push(m);
+      }
+    });
+  } catch(e) {}
 }
 
 // ── INIT ──────────────────────────────────────────────────────
 loadMyRecipes();
+save();
 renderToday();
 renderCal();
 </script>
