@@ -1198,7 +1198,8 @@ var MACRO_DB = {};
     'Protein Yoghurt (Yoguri)':     {p:7.5, c:3.3, f:0.5, fi:0},
     'Besan (Chickpea Flour)':       {p:22.0, c:58.0, f:7.0, fi:10.0},
     'Avocado (Australian)':         {p:2.0, c:5.0, f:13.0, fi:6.7},
-    'Sourdough Bread':              {p:10.9, c:51.8, f:2.7, fi:2.4}
+    'Sourdough Bread':              {p:10.9, c:51.8, f:2.7, fi:2.4},
+    'Chipotle Chicken Burrito Bowl (MyMuscleChef)': {p:14.5, c:13.8, f:4.6, fi:2.0}
   };
   for (var k in mfpIngDB) MACRO_DB[k] = mfpIngDB[k];
 })();
@@ -2725,7 +2726,7 @@ function mealEmoji(m) {
   if (all.indexOf('soup') >= 0) return '🍲';
   if (all.indexOf('pizza') >= 0) return '🍕';
   if (all.indexOf('burger') >= 0) return '🍔';
-  if (all.indexOf('wrap') >= 0 || all.indexOf('burrito') >= 0) return '🌯';
+  if (all.indexOf('wrap') >= 0 || all.indexOf('burrito') >= 0 || all.indexOf('chipotle') >= 0) return '🌯';
   if (all.indexOf('chilla') >= 0 || all.indexOf('pancake') >= 0 || all.indexOf('besan') >= 0) return '🥞';
   if (all.indexOf('toast') >= 0) return '🍞';
   if (all.indexOf('dumpling') >= 0) return '🥟';
@@ -5522,6 +5523,12 @@ var MY_RECIPES = [
     {name:'Avocado (Australian)',                  amount:'0.5', unit:'avocado', grams:100, calories:144, protein:2, carbs:5, fat:13, calTotal:true},
     {name:'Sardines in Spring Water',             amount:'225', unit:'g',   grams:225, calories:318,  protein:48, carbs:0,   fat:14,  calTotal:true},
     {name:'Sourdough Bread',                      amount:'110', unit:'g',   grams:110, calories:299,  protein:12, carbs:57,  fat:3,   calTotal:true}
+   ]},
+
+  {id:'mfp_chipotle_burrito', name:'Chipotle Chicken Burrito Bowl', tags:{cuisine:'Mexican',effort:'Quick',diet:['High Protein'],status:''},
+   notes:'MyMuscleChef pre-made meal — 450g serving',
+   ingredients:[
+    {name:'Chipotle Chicken Burrito Bowl (MyMuscleChef)', amount:'450', unit:'g', grams:450, calories:704, protein:65.4, carbs:62.3, fat:20.5, calTotal:true}
    ]}
 ];
 function loadMyRecipes() {
