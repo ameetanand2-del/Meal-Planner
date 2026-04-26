@@ -714,9 +714,9 @@ select {
     </div>
     <!-- Meal tab -->
     <div id="assign-tab-meal">
-      <label style="margin-bottom:6px;display:block">Portions</label>
+      <label style="margin-bottom:6px;display:block">Servings</label>
       <div class="port-row">
-        <span style="font-size:13px;color:var(--text2);flex:1">How many portions?</span>
+        <span style="font-size:13px;color:var(--text2);flex:1">How many servings?</span>
         <button class="pbtn" onclick="chgPort(-1)">−</button>
         <span class="pval" id="pval">1</span>
         <button class="pbtn" onclick="chgPort(1)">+</button>
@@ -761,6 +761,12 @@ select {
 
     <!-- Notes -->
     <div class="form-group"><label>Notes <span style="font-weight:400;color:var(--text3);text-transform:none;letter-spacing:0">(optional)</span></label><textarea id="meal-notes" placeholder="e.g. good post-workout meal..." style="height:55px;resize:none;font-size:13px"></textarea></div>
+
+    <!-- Total Servings -->
+    <div class="form-group">
+      <label>Total Servings <span style="font-weight:400;color:var(--text3);text-transform:none;letter-spacing:0">(how many servings does this recipe make?)</span></label>
+      <input type="number" id="meal-servings" min="1" value="1" style="width:80px;padding:8px 10px;font-size:14px;text-align:center;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--surface);color:var(--text);font-family:DM Sans,sans-serif">
+    </div>
 
     <!-- Recipe Status -->
     <div class="form-group">
@@ -1167,6 +1173,36 @@ const DS=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 // ── MACRO DATABASE (per 100g: p=protein, c=carbs, f=fat, fi=fiber) ──────────
 var MACRO_DB = {};
 
+// Pre-populate MACRO_DB with MFP ingredients (per 100g)
+(function(){
+  var mfpIngDB = {
+    'Mazafati Dates':               {p:1.1, c:75.0, f:0.4, fi:6.7},
+    'Peanut Butter (Mayver)':       {p:25.4, c:13.8, f:49.2, fi:6.0},
+    'Dark Chocolate 70% Cocoa (Cadbury)': {p:9.3, c:36.7, f:39.3, fi:10.9},
+    'Coconut Oil (Extra Virgin)':   {p:0, c:0, f:100, fi:0},
+    'Coconut Oil':                  {p:0, c:0, f:100, fi:0},
+    'Kimchi':                       {p:1.0, c:2.3, f:0.7, fi:1.6},
+    'Medium Grain Rice (Nice Rice)':{p:7.0, c:79.0, f:0.4, fi:1.3},
+    'Sesame Wok Oil (Lee Kum Kee)': {p:0, c:0, f:100, fi:0},
+    'Gochujang':                    {p:5.9, c:52.9, f:0, fi:0},
+    'Sardines in Spring Water':     {p:21.3, c:0, f:6.7, fi:0},
+    'Mozzarella (Perfect Italiano)':{p:25.0, c:2.5, f:22.5, fi:0},
+    'Pure Ghee (Sabrini)':          {p:0, c:0, f:100, fi:0},
+    'Olive Oil Extra Virgin (La Espanola)': {p:0, c:0, f:91.1, fi:0},
+    'Olive Oil':                    {p:0, c:0, f:88.7, fi:0},
+    'Butter Soft Salt Reduced (Mainland)': {p:20, c:20, f:80, fi:0},
+    'Grated Parmesan Extra Sharp':  {p:30.0, c:10.0, f:25.0, fi:0},
+    'Multigrain Protein Pasta (San Remo)': {p:30.4, c:48.8, f:2.4, fi:4.8},
+    'Garlic Bread (La Famiglia)':   {p:6.7, c:46.7, f:16.7, fi:0},
+    'Ghee':                         {p:0, c:0, f:100, fi:0},
+    'Protein Yoghurt (Yoguri)':     {p:7.5, c:3.3, f:0.5, fi:0},
+    'Besan (Chickpea Flour)':       {p:22.0, c:58.0, f:7.0, fi:10.0},
+    'Avocado (Australian)':         {p:2.0, c:5.0, f:13.0, fi:6.7},
+    'Sourdough Bread':              {p:10.9, c:51.8, f:2.7, fi:2.4}
+  };
+  for (var k in mfpIngDB) MACRO_DB[k] = mfpIngDB[k];
+})();
+
 // ── USDA FoodData Central API Key ─────────────────────────────
 // DEMO_KEY works for testing (rate limited to ~30 req/hour).
 // Get a free personal key at: https://fdc.nal.usda.gov/api-key-signup
@@ -1282,16 +1318,14 @@ function mealCals(meal, portions) {
     if (unit === 'tsp')       amt *= 5;
     else if (unit === 'tbsp') amt *= 15;
     else if (unit === 'cup')  amt *= 240;
-    // Use ing.calories if available.
-    // If calTotal=true, calories is the total for the given amount (not per 100g).
     if (ing.calories && parseFloat(ing.calories) > 0) {
       if (ing.calTotal) return s + Math.round(parseFloat(ing.calories));
       return s + Math.round((parseFloat(ing.calories) / 100) * amt);
     }
-    // Fallback to lookup
     return s + calcCals(ing.name, ing.amount, ing.unit);
   }, 0);
-  return Math.round(total * portions);
+  var servings = parseInt(meal.totalServings) || 1;
+  return Math.round((total / servings) * portions);
 }
 function getMacros(ingName, calories, amount, unit) {
   var key = null, nameLow = ingName.toLowerCase();
@@ -1350,7 +1384,8 @@ function mealMacros(m, portions) {
       tot.p += mac.p; tot.c += mac.c; tot.f += mac.f; tot.fi += (mac.fi||0);
     }
   });
-  return {p:Math.round(tot.p*portions),c:Math.round(tot.c*portions),f:Math.round(tot.f*portions),fi:Math.round(tot.fi*portions)};
+  var servings = parseInt(m.totalServings) || 1;
+  return {p:Math.round(tot.p/servings*portions),c:Math.round(tot.c/servings*portions),f:Math.round(tot.f/servings*portions),fi:Math.round(tot.fi/servings*portions)};
 }
 
 function dayMacros(dk) {
@@ -1567,7 +1602,7 @@ function renderToday() {
         } else {
           // ── Meal view — simple row
           h += '<div class="slot-meal-row">';
-          h += '<span class="slot-meal-name">' + m.name + (sl.portions > 1 ? ' <span style="color:var(--text3);font-size:11px">×' + sl.portions + '</span>' : '') + statusBadge + '</span>';
+          h += '<span class="slot-meal-name">' + m.name + (sl.portions > 1 ? ' <span style="color:var(--text3);font-size:11px">×' + sl.portions + ' srv</span>' : '') + ((m.totalServings && m.totalServings > 1 && sl.portions <= 1) ? ' <span style="color:var(--text4);font-size:10px">1/' + m.totalServings + '</span>' : '') + statusBadge + '</span>';
           h += '<div style="display:flex;align-items:center;gap:8px">';
           h += '<span class="slot-meal-kcal">' + mealCals(m, sl.portions||1) + ' kcal</span>';
           h += '<button onclick="rmSlotToday(\'' + dk + '\',\'' + mt + '\',\'' + sl.mealId + '\')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:13px;padding:2px">✕</button>';
@@ -2697,12 +2732,13 @@ function renderMeals(){
       </div>
       <!-- Footer: macros + total -->
       <div style="padding:10px 15px;background:var(--surface2);display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border-soft)">
-        <div style="display:flex;gap:10px">
+        <div style="display:flex;gap:10px;align-items:center">
           <span style="font-size:11px;font-weight:700;color:#2e7d52">P ${mac.p}g</span>
           <span style="font-size:11px;font-weight:700;color:var(--blue)">C ${mac.c}g</span>
           <span style="font-size:11px;font-weight:700;color:var(--purple)">F ${mac.f}g</span>
+          ${(m.totalServings && m.totalServings > 1) ? `<span style="font-size:10px;font-weight:700;color:var(--text3);background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:2px 7px">${m.totalServings} servings</span>` : ''}
         </div>
-        <span style="font-family:DM Serif Display,serif;font-size:17px;font-weight:700;color:var(--accent)">${cal} kcal</span>
+        <span style="font-family:DM Serif Display,serif;font-size:17px;font-weight:700;color:var(--accent)">${cal} kcal${(m.totalServings && m.totalServings > 1) ? '<span style="font-size:10px;font-weight:600;color:var(--text3)"> /srv</span>' : ''}</span>
       </div>
     </div>`;
 
@@ -2784,13 +2820,14 @@ function setMealStatus(s) {
   });
 }
 
-function openAddMeal(){editId=null;_mealStatus='';document.getElementById('m-meal-title').textContent='New Meal';document.getElementById('meal-name').value='';buildTags();document.getElementById('ing-inputs').innerHTML='';addIngRow();addIngRow();updTotalCal();setMealStatus('');document.getElementById('m-meal').classList.add('open');}
+function openAddMeal(){editId=null;_mealStatus='';document.getElementById('m-meal-title').textContent='New Meal';document.getElementById('meal-name').value='';document.getElementById('meal-servings').value='1';buildTags();document.getElementById('ing-inputs').innerHTML='';addIngRow();addIngRow();updTotalCal();setMealStatus('');document.getElementById('m-meal').classList.add('open');}
 
 function openEditMeal(id){
   const m=getMeal(id);if(!m)return;
   editId=id;
   document.getElementById('m-meal-title').textContent='Edit Meal';
   document.getElementById('meal-name').value=m.name;
+  document.getElementById('meal-servings').value=m.totalServings||1;
   var ne=document.getElementById('meal-notes');if(ne)ne.value=m.notes||'';
   buildTags(m.tags||{});
   setMealStatus((m.tags && m.tags.status) || '');
@@ -2938,8 +2975,9 @@ function saveMeal(){
     }
   });
   const mNotes=(document.getElementById('meal-notes')&&document.getElementById('meal-notes').value.trim())||'';
-  if(editId){const i=meals.findIndex(m=>m.id===editId);if(i>=0)meals[i]={...meals[i],name,tags,ingredients:ings,notes:mNotes};}
-  else meals.push({id:uid(),name,tags,ingredients:ings,notes:mNotes});
+  const mServings=parseInt(document.getElementById('meal-servings').value)||1;
+  if(editId){const i=meals.findIndex(m=>m.id===editId);if(i>=0)meals[i]={...meals[i],name,tags,ingredients:ings,notes:mNotes,totalServings:mServings};}
+  else meals.push({id:uid(),name,tags,ingredients:ings,notes:mNotes,totalServings:mServings});
   save();closeM('m-meal');renderMeals();
   showToast(editId ? 'Meal updated ✓' : 'Meal saved ✓');
 }
@@ -5274,6 +5312,56 @@ var MY_RECIPES = [
     {name:'Greek Style Light Yoghurt',amount:'200', unit:'g',          grams:200,  calories:22,  protein:1,  carbs:2,  fat:1,  calTotal:true},
     {name:'Coconut Cream',            amount:'394', unit:'ml',         grams:394,  calories:141, protein:2,  carbs:2,  fat:14, calTotal:true},
     {name:'Mozzarella Cheese Grated', amount:'250', unit:'g',          grams:250,  calories:94,  protein:8,  carbs:0,  fat:7,  calTotal:true}
+   ]},
+
+  // ── Meals from MyFitnessPal ────────────────────────────────
+  {id:'mfp_dates_choc_bar', name:'High Protein Dates Chocolate Bar', totalServings:20, tags:{cuisine:'Snack',effort:'Quick',diet:['High Protein'],status:''},
+   notes:'High calorie snack - dates, peanut butter, dark chocolate, coconut oil',
+   ingredients:[
+    {name:'Mazafati Dates',                      amount:'550', unit:'g',   grams:550, calories:1549, protein:6,  carbs:413, fat:2,   calTotal:true},
+    {name:'Peanut Butter (Mayver)',              amount:'130', unit:'g',   grams:130, calories:754,  protein:33, carbs:18,  fat:64,  calTotal:true},
+    {name:'Dark Chocolate 70% Cocoa (Cadbury)',  amount:'150', unit:'g',   grams:150, calories:804,  protein:14, carbs:55,  fat:59,  calTotal:true},
+    {name:'Coconut Oil (Extra Virgin)',           amount:'30',  unit:'g',   grams:30,  calories:264,  protein:0,  carbs:0,   fat:30,  calTotal:true}
+   ]},
+
+  {id:'mfp_kimchi_rice', name:'High Protein Kimchi Rice', tags:{cuisine:'Korean',effort:'Medium',diet:['High Protein'],status:''},
+   notes:'Kimchi fried rice with sardines and mozzarella',
+   ingredients:[
+    {name:'Kimchi',                              amount:'2',   unit:'cup', grams:300, calories:45,   protein:3,  carbs:7,   fat:2,   calTotal:true},
+    {name:'Medium Grain Rice (Nice Rice)',        amount:'100', unit:'g',   grams:100, calories:345,  protein:7,  carbs:79,  fat:0,   calTotal:true},
+    {name:'Sesame Wok Oil (Lee Kum Kee)',         amount:'10',  unit:'ml',  grams:10,  calories:83,   protein:0,  carbs:0,   fat:9,   calTotal:true},
+    {name:'Gochujang',                            amount:'2',   unit:'tbsp',grams:34,  calories:80,   protein:2,  carbs:18,  fat:0,   calTotal:true},
+    {name:'Sardines in Spring Water',             amount:'75',  unit:'g',   grams:75,  calories:106,  protein:16, carbs:0,   fat:5,   calTotal:true},
+    {name:'Mozzarella (Perfect Italiano)',        amount:'40',  unit:'g',   grams:40,  calories:120,  protein:10, carbs:1,   fat:9,   calTotal:true},
+    {name:'Coconut Oil',                          amount:'15',  unit:'g',   grams:15,  calories:125,  protein:0,  carbs:0,   fat:15,  calTotal:true}
+   ]},
+
+  {id:'mfp_protein_pasta', name:'Protein Pasta + Garlic Bread', tags:{cuisine:'Italian',effort:'Medium',diet:['High Protein'],status:''},
+   notes:'Multigrain protein pasta with parmesan and garlic bread',
+   ingredients:[
+    {name:'Pure Ghee (Sabrini)',                  amount:'3',   unit:'ml',  grams:3,   calories:27,   protein:0,  carbs:0,   fat:3,   calTotal:true},
+    {name:'Olive Oil Extra Virgin (La Espanola)', amount:'9',   unit:'ml',  grams:9,   calories:73,   protein:0,  carbs:0,   fat:8,   calTotal:true},
+    {name:'Butter Soft Salt Reduced (Mainland)',  amount:'10',  unit:'g',   grams:10,  calories:74,   protein:2,  carbs:2,   fat:8,   calTotal:true},
+    {name:'Grated Parmesan Extra Sharp',          amount:'20',  unit:'g',   grams:20,  calories:74,   protein:6,  carbs:2,   fat:5,   calTotal:true},
+    {name:'Multigrain Protein Pasta (San Remo)',  amount:'125', unit:'g',   grams:125, calories:442,  protein:38, carbs:61,  fat:3,   calTotal:true},
+    {name:'Garlic Bread (La Famiglia)',           amount:'30',  unit:'g',   grams:30,  calories:111,  protein:2,  carbs:14,  fat:5,   calTotal:true}
+   ]},
+
+  {id:'mfp_chilla_yogurt', name:'Chilla And Yogurt', tags:{cuisine:'Indian',effort:'Medium',diet:['High Protein'],status:''},
+   notes:'Besan chilla with protein yoghurt',
+   ingredients:[
+    {name:'Ghee',                                 amount:'3',   unit:'tsp', grams:15,  calories:135,  protein:0,  carbs:0,   fat:15,  calTotal:true},
+    {name:'Protein Yoghurt (Yoguri)',             amount:'2',   unit:'cup', grams:400, calories:190,  protein:30, carbs:13,  fat:2,   calTotal:true},
+    {name:'Besan (Chickpea Flour)',               amount:'100', unit:'g',   grams:100, calories:387,  protein:22, carbs:58,  fat:7,   calTotal:true}
+   ]},
+
+  {id:'mfp_sardine_avo_sandwich', name:'3 Can Sardine/Avo Sandwich', tags:{cuisine:'Western',effort:'Quick',diet:['High Protein','Omega-3 Rich'],status:''},
+   notes:'Sardine and avocado on sourdough',
+   ingredients:[
+    {name:'Olive Oil',                            amount:'15',  unit:'g',   grams:15,  calories:133,  protein:0,  carbs:0,   fat:15,  calTotal:true},
+    {name:'Avocado (Australian)',                  amount:'0.5', unit:'avocado', grams:100, calories:144, protein:2, carbs:5, fat:13, calTotal:true},
+    {name:'Sardines in Spring Water',             amount:'225', unit:'g',   grams:225, calories:318,  protein:48, carbs:0,   fat:14,  calTotal:true},
+    {name:'Sourdough Bread',                      amount:'110', unit:'g',   grams:110, calories:299,  protein:12, carbs:57,  fat:3,   calTotal:true}
    ]}
 ];
 function loadMyRecipes() {
