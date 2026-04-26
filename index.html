@@ -1143,6 +1143,15 @@ select {
   </div>
 </div>
 
+<!-- Ingredient Picker Modal -->
+<div id="m-ing-pick" class="modal-overlay">
+  <div class="modal slide-up" style="max-height:80vh">
+    <div class="mhdr"><div id="m-ing-pick-title" class="mhdr-title">Add Ingredient</div><button class="mhdr-x" onclick="closeM('m-ing-pick')">✕</button></div>
+    <input type="text" id="ing-pick-search" placeholder="Search ingredients..." oninput="renderIngPickList()" style="margin:0 15px 10px;padding:10px 14px;font-size:14px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--surface2);color:var(--text);font-family:DM Sans,sans-serif;width:calc(100% - 30px);box-sizing:border-box">
+    <div id="ing-pick-list" style="overflow-y:auto;max-height:55vh;padding:0 15px 15px"></div>
+  </div>
+</div>
+
 <script>
 // ═══════════════════════════════════════════════════════════════
 //  MealOS v2 — Today + Planner
@@ -1517,16 +1526,18 @@ function renderToday() {
           h += '<div style="padding:6px 0;border-bottom:1px solid var(--border-soft)">';
           h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">';
           h += '<span style="font-size:13px;font-weight:700;color:var(--text)">' + mc.name + statusBadge + '</span>';
-          h += '<div style="display:flex;gap:6px;align-items:center">';
-          h += '<button onclick="promptSaveMealChanges(\'' + sl.mealId + '\')" style="font-size:10px;font-weight:700;color:var(--green);background:var(--green-light);border:1px solid rgba(14,138,95,0.25);border-radius:20px;padding:3px 9px;cursor:pointer;font-family:DM Sans,sans-serif;white-space:nowrap">💾 Save to meal</button>';
+          h += '<div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;justify-content:flex-end">';
+          h += '<button onclick="promptSaveMealChanges(\'' + sl.mealId + '\')" style="font-size:10px;font-weight:700;color:var(--green);background:var(--green-light);border:1px solid rgba(14,138,95,0.25);border-radius:20px;padding:3px 8px;cursor:pointer;font-family:DM Sans,sans-serif;white-space:nowrap">💾 Update</button>';
+          h += '<button onclick="openSaveAsNewMeal(\'' + sl.mealId + '\',\'today\')" style="font-size:10px;font-weight:700;color:var(--blue);background:var(--blue-light);border:1px solid rgba(42,122,181,0.25);border-radius:20px;padding:3px 8px;cursor:pointer;font-family:DM Sans,sans-serif;white-space:nowrap">📋 Save As</button>';
           h += '<button onclick="rmSlotToday(\'' + dk + '\',\'' + mt + '\',\'' + sl.mealId + '\')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:13px;padding:2px 4px">✕</button>';
           h += '</div></div>';
           if (mc.ingredients && mc.ingredients.length) {
-            h += '<div style="display:grid;grid-template-columns:1fr 52px 60px 52px;gap:4px;padding:3px 0 4px;border-bottom:1px solid var(--border-soft)">';
+            h += '<div style="display:grid;grid-template-columns:1fr 52px 60px 52px 20px;gap:4px;padding:3px 0 4px;border-bottom:1px solid var(--border-soft)">';
             h += '<span style="font-size:9px;font-weight:700;color:var(--text4);text-transform:uppercase;letter-spacing:0.5px">Ingredient</span>';
             h += '<span style="font-size:9px;font-weight:700;color:var(--text4);text-transform:uppercase;letter-spacing:0.5px;text-align:center">Qty</span>';
             h += '<span style="font-size:9px;font-weight:700;color:var(--text4);text-transform:uppercase;letter-spacing:0.5px;text-align:center">Grams</span>';
             h += '<span style="font-size:9px;font-weight:700;color:var(--text4);text-transform:uppercase;letter-spacing:0.5px;text-align:right">kcal</span>';
+            h += '<span></span>';
             h += '</div>';
             mc.ingredients.forEach(function(ing, ii) {
               var baseAmt   = parseFloat(ing.amount) || 1;
@@ -1535,7 +1546,7 @@ function renderToday() {
               var curCal    = Math.round(baseCals);
               var curGrams  = baseGrams % 1 === 0 ? baseGrams : parseFloat(baseGrams.toFixed(1));
               var isGramUnit = (ing.unit === 'g' || ing.unit === 'ml');
-              h += '<div style="display:grid;grid-template-columns:1fr 52px 60px 52px;gap:4px;align-items:center;padding:5px 0;border-bottom:1px solid var(--border-soft)">';
+              h += '<div style="display:grid;grid-template-columns:1fr 52px 60px 52px 20px;gap:4px;align-items:center;padding:5px 0;border-bottom:1px solid var(--border-soft)">';
               h += '<span style="font-size:12px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + ing.name + '</span>';
               h += '<input type="number" value="' + ing.amount + '" min="0" step="' + (isGramUnit ? '1' : '0.5') + '" '
                 + 'style="width:100%;padding:4px 4px;font-size:12px;text-align:center;border-radius:8px;border:1.5px solid var(--border);background:var(--surface2);color:var(--text);font-family:DM Sans,sans-serif" '
@@ -1546,9 +1557,12 @@ function renderToday() {
                 h += '<span style="font-size:11px;color:var(--text3);text-align:center" id="inggrams-' + sl.mealId + '-' + ii + '">' + curGrams + 'g</span>';
               }
               h += '<span style="font-size:11px;font-weight:700;color:var(--accent);text-align:right" id="ingcal-' + sl.mealId + '-' + ii + '">' + curCal + '</span>';
+              h += '<button onclick="rmTodayIng(\'' + sl.mealId + '\',' + ii + ')" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:11px;padding:0;width:20px;text-align:center">✕</button>';
               h += '</div>';
             });
           }
+          // Add ingredient button
+          h += '<button onclick="addTodayIng(\'' + sl.mealId + '\')" style="width:100%;margin-top:6px;padding:6px;font-size:11px;font-weight:700;color:var(--accent);background:var(--accent-light);border:1px dashed var(--accent);border-radius:8px;cursor:pointer;font-family:DM Sans,sans-serif">+ Add Ingredient</button>';
           h += '</div>';
         } else {
           // ── Meal view — simple row
@@ -1689,6 +1703,11 @@ function updateTodayIng(mealId, ingIdx, newAmt) {
   if (!mc || !mc.ingredients[ingIdx]) return;
   var ing = mc.ingredients[ingIdx];
   var newVal = parseFloat(newAmt) || 0;
+  // Work on the session copy ONLY — never touch the real meal
+  var mc = getTodayCopy(mealId);
+  if (!mc || !mc.ingredients[ingIdx]) return;
+  var ing = mc.ingredients[ingIdx];
+  var newVal = parseFloat(newAmt) || 0;
 
   // Store original base values once on first edit
   if (!ing._baseAmount) {
@@ -1770,6 +1789,135 @@ function updateTodayIng(mealId, ingIdx, newAmt) {
     var mtIdx = MT.indexOf(mt);
     if (slotHdrs[mtIdx]) slotHdrs[mtIdx].textContent = slotCal > 0 ? slotCal + ' kcal' : '';
   });
+}
+
+// ── Remove ingredient from today copy
+function rmTodayIng(mealId, ingIdx) {
+  var mc = getTodayCopy(mealId);
+  if (!mc || !mc.ingredients[ingIdx]) return;
+  mc.ingredients.splice(ingIdx, 1);
+  renderToday();
+}
+
+// ── Add existing ingredient to today copy via search picker
+function addTodayIng(mealId) {
+  openIngPicker(function(ing) {
+    var mc = getTodayCopy(mealId);
+    if (!mc) return;
+    mc.ingredients.push(ing);
+    renderToday();
+  });
+}
+
+// ── Ingredient Picker — search from all known ingredients
+var _ingPickCallback = null;
+
+function getAllIngredients() {
+  var byName = {};
+  // From meals
+  meals.forEach(function(m) {
+    (m.ingredients || []).forEach(function(ing) {
+      var key = ing.name.toLowerCase().trim();
+      if (!byName[key]) {
+        byName[key] = {
+          name: ing.name,
+          unit: ing.unit || 'g',
+          amount: parseFloat(ing.amount) || 100,
+          grams: parseFloat(ing.grams) || parseFloat(ing.amount) || 100,
+          calories: parseFloat(ing.calories) || 0,
+          protein: parseFloat(ing.protein) || 0,
+          carbs: parseFloat(ing.carbs) || 0,
+          fat: parseFloat(ing.fat) || 0,
+          calTotal: ing.calTotal || false
+        };
+      }
+    });
+  });
+  // From standalone pantry
+  (MY_INGREDIENTS || []).forEach(function(ing) {
+    var key = ing.name.toLowerCase().trim();
+    if (!byName[key]) {
+      byName[key] = {
+        name: ing.name,
+        unit: 'g',
+        amount: 100,
+        grams: 100,
+        calories: parseFloat(ing.per100cal) || 0,
+        protein: parseFloat(ing.per100p) || 0,
+        carbs: parseFloat(ing.per100c) || 0,
+        fat: parseFloat(ing.per100f) || 0,
+        calTotal: true
+      };
+    }
+  });
+  return Object.values(byName).sort(function(a,b){ return a.name.localeCompare(b.name); });
+}
+
+function openIngPicker(callback) {
+  _ingPickCallback = callback;
+  var el = document.getElementById('ing-pick-search');
+  if (el) el.value = '';
+  renderIngPickList();
+  document.getElementById('m-ing-pick').classList.add('open');
+}
+
+function renderIngPickList() {
+  var el = document.getElementById('ing-pick-list');
+  if (!el) return;
+  var q = (document.getElementById('ing-pick-search').value || '').toLowerCase().trim();
+  var all = getAllIngredients();
+  var filtered = q ? all.filter(function(i){ return i.name.toLowerCase().indexOf(q) >= 0; }) : all;
+
+  if (!filtered.length) {
+    el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text3);font-size:13px">' + (q ? 'No ingredients match "' + q + '"' : 'No ingredients in your pantry yet') + '</div>';
+    return;
+  }
+
+  var h = '';
+  filtered.forEach(function(ing, idx) {
+    var cal = Math.round(ing.calories);
+    h += '<div onclick="pickIngredient(' + idx + ')" style="display:flex;align-items:center;padding:12px 0;cursor:pointer;' + (idx > 0 ? 'border-top:1px solid var(--border-soft);' : '') + '">';
+    h += '<div style="flex:1;min-width:0">';
+    h += '<div style="font-size:14px;font-weight:700;color:var(--text)">' + ing.name + '</div>';
+    h += '<div style="font-size:11px;color:var(--text3);margin-top:2px">' + ing.amount + ing.unit + '</div>';
+    h += '</div>';
+    h += '<div style="display:flex;align-items:center;gap:8px;flex-shrink:0">';
+    h += '<div style="display:flex;gap:5px">';
+    h += '<span style="font-size:10px;font-weight:800;color:#2e7d52">P' + Math.round(ing.protein) + '</span>';
+    h += '<span style="font-size:10px;font-weight:800;color:var(--blue)">C' + Math.round(ing.carbs) + '</span>';
+    h += '<span style="font-size:10px;font-weight:800;color:var(--purple)">F' + Math.round(ing.fat) + '</span>';
+    h += '</div>';
+    h += '<span style="font-size:13px;font-weight:700;color:var(--accent)">' + cal + '</span>';
+    h += '</div></div>';
+  });
+
+  el.innerHTML = h;
+  // Store filtered list for pickIngredient
+  el._filteredList = filtered;
+}
+
+function pickIngredient(idx) {
+  var el = document.getElementById('ing-pick-list');
+  var list = el && el._filteredList;
+  if (!list || !list[idx]) return;
+  var src = list[idx];
+  // Create a fresh copy of the ingredient
+  var ing = {
+    name: src.name,
+    unit: src.unit,
+    amount: src.amount,
+    grams: src.grams,
+    calories: src.calories,
+    protein: src.protein,
+    carbs: src.carbs,
+    fat: src.fat,
+    calTotal: src.calTotal
+  };
+  closeM('m-ing-pick');
+  if (_ingPickCallback) {
+    _ingPickCallback(ing);
+    _ingPickCallback = null;
+  }
 }
 
 // ── PLANNER ───────────────────────────────────────────────────
@@ -3033,17 +3181,19 @@ function renderPlanSlotMeals(mt){
 
       var hdr = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">';
       hdr += '<span style="font-size:13px;font-weight:700;color:var(--text)">' + mc.name + '</span>';
-      hdr += '<div style="display:flex;gap:6px;align-items:center">';
-      hdr += '<button onclick="savePlanMealChanges(\'' + entry.mealId + '\')" style="font-size:10px;font-weight:700;color:var(--green);background:var(--green-light);border:1px solid rgba(14,138,95,0.25);border-radius:20px;padding:3px 9px;cursor:pointer;font-family:DM Sans,sans-serif;white-space:nowrap">💾 Save to meal</button>';
+      hdr += '<div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;justify-content:flex-end">';
+      hdr += '<button onclick="savePlanMealChanges(\'' + entry.mealId + '\')" style="font-size:10px;font-weight:700;color:var(--green);background:var(--green-light);border:1px solid rgba(14,138,95,0.25);border-radius:20px;padding:3px 8px;cursor:pointer;font-family:DM Sans,sans-serif;white-space:nowrap">💾 Update</button>';
+      hdr += '<button onclick="openSaveAsNewMeal(\'' + entry.mealId + '\',\'plan\')" style="font-size:10px;font-weight:700;color:var(--blue);background:var(--blue-light);border:1px solid rgba(42,122,181,0.25);border-radius:20px;padding:3px 8px;cursor:pointer;font-family:DM Sans,sans-serif;white-space:nowrap">📋 Save As</button>';
       hdr += '<button style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:13px;padding:2px 4px" data-rm-slot="' + mt + '" data-rm-idx="' + i + '">✕</button>';
       hdr += '</div></div>';
 
       // Ingredient grid header
-      var grid = '<div style="display:grid;grid-template-columns:1fr 52px 60px 52px;gap:4px;padding:3px 0 4px;border-bottom:1px solid var(--border-soft)">';
+      var grid = '<div style="display:grid;grid-template-columns:1fr 52px 60px 52px 20px;gap:4px;padding:3px 0 4px;border-bottom:1px solid var(--border-soft)">';
       grid += '<span style="font-size:9px;font-weight:700;color:var(--text4);text-transform:uppercase;letter-spacing:0.5px">Ingredient</span>';
       grid += '<span style="font-size:9px;font-weight:700;color:var(--text4);text-transform:uppercase;letter-spacing:0.5px;text-align:center">Qty</span>';
       grid += '<span style="font-size:9px;font-weight:700;color:var(--text4);text-transform:uppercase;letter-spacing:0.5px;text-align:center">Grams</span>';
       grid += '<span style="font-size:9px;font-weight:700;color:var(--text4);text-transform:uppercase;letter-spacing:0.5px;text-align:right">kcal</span>';
+      grid += '<span></span>';
       grid += '</div>';
 
       // Ingredient rows
@@ -3053,7 +3203,7 @@ function renderPlanSlotMeals(mt){
           var baseCals = parseFloat(ing.calories) || 0;
           var baseGrams = parseFloat(ing.grams) || parseFloat(ing.amount) || 0;
           var isGramUnit = (ing.unit === 'g' || ing.unit === 'ml');
-          rows += '<div style="display:grid;grid-template-columns:1fr 52px 60px 52px;gap:4px;align-items:center;padding:5px 0;border-bottom:1px solid var(--border-soft)">';
+          rows += '<div style="display:grid;grid-template-columns:1fr 52px 60px 52px 20px;gap:4px;align-items:center;padding:5px 0;border-bottom:1px solid var(--border-soft)">';
           rows += '<span style="font-size:12px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + ing.name + '</span>';
           rows += '<input type="number" value="' + ing.amount + '" min="0" step="' + (isGramUnit ? '1' : '0.5') + '" '
             + 'style="width:100%;padding:4px 4px;font-size:12px;text-align:center;border-radius:8px;border:1.5px solid var(--border);background:var(--surface2);color:var(--text);font-family:DM Sans,sans-serif" '
@@ -3064,9 +3214,13 @@ function renderPlanSlotMeals(mt){
             rows += '<span style="font-size:11px;color:var(--text3);text-align:center" id="planinggrams-' + entry.mealId + '-' + ii + '">' + (baseGrams % 1 === 0 ? baseGrams : parseFloat(baseGrams.toFixed(1))) + 'g</span>';
           }
           rows += '<span style="font-size:11px;font-weight:700;color:var(--accent);text-align:right" id="planingcal-' + entry.mealId + '-' + ii + '">' + Math.round(baseCals) + '</span>';
+          rows += '<button onclick="rmPlanIng(\'' + entry.mealId + '\',' + ii + ')" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:11px;padding:0;width:20px;text-align:center">✕</button>';
           rows += '</div>';
         });
       }
+
+      // Add ingredient button
+      rows += '<button onclick="addPlanIng(\'' + entry.mealId + '\',\'' + mt + '\')" style="width:100%;margin-top:6px;padding:6px;font-size:11px;font-weight:700;color:var(--accent);background:var(--accent-light);border:1px dashed var(--accent);border-radius:8px;cursor:pointer;font-family:DM Sans,sans-serif">+ Add Ingredient</button>';
 
       div.innerHTML = hdr + grid + rows;
       // Wire up remove button
@@ -3186,9 +3340,9 @@ function savePlanMealChanges(mealId) {
   document.getElementById('m-confirm-msg').textContent =
     'Save your updated amounts for "' + mc.name + '" back to the meal library?';
   var yesBtn = document.getElementById('m-confirm-yes');
+  yesBtn.style.display = '';
   yesBtn.onclick = function() {
     closeM('m-confirm');
-    var m = getMeal(mealId);
     var idx = meals.findIndex(function(x){ return x.id === mealId; });
     if (idx >= 0) {
       var cleanIngs = mc.ingredients.map(function(ing) {
@@ -3204,6 +3358,26 @@ function savePlanMealChanges(mealId) {
     showToast(mc.name + ' updated ✓');
   };
   document.getElementById('m-confirm').classList.add('open');
+}
+
+// ── Remove ingredient from plan copy
+function rmPlanIng(mealId, ingIdx) {
+  var mc = _planMealCopies[mealId];
+  if (!mc || !mc.ingredients[ingIdx]) return;
+  mc.ingredients.splice(ingIdx, 1);
+  buildPlanSlotUI();
+  updatePlanTotalsFromCopies();
+}
+
+// ── Add existing ingredient to plan copy via search picker
+function addPlanIng(mealId, slotMt) {
+  openIngPicker(function(ing) {
+    var mc = getPlanMealCopy(mealId);
+    if (!mc) return;
+    mc.ingredients.push(ing);
+    buildPlanSlotUI();
+    updatePlanTotalsFromCopies();
+  });
 }
 
 function openPlanMealPicker(mt){
