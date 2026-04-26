@@ -714,6 +714,7 @@ select {
     </div>
     <!-- Meal tab -->
     <div id="assign-tab-meal">
+      <input type="text" id="assign-meal-search" placeholder="Search meals..." oninput="filterAssignMeals()" style="width:100%;padding:10px 14px;font-size:14px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--surface2);color:var(--text);font-family:DM Sans,sans-serif;margin-bottom:10px;box-sizing:border-box">
       <label style="margin-bottom:6px;display:block">Servings</label>
       <div class="port-row">
         <span style="font-size:13px;color:var(--text2);flex:1">How many servings?</span>
@@ -721,12 +722,11 @@ select {
         <span class="pval" id="pval">1</span>
         <button class="pbtn" onclick="chgPort(1)">+</button>
       </div>
-      <div style="font-size:12px;color:var(--text3);margin-bottom:10px;line-height:1.6">Pick a meal — then tap calendar days to assign it:</div>
       <div id="assign-list" style="max-height:300px;overflow-y:auto;"></div>
     </div>
     <!-- Plan tab -->
     <div id="assign-tab-plan" style="display:none">
-      <div style="font-size:12px;color:var(--text3);margin-bottom:10px;line-height:1.6">Pick a full day plan — all its meals get added to this day:</div>
+      <input type="text" id="assign-plan-search" placeholder="Search day plans..." oninput="filterAssignPlans()" style="width:100%;padding:10px 14px;font-size:14px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--surface2);color:var(--text);font-family:DM Sans,sans-serif;margin-bottom:10px;box-sizing:border-box">
       <div id="assign-plan-list" style="max-height:340px;overflow-y:auto;"></div>
     </div>
     <div class="row end" style="margin-top:14px">
@@ -1561,7 +1561,7 @@ function renderToday() {
           // ── Ingredient view
           h += '<div style="padding:6px 0;border-bottom:1px solid var(--border-soft)">';
           h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">';
-          h += '<span style="font-size:13px;font-weight:700;color:var(--text)">' + mc.name + statusBadge + '</span>';
+          h += '<span style="font-size:13px;font-weight:700;color:var(--text)"><span style="margin-right:4px">' + mealEmoji(mc) + '</span>' + mc.name + statusBadge + '</span>';
           h += '<div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;justify-content:flex-end">';
           h += '<button onclick="promptSaveMealChanges(\'' + sl.mealId + '\')" style="font-size:10px;font-weight:700;color:var(--green);background:var(--green-light);border:1px solid rgba(14,138,95,0.25);border-radius:20px;padding:3px 8px;cursor:pointer;font-family:DM Sans,sans-serif;white-space:nowrap">💾 Update</button>';
           h += '<button onclick="openSaveAsNewMeal(\'' + sl.mealId + '\',\'today\')" style="font-size:10px;font-weight:700;color:var(--blue);background:var(--blue-light);border:1px solid rgba(42,122,181,0.25);border-radius:20px;padding:3px 8px;cursor:pointer;font-family:DM Sans,sans-serif;white-space:nowrap">📋 Save As</button>';
@@ -1603,7 +1603,7 @@ function renderToday() {
         } else {
           // ── Meal view — simple row
           h += '<div class="slot-meal-row">';
-          h += '<span class="slot-meal-name">' + m.name + (sl.portions > 1 ? ' <span style="color:var(--text3);font-size:11px">×' + sl.portions + ' srv</span>' : '') + ((m.totalServings && m.totalServings > 1 && sl.portions <= 1) ? ' <span style="color:var(--text4);font-size:10px">1/' + m.totalServings + '</span>' : '') + statusBadge + '</span>';
+          h += '<span class="slot-meal-name"><span style="margin-right:4px">' + mealEmoji(m) + '</span>' + m.name + (sl.portions > 1 ? ' <span style="color:var(--text3);font-size:11px">×' + sl.portions + ' srv</span>' : '') + ((m.totalServings && m.totalServings > 1 && sl.portions <= 1) ? ' <span style="color:var(--text4);font-size:10px">1/' + m.totalServings + '</span>' : '') + statusBadge + '</span>';
           h += '<div style="display:flex;align-items:center;gap:8px">';
           h += '<span class="slot-meal-kcal">' + mealCals(m, sl.portions||1) + ' kcal</span>';
           h += '<button onclick="rmSlotToday(\'' + dk + '\',\'' + mt + '\',\'' + sl.mealId + '\')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:13px;padding:2px">✕</button>';
@@ -1614,6 +1614,49 @@ function renderToday() {
     h += '<button class="slot-add-btn" onclick="openAssign(\'' + dk + '\',\'' + mt + '\')">+ Add to ' + mt + '</button>';
     h += '</div></div>';
   });
+
+  // ── Daily Habits
+  var habits = getHabits(dk);
+  h += '<div style="margin-top:14px">';
+  h += '<div style="font-size:13px;font-weight:800;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px">Daily Habits</div>';
+
+  // Water habit
+  var waterTarget = parseFloat(localStorage.getItem('mp4_water_target') || '2');
+  var waterDone = habits.water || 0;
+  var waterComplete = waterDone >= waterTarget;
+  h += '<div style="background:' + (waterComplete ? 'var(--green-light)' : 'var(--surface)') + ';border:1.5px solid ' + (waterComplete ? 'var(--green)' : 'var(--border-soft)') + ';border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px">';
+  h += '<span style="font-size:24px">💧</span>';
+  h += '<div style="flex:1">';
+  h += '<div style="font-size:13px;font-weight:700;color:' + (waterComplete ? 'var(--green)' : 'var(--text)') + '">Water</div>';
+  h += '<div style="font-size:11px;color:var(--text3);margin-top:1px">' + waterDone + ' / ' + waterTarget + ' bottles</div>';
+  h += '</div>';
+  h += '<div style="display:flex;align-items:center;gap:6px">';
+  h += '<button onclick="adjustHabit(\'' + dk + '\',\'water\',-0.5)" style="width:28px;height:28px;border-radius:50%;background:var(--surface2);border:1.5px solid var(--border);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text2);font-family:DM Sans">−</button>';
+  h += '<span style="font-size:16px;font-weight:800;color:' + (waterComplete ? 'var(--green)' : 'var(--accent)') + ';min-width:28px;text-align:center">' + waterDone + '</span>';
+  h += '<button onclick="adjustHabit(\'' + dk + '\',\'water\',0.5)" style="width:28px;height:28px;border-radius:50%;background:var(--surface2);border:1.5px solid var(--border);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text2);font-family:DM Sans">+</button>';
+  h += '</div>';
+  if (waterComplete) h += '<span style="font-size:16px">✅</span>';
+  h += '</div>';
+
+  // Creatine + Hydration habit
+  var creatineDone = !!habits.creatine;
+  h += '<div onclick="toggleHabit(\'' + dk + '\',\'creatine\')" style="background:' + (creatineDone ? 'var(--green-light)' : 'var(--surface)') + ';border:1.5px solid ' + (creatineDone ? 'var(--green)' : 'var(--border-soft)') + ';border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;cursor:pointer">';
+  h += '<span style="font-size:24px">⚡</span>';
+  h += '<div style="flex:1">';
+  h += '<div style="font-size:13px;font-weight:700;color:' + (creatineDone ? 'var(--green)' : 'var(--text)') + '">5g Creatine + Hydration</div>';
+  h += '<div style="font-size:11px;color:var(--text3);margin-top:1px">First thing in the morning</div>';
+  h += '</div>';
+  h += '<div style="width:24px;height:24px;border-radius:50%;background:' + (creatineDone ? 'var(--green)' : 'var(--surface2)') + ';border:2px solid ' + (creatineDone ? 'var(--green)' : 'var(--border)') + ';display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff">' + (creatineDone ? '✓' : '') + '</div>';
+  h += '</div>';
+
+  // Water target adjuster
+  h += '<div style="display:flex;align-items:center;justify-content:flex-end;gap:6px;margin-bottom:4px">';
+  h += '<span style="font-size:10px;color:var(--text4)">Target:</span>';
+  h += '<button onclick="adjustWaterTarget(-0.5)" style="background:none;border:1px solid var(--border);border-radius:4px;font-size:10px;cursor:pointer;padding:1px 5px;color:var(--text3);font-family:DM Sans">−</button>';
+  h += '<span style="font-size:11px;font-weight:700;color:var(--text3)">' + waterTarget + ' bottles</span>';
+  h += '<button onclick="adjustWaterTarget(0.5)" style="background:none;border:1px solid var(--border);border-radius:4px;font-size:10px;cursor:pointer;padding:1px 5px;color:var(--text3);font-family:DM Sans">+</button>';
+  h += '</div>';
+  h += '</div>';
 
   // ── New Day Plan button on Today
   h += '<div style="margin-top:10px;margin-bottom:4px">';
@@ -1649,6 +1692,40 @@ function renderToday() {
 
 function shiftToday(dir) {
   todayOffset += dir;
+  renderToday();
+}
+
+// ── DAILY HABITS ─────────────────────────────────────────────
+var habitLogs = JSON.parse(localStorage.getItem('mp4_habits') || '{}');
+
+function getHabits(dk) {
+  return habitLogs[dk] || {water: 0, creatine: false};
+}
+
+function saveHabits() {
+  localStorage.setItem('mp4_habits', JSON.stringify(habitLogs));
+}
+
+function adjustHabit(dk, habit, delta) {
+  if (!habitLogs[dk]) habitLogs[dk] = {water: 0, creatine: false};
+  if (habit === 'water') {
+    habitLogs[dk].water = Math.max(0, (habitLogs[dk].water || 0) + delta);
+  }
+  saveHabits();
+  renderToday();
+}
+
+function toggleHabit(dk, habit) {
+  if (!habitLogs[dk]) habitLogs[dk] = {water: 0, creatine: false};
+  habitLogs[dk][habit] = !habitLogs[dk][habit];
+  saveHabits();
+  renderToday();
+}
+
+function adjustWaterTarget(delta) {
+  var cur = parseFloat(localStorage.getItem('mp4_water_target') || '2');
+  var next = Math.max(0.5, cur + delta);
+  localStorage.setItem('mp4_water_target', String(next));
   renderToday();
 }
 
@@ -2451,6 +2528,7 @@ function populateAssignPlanList() {
 
     var card = document.createElement('div');
     card.style.cssText = 'background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);margin-bottom:10px;overflow:hidden';
+    card.dataset.planName = mp.name;
 
     // ── Header: name + macros + calories (always visible)
     var hdr = document.createElement('div');
@@ -2587,9 +2665,12 @@ function openAssign(dk, mt) {
     meals.forEach(function(m) {
       var cal = mealCals(m);
       var mac = mealMacros(m);
+      var emoji = mealEmoji(m);
+      var srvLabel = (m.totalServings && m.totalServings > 1) ? ' · ' + m.totalServings + ' srv' : '';
       var card = document.createElement('div'); card.className = 'assign-meal-card';
-      card.innerHTML = '<div class="assign-meal-name">' + m.name + '</div>'
-        + '<div class="assign-meal-meta">' + cal + ' kcal · P:' + mac.p + 'g C:' + mac.c + 'g F:' + mac.f + 'g</div>';
+      card.dataset.mealName = m.name;
+      card.innerHTML = '<div style="display:flex;align-items:center;gap:8px"><span style="font-size:18px">' + emoji + '</span><div style="flex:1;min-width:0"><div class="assign-meal-name">' + m.name + '</div>'
+        + '<div class="assign-meal-meta">' + cal + ' kcal · P:' + mac.p + 'g C:' + mac.c + 'g F:' + mac.f + 'g' + srvLabel + '</div></div></div>';
       card.onclick = function(){ startAssign(m.id, mt, dk); };
       list.appendChild(card);
     });
@@ -2622,6 +2703,62 @@ function cancelAssign() {
   document.getElementById('assign-banner').classList.remove('vis');
   renderCal();
   renderToday();
+}
+
+// ── Meal emoji based on ingredients/name
+function mealEmoji(m) {
+  if (!m) return '🍽';
+  var n = (m.name || '').toLowerCase();
+  var ings = (m.ingredients || []).map(function(i){ return (i.name||'').toLowerCase(); }).join(' ');
+  var all = n + ' ' + ings;
+  if (all.indexOf('salmon') >= 0) return '🐟';
+  if (all.indexOf('sardine') >= 0) return '🐟';
+  if (all.indexOf('fish') >= 0) return '🐟';
+  if (all.indexOf('tuna') >= 0) return '🐟';
+  if (all.indexOf('prawn') >= 0 || all.indexOf('shrimp') >= 0) return '🦐';
+  if (all.indexOf('chicken') >= 0) return '🍗';
+  if (all.indexOf('beef') >= 0 || all.indexOf('steak') >= 0) return '🥩';
+  if (all.indexOf('egg') >= 0) return '🥚';
+  if (all.indexOf('sandwich') >= 0 || all.indexOf('bread') >= 0 || all.indexOf('sourdough') >= 0) return '🥪';
+  if (all.indexOf('pasta') >= 0 || all.indexOf('noodle') >= 0) return '🍝';
+  if (all.indexOf('rice') >= 0 || all.indexOf('kimchi') >= 0) return '🍚';
+  if (all.indexOf('curry') >= 0) return '🍛';
+  if (all.indexOf('salad') >= 0) return '🥗';
+  if (all.indexOf('smoothie') >= 0 || all.indexOf('shake') >= 0) return '🥤';
+  if (all.indexOf('yogurt') >= 0 || all.indexOf('yoghurt') >= 0) return '🥛';
+  if (all.indexOf('chocolate') >= 0 || all.indexOf('date') >= 0 || all.indexOf('bar') >= 0) return '🍫';
+  if (all.indexOf('avocado') >= 0 || all.indexOf('avo') >= 0) return '🥑';
+  if (all.indexOf('oat') >= 0 || all.indexOf('porridge') >= 0) return '🥣';
+  if (all.indexOf('soup') >= 0) return '🍲';
+  if (all.indexOf('pizza') >= 0) return '🍕';
+  if (all.indexOf('burger') >= 0) return '🍔';
+  if (all.indexOf('wrap') >= 0 || all.indexOf('burrito') >= 0) return '🌯';
+  if (all.indexOf('chilla') >= 0 || all.indexOf('pancake') >= 0 || all.indexOf('besan') >= 0) return '🥞';
+  if (all.indexOf('toast') >= 0) return '🍞';
+  if (all.indexOf('dumpling') >= 0) return '🥟';
+  if (all.indexOf('snicker') >= 0 || all.indexOf('protein bar') >= 0) return '🍬';
+  if (all.indexOf('cheese') >= 0 || all.indexOf('feta') >= 0) return '🧀';
+  return '🍽';
+}
+
+// ── Search filter for assign meal list
+function filterAssignMeals() {
+  var q = (document.getElementById('assign-meal-search').value || '').toLowerCase().trim();
+  var cards = document.querySelectorAll('#assign-list .assign-meal-card');
+  cards.forEach(function(c) {
+    var name = (c.dataset.mealName || '').toLowerCase();
+    c.style.display = (!q || name.indexOf(q) >= 0) ? '' : 'none';
+  });
+}
+
+// ── Search filter for assign plan list
+function filterAssignPlans() {
+  var q = (document.getElementById('assign-plan-search').value || '').toLowerCase().trim();
+  var cards = document.querySelectorAll('#assign-plan-list > div');
+  cards.forEach(function(c) {
+    var name = (c.dataset.planName || '').toLowerCase();
+    c.style.display = (!q || name.indexOf(q) >= 0) ? '' : 'none';
+  });
 }
 
 function chgPort(dir) {
@@ -2718,7 +2855,7 @@ function renderMeals(){
     return`<div class="card" style="padding:0;overflow:hidden">
       <div style="padding:14px 15px 10px">
         <div class="row between" style="margin-bottom:6px">
-          <div style="font-family:DM Serif Display,serif;font-size:16px;font-weight:700;flex:1;min-width:0;margin-right:8px;line-height:1.3">${m.name}</div>
+          <div style="font-family:DM Serif Display,serif;font-size:16px;font-weight:700;flex:1;min-width:0;margin-right:8px;line-height:1.3"><span style="margin-right:4px">${mealEmoji(m)}</span>${m.name}</div>
           <div class="row" style="gap:6px;flex-shrink:0">
             <button class="icon-btn" onclick="openEditMeal('${m.id}')"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
             <button class="icon-btn" style="color:var(--red)" onclick="delMeal('${m.id}')"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
@@ -4055,6 +4192,35 @@ function renderNutritionTrends() {
     h += '<div style="font-size:11px;font-weight:700;color:#ff5e3a;background:rgba(255,94,58,0.1);border:1px solid rgba(255,94,58,0.2);border-radius:20px;padding:4px 10px;white-space:nowrap">Keep it up!</div>';
   }
   h += '</div>';
+
+  // ── Habit Tracking Summary
+  var waterTarget = parseFloat(localStorage.getItem('mp4_water_target') || '2');
+  var waterHitDays = 0, creatineHitDays = 0, habitDaysChecked = 0;
+  logged.forEach(function(dk) {
+    habitDaysChecked++;
+    var hb = habitLogs[dk] || {};
+    if ((hb.water || 0) >= waterTarget) waterHitDays++;
+    if (hb.creatine) creatineHitDays++;
+  });
+  var waterPct = habitDaysChecked > 0 ? Math.round(waterHitDays / habitDaysChecked * 100) : 0;
+  var creatinePct = habitDaysChecked > 0 ? Math.round(creatineHitDays / habitDaysChecked * 100) : 0;
+
+  h += '<div class="card" style="margin-bottom:10px">';
+  h += '<div style="font-family:DM Serif Display,serif;font-size:16px;font-weight:700;margin-bottom:10px">Habit Tracking</div>';
+  h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
+  // Water card
+  h += '<div style="background:var(--surface2);border-radius:var(--radius-xs);padding:10px;text-align:center;border:1px solid var(--border-soft)">';
+  h += '<div style="font-size:22px;margin-bottom:4px">💧</div>';
+  h += '<div style="font-size:20px;font-weight:800;color:' + (waterPct >= 80 ? 'var(--green)' : waterPct >= 50 ? '#b07d00' : 'var(--red)') + '">' + waterPct + '%</div>';
+  h += '<div style="font-size:10px;font-weight:700;color:var(--text3);margin-top:2px">Water (' + waterHitDays + '/' + habitDaysChecked + ' days)</div>';
+  h += '</div>';
+  // Creatine card
+  h += '<div style="background:var(--surface2);border-radius:var(--radius-xs);padding:10px;text-align:center;border:1px solid var(--border-soft)">';
+  h += '<div style="font-size:22px;margin-bottom:4px">⚡</div>';
+  h += '<div style="font-size:20px;font-weight:800;color:' + (creatinePct >= 80 ? 'var(--green)' : creatinePct >= 50 ? '#b07d00' : 'var(--red)') + '">' + creatinePct + '%</div>';
+  h += '<div style="font-size:10px;font-weight:700;color:var(--text3);margin-top:2px">Creatine (' + creatineHitDays + '/' + habitDaysChecked + ' days)</div>';
+  h += '</div>';
+  h += '</div></div>';
 
   // Avg calories KPI
   var calPct=tgtCal>0?Math.min(100,Math.round(avgCal/tgtCal*100)):0;
