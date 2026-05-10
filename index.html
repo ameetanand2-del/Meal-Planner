@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
 <title>Nutrio</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Serif:wght@400;500&display=swap" rel="stylesheet">
 <style>
 /* ═══════════════════════════════════════════════════════
    NUTRIO  —  Design System v1.0
@@ -12,53 +12,49 @@
    ═══════════════════════════════════════════════════════ */
 
 :root {
-  /* Background — soft navy mist, light not dark */
-  --bg:          #EEF2F9;
+  --bg:          #F4F4F4;
   --surface:     #FFFFFF;
-  --surface2:    #E4EAF6;
-  --surface3:    #D5DFEF;
+  --surface2:    #EBEBEB;
+  --surface3:    #DCDCDC;
 
-  /* Accent — confident navy blue */
-  --accent:      #2353C4;
-  --accent-light:#E8EEFB;
-  --accent2:     #3B6EE0;
-  --accent3:     #173A9A;
-  --accent-glow: rgba(35,83,196,0.13);
+  --accent:      #1A1A1A;
+  --accent-light:#F0F0F0;
+  --accent2:     #333333;
+  --accent3:     #000000;
+  --accent-glow: rgba(0,0,0,0.08);
 
-  /* Text — deep navy, readable and clean */
-  --text:  #0F1D3A;
-  --text2: #3A5080;
-  --text3: #7A90B8;
-  --text4: #ADBDD8;
+  --text:  #111111;
+  --text2: #555555;
+  --text3: #888888;
+  --text4: #AAAAAA;
 
-  /* Semantic */
-  --green:        #0E8A5F;
-  --green-light:  #E0F5EC;
-  --blue:         #2353C4;
-  --blue-light:   #E8EEFB;
-  --purple:       #6B44CC;
-  --purple-light: #EEE8FB;
-  --red:          #D43030;
-  --red-light:    #FDEAEA;
-  --yellow:       #B07800;
-  --yellow-light: #FDF6E0;
+  --green:        #2E7D52;
+  --green-light:  #E8F5EE;
+  --blue:         #444444;
+  --blue-light:   #F0F0F0;
+  --purple:       #666666;
+  --purple-light: #F0F0F0;
+  --red:          #C94040;
+  --red-light:    #FDE8E8;
+  --yellow:       #8A6D00;
+  --yellow-light: #F5F0E0;
 
-  --border:      #C8D5EA;
-  --border-soft: #D8E2F0;
-  --radius:      18px;
-  --radius-sm:   12px;
-  --radius-xs:   8px;
+  --border:      #D4D4D4;
+  --border-soft: #E2E2E2;
+  --radius:      14px;
+  --radius-sm:   10px;
+  --radius-xs:   6px;
 
-  --shadow-xs: 0 1px 3px rgba(28,20,16,0.05);
-  --shadow:    0 2px 12px rgba(28,20,16,0.07);
-  --shadow-md: 0 6px 24px rgba(28,20,16,0.10);
-  --shadow-lg: 0 12px 40px rgba(28,20,16,0.13);
+  --shadow-xs: 0 1px 2px rgba(0,0,0,0.04);
+  --shadow:    0 1px 6px rgba(0,0,0,0.06);
+  --shadow-md: 0 3px 12px rgba(0,0,0,0.08);
+  --shadow-lg: 0 6px 20px rgba(0,0,0,0.10);
 }
 
 *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
 
 body {
-  font-family:'DM Sans',sans-serif;
+  font-family:'IBM Plex Sans',system-ui,sans-serif;
   background:var(--bg);
   color:var(--text);
   max-width:480px;
@@ -66,6 +62,7 @@ body {
   padding-bottom:96px;
   min-height:100vh;
   -webkit-font-smoothing:antialiased;
+  font-size:13px;
 }
 
 /* ── HEADER ────────────────────────────────────── */
@@ -85,11 +82,11 @@ body {
   background:linear-gradient(145deg, #3B6EE0, #173A9A);
   border-radius:11px;
   display:flex; align-items:center; justify-content:center;
-  box-shadow:0 3px 10px rgba(192,92,43,0.30);
+  box-shadow:0 2px 8px rgba(0,0,0,0.15);
 }
 .app-name {
-  font-family:'DM Serif Display',serif;
-  font-size:23px; font-weight:400;
+  font-family:'IBM Plex Serif',serif;
+  font-size:14px; font-weight:400;
   letter-spacing:-0.3px;
   color:var(--text);
 }
@@ -98,7 +95,7 @@ body {
   font-size:10px; font-weight:600;
   background:var(--accent-light); color:var(--accent);
   padding:4px 10px; border-radius:20px;
-  border:1px solid rgba(192,92,43,0.18);
+  border:1px solid var(--border);
 }
 
 /* ── BOTTOM NAV ───────────────────────────────── */
@@ -116,7 +113,7 @@ body {
 .nav-btn {
   flex:0 0 60px; display:flex; flex-direction:column; align-items:center; gap:1px;
   padding:4px 2px; background:none; border:none; cursor:pointer;
-  color:var(--text4); font-family:'DM Sans',sans-serif;
+  color:var(--text4); font-family:'IBM Plex Sans',sans-serif;
   font-size:8px; font-weight:700; letter-spacing:0.1px;
   -webkit-tap-highlight-color:transparent;
 }
@@ -141,14 +138,14 @@ body {
 .btn {
   display:inline-flex; align-items:center; justify-content:center; gap:6px;
   padding:12px 20px; border-radius:var(--radius-sm); border:none;
-  cursor:pointer; font-family:'DM Sans',sans-serif;
+  cursor:pointer; font-family:'IBM Plex Sans',sans-serif;
   font-size:14px; font-weight:600; letter-spacing:-0.1px;
   transition:all 0.16s;
 }
 .btn-primary {
-  background:linear-gradient(135deg, #3B6EE0 0%, #2353C4 100%);
+  background:linear-gradient(135deg, #333 0%, #1A1A1A 100%);
   color:#fff;
-  box-shadow:0 3px 14px rgba(192,92,43,0.26);
+  box-shadow:0 2px 8px rgba(0,0,0,0.12);
 }
 .btn-primary:active { transform:scale(0.98); box-shadow:none; }
 .btn-ghost  { background:var(--surface2); color:var(--text2); border:1px solid var(--border); }
@@ -172,7 +169,7 @@ body {
 }
 .ctbtn {
   flex:1; padding:8px 6px; border:none; background:transparent;
-  border-radius:11px; font-family:'DM Sans',sans-serif;
+  border-radius:11px; font-family:'IBM Plex Sans',sans-serif;
   font-size:13px; font-weight:600; color:var(--text3);
   cursor:pointer; transition:all 0.18s;
 }
@@ -191,7 +188,7 @@ input,select,textarea {
   width:100%; background:var(--surface2);
   border:1.5px solid var(--border); border-radius:var(--radius-sm);
   padding:12px 15px; color:var(--text);
-  font-family:'DM Sans',sans-serif; font-size:15px;
+  font-family:'IBM Plex Sans',sans-serif; font-size:15px;
   outline:none; transition:border-color 0.2s, background 0.2s, box-shadow 0.2s;
   -webkit-appearance:none;
 }
@@ -230,8 +227,8 @@ select {
   border-radius:2px; margin:0 auto 20px;
 }
 .modal-title {
-  font-family:'DM Serif Display',serif;
-  font-size:22px; font-weight:400; margin-bottom:18px;
+  font-family:'IBM Plex Serif',serif;
+  font-size:13px; font-weight:400; margin-bottom:18px;
   letter-spacing:-0.2px;
 }
 
@@ -241,24 +238,24 @@ select {
 .tpill.effort  { background:var(--green-light);  color:var(--green);  border-color:rgba(61,122,86,0.2);  }
 .tpill.diet    { background:var(--purple-light); color:var(--purple); border-color:rgba(107,78,160,0.2); }
 
-.badge      { display:inline-flex; align-items:center; background:var(--accent-light); color:var(--accent); font-size:11px; font-weight:600; padding:4px 10px; border-radius:20px; border:1px solid rgba(192,92,43,0.18); }
+.badge      { display:inline-flex; align-items:center; background:var(--accent-light); color:var(--accent); font-size:11px; font-weight:600; padding:4px 10px; border-radius:20px; border:1px solid var(--border); }
 .badge-goal { background:var(--green-light); color:var(--green); border-color:rgba(61,122,86,0.2); }
 .badge-red  { background:var(--red-light); color:var(--red); border-color:rgba(196,56,56,0.2); }
 .badge-yellow { background:var(--yellow-light); color:var(--yellow); border-color:rgba(168,112,0,0.2); }
 
 .empty       { text-align:center; padding:44px 16px; color:var(--text3); }
 .empty-icon  { font-size:38px; margin-bottom:12px; }
-.empty-title { font-size:16px; font-weight:600; color:var(--text2); margin-bottom:6px; }
+.empty-title { font-size:13px; font-weight:600; color:var(--text2); margin-bottom:6px; }
 .empty-sub   { font-size:13px; line-height:1.65; }
 
 /* ═══════════════════════════════════════════════
    TODAY
    ═══════════════════════════════════════════════ */
 .today-header {
-  background:linear-gradient(145deg, #3B6EE0 0%, #2353C4 50%, #173A9A 100%);
+  background:linear-gradient(145deg, #333 0%, #222 50%, #111 100%);
   color:#fff; border-radius:var(--radius);
   padding:20px; margin-bottom:14px;
-  box-shadow:0 6px 24px rgba(192,92,43,0.26);
+  box-shadow:0 3px 12px rgba(0,0,0,0.10);
   position:relative; overflow:hidden;
 }
 .today-header::before {
@@ -276,18 +273,18 @@ select {
   text-transform:uppercase; letter-spacing:1px; margin-bottom:2px;
 }
 .today-day-name {
-  font-family:'DM Serif Display',serif;
-  font-size:22px; font-weight:400; margin-bottom:16px; letter-spacing:-0.2px;
+  font-family:'IBM Plex Serif',serif;
+  font-size:13px; font-weight:400; margin-bottom:16px; letter-spacing:-0.2px;
 }
 .today-kcal-row    { display:flex; align-items:baseline; gap:6px; margin-bottom:10px; }
-.today-kcal-num    { font-family:'DM Serif Display',serif; font-size:46px; font-weight:400; line-height:1; }
+.today-kcal-num    { font-family:'IBM Plex Serif',serif; font-size:32px; font-weight:400; line-height:1; }
 .today-kcal-label  { font-size:14px; font-weight:500; opacity:0.74; }
 .today-kcal-target { font-size:12px; opacity:0.54; margin-left:2px; }
 .today-prog-track  { height:5px; background:rgba(255,255,255,0.15); border-radius:3px; overflow:hidden; margin-bottom:16px; }
 .today-prog-fill   { height:100%; background:rgba(255,255,255,0.90); border-radius:3px; transition:width 0.45s cubic-bezier(0.34,1.56,0.64,1); }
 .today-macro-row   { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
 .today-macro-pill  { background:rgba(255,255,255,0.10); border-radius:11px; padding:10px 6px; text-align:center; border:1px solid rgba(255,255,255,0.14); }
-.today-macro-val   { font-family:'DM Serif Display',serif; font-size:19px; font-weight:400; }
+.today-macro-val   { font-family:'IBM Plex Serif',serif; font-size:15px; font-weight:400; }
 .today-macro-lbl   { font-size:9.5px; font-weight:600; opacity:0.70; text-transform:uppercase; letter-spacing:0.5px; margin-top:2px; }
 
 .today-slot   { background:var(--surface); border-radius:var(--radius); margin-bottom:10px; border:1px solid var(--border-soft); box-shadow:var(--shadow); overflow:hidden; }
@@ -303,7 +300,7 @@ select {
 .slot-add-btn {
   background:none; border:1.5px dashed var(--border); border-radius:10px;
   padding:10px; font-size:12.5px; color:var(--text3); cursor:pointer;
-  font-family:'DM Sans',sans-serif; font-weight:600;
+  font-family:'IBM Plex Sans',sans-serif; font-weight:600;
   width:100%; text-align:center; margin-top:6px;
   transition:border-color 0.18s, color 0.18s, background 0.18s;
 }
@@ -311,7 +308,7 @@ select {
 
 /* kept for CSS compat — not rendered */
 .macro-prog-card  { background:var(--surface); border-radius:var(--radius); padding:16px; margin-bottom:10px; border:1px solid var(--border-soft); box-shadow:var(--shadow); }
-.macro-prog-title { font-family:'DM Serif Display',serif; font-size:16px; font-weight:400; margin-bottom:14px; }
+.macro-prog-title { font-family:'IBM Plex Serif',serif; font-size:13px; font-weight:400; margin-bottom:14px; }
 .prog-row         { margin-bottom:12px; }
 .prog-labels      { display:flex; justify-content:space-between; font-size:11px; margin-bottom:5px; }
 .prog-lbl         { font-weight:600; color:var(--text2); }
@@ -325,7 +322,7 @@ select {
    ═══════════════════════════════════════════════ */
 .cal-toggle { display:flex; background:var(--surface2); border-radius:14px; padding:3px; margin-bottom:14px; border:1px solid var(--border-soft); gap:2px; }
 .cal-nav    { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
-.cal-nav-lbl { font-family:'DM Serif Display',serif; font-size:17px; font-weight:400; }
+.cal-nav-lbl { font-family:'IBM Plex Serif',serif; font-size:14px; font-weight:400; }
 
 .dhdr-row   { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; margin-bottom:5px; }
 .dhdr       { font-size:10px; font-weight:800; text-align:center; color:var(--text3); text-transform:uppercase; letter-spacing:0.5px; }
@@ -365,7 +362,7 @@ select {
 .dv-chip-name { font-size:12.5px; font-weight:600; color:var(--text); flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .dv-chip-cal  { font-size:11px; color:var(--accent); font-weight:700; white-space:nowrap; }
 .dv-chip-rm   { background:none; border:none; color:var(--text3); cursor:pointer; font-size:14px; padding:0 2px; flex-shrink:0; }
-.dv-add-btn   { background:none; border:1.5px dashed var(--border); border-radius:8px; padding:6px 10px; font-size:11.5px; color:var(--text3); cursor:pointer; font-family:'DM Sans',sans-serif; font-weight:600; width:100%; text-align:center; margin-top:2px; transition:border-color 0.15s,color 0.15s; }
+.dv-add-btn   { background:none; border:1.5px dashed var(--border); border-radius:8px; padding:6px 10px; font-size:11.5px; color:var(--text3); cursor:pointer; font-family:'IBM Plex Sans',sans-serif; font-weight:600; width:100%; text-align:center; margin-top:2px; transition:border-color 0.15s,color 0.15s; }
 .dv-add-btn:active { border-color:var(--accent); color:var(--accent); }
 
 .month-grid  { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; }
@@ -378,20 +375,20 @@ select {
 .mdot        { width:6px; height:6px; border-radius:50%; background:var(--green); }
 .mcal-lbl    { font-size:8px; color:var(--text3); font-weight:600; }
 
-.assign-banner     { position:fixed; top:0; left:50%; transform:translateX(-50%); width:100%; max-width:480px; background:linear-gradient(90deg, #3B6EE0, #2353C4); color:#fff; padding:13px 20px; display:none; align-items:center; justify-content:space-between; z-index:250; box-shadow:0 4px 16px rgba(192,92,43,0.38); }
+.assign-banner     { position:fixed; top:0; left:50%; transform:translateX(-50%); width:100%; max-width:480px; background:var(--accent); color:#fff; padding:13px 20px; display:none; align-items:center; justify-content:space-between; z-index:250; box-shadow:0 3px 12px rgba(0,0,0,0.15); }
 .assign-banner.vis { display:flex; }
 .ab-text   { font-size:12.5px; font-weight:600; flex:1; line-height:1.4; }
-.ab-cancel { background:rgba(255,255,255,0.22); border:none; color:#fff; padding:7px 13px; border-radius:9px; cursor:pointer; font-family:'DM Sans',sans-serif; font-size:12px; font-weight:600; white-space:nowrap; margin-left:10px; }
+.ab-cancel { background:rgba(255,255,255,0.22); border:none; color:#fff; padding:7px 13px; border-radius:9px; cursor:pointer; font-family:'IBM Plex Sans',sans-serif; font-size:12px; font-weight:600; white-space:nowrap; margin-left:10px; }
 
 .assign-mode-toggle { display:flex; background:var(--surface2); border-radius:14px; padding:3px; margin-bottom:14px; border:1px solid var(--border-soft); }
 .assign-mode-toggle .ctbtn { flex:1; }
 .port-row { display:flex; align-items:center; gap:10px; background:var(--surface2); border-radius:var(--radius-sm); padding:11px 15px; margin-bottom:13px; border:1px solid var(--border); }
-.pbtn { width:32px; height:32px; border-radius:9px; border:1.5px solid var(--border); background:var(--surface); color:var(--text); font-size:18px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; }
-.pval { font-family:'DM Serif Display',serif; font-size:22px; font-weight:400; color:var(--accent); min-width:24px; text-align:center; }
+.pbtn { width:32px; height:32px; border-radius:9px; border:1.5px solid var(--border); background:var(--surface); color:var(--text); font-size:14px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.pval { font-family:'IBM Plex Serif',serif; font-size:13px; font-weight:400; color:var(--accent); min-width:24px; text-align:center; }
 
 .plan-assign-row  { display:flex; align-items:center; gap:10px; padding:12px 14px; background:var(--surface2); border-radius:var(--radius-sm); margin-bottom:8px; cursor:pointer; border:1.5px solid var(--border); transition:border-color 0.15s,background 0.15s; }
 .plan-assign-row:active  { border-color:var(--accent); background:var(--accent-light); }
-.plan-assign-name { font-family:'DM Serif Display',serif; font-size:15px; font-weight:400; }
+.plan-assign-name { font-family:'IBM Plex Serif',serif; font-size:15px; font-weight:400; }
 .plan-assign-meta { font-size:11.5px; color:var(--text3); margin-top:2px; }
 
 .assign-meal-card  { background:var(--surface2); border-radius:var(--radius-sm); padding:12px 14px; margin-bottom:8px; cursor:pointer; border:1.5px solid var(--border); transition:border-color 0.15s,background 0.15s; }
@@ -404,7 +401,7 @@ select {
 
 .coming-soon       { text-align:center; padding:60px 20px; color:var(--text3); }
 .coming-soon-icon  { font-size:48px; margin-bottom:14px; }
-.coming-soon-title { font-family:'DM Serif Display',serif; font-size:22px; font-weight:400; color:var(--text2); margin-bottom:8px; }
+.coming-soon-title { font-family:'IBM Plex Serif',serif; font-size:13px; font-weight:400; color:var(--text2); margin-bottom:8px; }
 .coming-soon-sub   { font-size:13px; line-height:1.7; }
 
 /* ═══════════════════════════════════════════════
@@ -415,7 +412,7 @@ select {
 .fpill { flex-shrink:0; padding:7px 14px; background:var(--surface); border:1.5px solid var(--border); border-radius:20px; font-size:12px; font-weight:600; color:var(--text3); cursor:pointer; transition:all 0.14s; }
 .fpill.active { background:var(--accent); color:#fff; border-color:var(--accent); }
 
-.topt { padding:7px 13px; border-radius:20px; font-size:12px; font-weight:600; cursor:pointer; border:1.5px solid; font-family:'DM Sans',sans-serif; transition:all 0.14s; }
+.topt { padding:7px 13px; border-radius:20px; font-size:12px; font-weight:600; cursor:pointer; border:1.5px solid; font-family:'IBM Plex Sans',sans-serif; transition:all 0.14s; }
 .topt.cuisine     { background:var(--blue-light);   color:var(--blue);   border-color:rgba(49,96,160,0.25);  }
 .topt.cuisine.sel { background:var(--blue);   color:#fff; }
 .topt.effort      { background:var(--green-light);  color:var(--green);  border-color:rgba(61,122,86,0.25);  }
@@ -429,17 +426,17 @@ select {
 .ing-pick-lbl { font-size:13.5px; font-weight:600; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .ing-pick-lbl.empty { color:var(--text3); }
 .ing-grid     { display:grid; grid-template-columns:1fr 1fr 1fr auto; gap:7px; align-items:end; }
-.del-ing      { background:none; border:none; cursor:pointer; color:var(--text3); font-size:16px; padding:4px; }
-.cal-bar      { background:var(--accent-light); border-radius:var(--radius-sm); padding:12px 15px; display:flex; justify-content:space-between; align-items:center; border:1.5px solid rgba(192,92,43,0.18); }
-.cal-bar-val  { font-family:'DM Serif Display',serif; font-size:22px; font-weight:400; color:var(--accent); }
+.del-ing      { background:none; border:none; cursor:pointer; color:var(--text3); font-size:13px; padding:4px; }
+.cal-bar      { background:var(--accent-light); border-radius:var(--radius-sm); padding:12px 15px; display:flex; justify-content:space-between; align-items:center; border:1.5px solid var(--border); }
+.cal-bar-val  { font-family:'IBM Plex Serif',serif; font-size:13px; font-weight:400; color:var(--accent); }
 
 .mp-card     { background:var(--surface); border-radius:var(--radius); border:1px solid var(--border-soft); margin-bottom:10px; overflow:hidden; box-shadow:var(--shadow); }
 .mp-card-hdr { padding:14px 15px 10px; border-bottom:1px solid var(--border-soft); }
-.mp-name     { font-family:'DM Serif Display',serif; font-size:17px; font-weight:400; margin-bottom:4px; }
+.mp-name     { font-family:'IBM Plex Serif',serif; font-size:14px; font-weight:400; margin-bottom:4px; }
 .mp-slot-row { padding:9px 15px; border-bottom:1px solid var(--border-soft); font-size:12.5px; }
 .mp-slot-row:last-child { border-bottom:none; }
 .mp-slot-lbl { font-size:10px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px; }
-.mp-add-meal-btn { background:none; border:1.5px dashed var(--border); border-radius:8px; padding:7px; font-size:11.5px; font-weight:600; color:var(--text3); cursor:pointer; font-family:'DM Sans',sans-serif; width:100%; text-align:center; margin-top:4px; }
+.mp-add-meal-btn { background:none; border:1.5px dashed var(--border); border-radius:8px; padding:7px; font-size:11.5px; font-weight:600; color:var(--text3); cursor:pointer; font-family:'IBM Plex Sans',sans-serif; width:100%; text-align:center; margin-top:4px; }
 
 .cat-pill { flex-shrink:0; padding:7px 13px; background:var(--surface); border:1.5px solid var(--border); border-radius:20px; font-size:11.5px; font-weight:600; color:var(--text3); cursor:pointer; white-space:nowrap; }
 .cat-pill.active { background:var(--accent); color:#fff; border-color:var(--accent); }
@@ -455,9 +452,9 @@ select {
    PROGRESS / WEIGHT
    ═══════════════════════════════════════════════ */
 .stat-card       { background:var(--surface); border-radius:var(--radius); padding:16px; margin-bottom:10px; border:1px solid var(--border-soft); box-shadow:var(--shadow); }
-.stat-card-title { font-family:'DM Serif Display',serif; font-size:17px; font-weight:400; margin-bottom:13px; }
+.stat-card-title { font-family:'IBM Plex Serif',serif; font-size:14px; font-weight:400; margin-bottom:13px; }
 .weight-hero     { text-align:center; padding:12px 0 8px; }
-.weight-hero-num { font-family:'DM Serif Display',serif; font-size:54px; font-weight:400; color:var(--accent); line-height:1; }
+.weight-hero-num { font-family:'IBM Plex Serif',serif; font-size:36px; font-weight:400; color:var(--accent); line-height:1; }
 .weight-hero-unit { font-size:13px; color:var(--text3); font-weight:600; margin-top:4px; }
 .weight-trend    { display:inline-flex; align-items:center; gap:6px; padding:5px 13px; border-radius:20px; font-size:12px; font-weight:600; margin-top:8px; }
 .weight-trend.down { background:var(--green-light); color:var(--green); }
@@ -465,21 +462,21 @@ select {
 .weight-trend.flat { background:var(--surface2);    color:var(--text3); }
 .weight-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-top:14px; }
 .weight-stat     { background:var(--surface2); border-radius:var(--radius-sm); padding:11px; text-align:center; border:1px solid var(--border-soft); }
-.weight-stat-val { font-family:'DM Serif Display',serif; font-size:19px; font-weight:400; color:var(--text); }
+.weight-stat-val { font-family:'IBM Plex Serif',serif; font-size:15px; font-weight:400; color:var(--text); }
 .weight-stat-lbl { font-size:10px; color:var(--text3); font-weight:700; text-transform:uppercase; letter-spacing:0.5px; margin-top:3px; }
 .weight-log-item { display:flex; align-items:center; justify-content:space-between; padding:12px 0; border-bottom:1px solid var(--border-soft); }
 .weight-log-item:last-child { border-bottom:none; }
 .weight-log-date { font-size:12px; color:var(--text3); font-weight:600; }
-.weight-log-val  { font-family:'DM Serif Display',serif; font-size:17px; font-weight:400; }
+.weight-log-val  { font-family:'IBM Plex Serif',serif; font-size:14px; font-weight:400; }
 .weight-log-del  { background:none; border:none; color:var(--text3); cursor:pointer; font-size:14px; padding:4px; }
 .trend-chart { display:flex; align-items:flex-end; gap:3px; height:60px; margin:10px 0 20px; }
-.trend-bar   { flex:1; background:var(--accent-light); border-radius:3px 3px 0 0; border:1px solid rgba(192,92,43,0.2); position:relative; }
+.trend-bar   { flex:1; background:var(--accent-light); border-radius:3px 3px 0 0; border:1px solid var(--border); position:relative; }
 .trend-bar-lbl { position:absolute; bottom:-16px; left:50%; transform:translateX(-50%); font-size:8px; color:var(--text3); white-space:nowrap; }
 
 /* ═══════════════════════════════════════════════
    SETTINGS
    ═══════════════════════════════════════════════ */
-.goal-pill { display:inline-flex; align-items:center; padding:8px 15px; border-radius:20px; font-size:12.5px; font-weight:600; cursor:pointer; border:1.5px solid var(--border); background:var(--surface); color:var(--text3); font-family:'DM Sans',sans-serif; transition:all 0.14s; }
+.goal-pill { display:inline-flex; align-items:center; padding:8px 15px; border-radius:20px; font-size:12.5px; font-weight:600; cursor:pointer; border:1.5px solid var(--border); background:var(--surface); color:var(--text3); font-family:'IBM Plex Sans',sans-serif; transition:all 0.14s; }
 .goal-pill.active { background:var(--accent); color:#fff; border-color:var(--accent); }
 .rule-item            { display:flex; align-items:center; justify-content:space-between; padding:11px 0; border-bottom:1px solid var(--border-soft); }
 .rule-item:last-child { border-bottom:none; }
@@ -489,15 +486,15 @@ select {
 /* ═══════════════════════════════════════════════
    TRENDS
    ═══════════════════════════════════════════════ */
-.period-pill { flex-shrink:0; padding:7px 15px; background:var(--surface); border:1.5px solid var(--border); border-radius:20px; font-size:12px; font-weight:600; color:var(--text3); cursor:pointer; font-family:'DM Sans',sans-serif; white-space:nowrap; transition:all 0.14s; }
+.period-pill { flex-shrink:0; padding:7px 15px; background:var(--surface); border:1.5px solid var(--border); border-radius:20px; font-size:12px; font-weight:600; color:var(--text3); cursor:pointer; font-family:'IBM Plex Sans',sans-serif; white-space:nowrap; transition:all 0.14s; }
 .period-pill.active { background:var(--accent); color:#fff; border-color:var(--accent); }
 .kpi-row { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:14px; }
 .kpi-card { background:var(--surface); border-radius:var(--radius-sm); padding:13px 10px; text-align:center; border:1px solid var(--border-soft); box-shadow:var(--shadow); }
-.kpi-val  { font-family:'DM Serif Display',serif; font-size:22px; font-weight:400; line-height:1; }
+.kpi-val  { font-family:'IBM Plex Serif',serif; font-size:13px; font-weight:400; line-height:1; }
 .kpi-lbl  { font-size:10px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:0.5px; margin-top:3px; }
 .kpi-sub  { font-size:10px; font-weight:600; margin-top:3px; }
 .chart-card  { background:var(--surface); border-radius:var(--radius); padding:16px; margin-bottom:12px; border:1px solid var(--border-soft); box-shadow:var(--shadow); }
-.chart-title { font-family:'DM Serif Display',serif; font-size:16px; font-weight:400; margin-bottom:4px; }
+.chart-title { font-family:'IBM Plex Serif',serif; font-size:13px; font-weight:400; margin-bottom:4px; }
 .chart-sub   { font-size:11.5px; color:var(--text3); margin-bottom:14px; }
 .bar-chart-wrap { display:flex; align-items:flex-end; gap:3px; height:158px; position:relative; padding-bottom:22px; }
 .bar-col  { flex:1; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; position:relative; height:100%; }
@@ -514,22 +511,22 @@ select {
 
 .picker-source-badge { display:inline-flex; align-items:center; gap:4px; padding:2px 7px; border-radius:20px; font-size:9px; font-weight:700; background:var(--green-light); color:var(--green); border:1px solid rgba(61,122,86,0.2); vertical-align:middle; margin-left:6px; }
 
-.barcode-result-name   { font-family:'DM Serif Display',serif; font-size:16px; font-weight:400; margin-bottom:3px; }
+.barcode-result-name   { font-family:'IBM Plex Serif',serif; font-size:13px; font-weight:400; margin-bottom:3px; }
 .barcode-result-meta   { font-size:12px; color:var(--text2); margin-bottom:10px; }
 .barcode-result-macros { display:flex; gap:7px; flex-wrap:wrap; margin-bottom:8px; }
 .barcode-macro-pill    { background:var(--surface); border-radius:8px; padding:5px 10px; font-size:11px; font-weight:700; border:1px solid var(--border); }
 
 .fab-wrap{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;flex:0 0 52px;}
-.fab-btn{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--accent2),var(--accent));border:none;color:#fff;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(193,98,47,0.4);transition:transform 0.18s;}
+.fab-btn{width:44px;height:44px;border-radius:50%;background:var(--accent);border:none;color:#fff;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(193,98,47,0.4);transition:transform 0.18s;}
 .fab-btn.open{transform:rotate(45deg);}
 .fab-menu{position:absolute;bottom:62px;left:50%;transform:translateX(-50%);background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius-sm);box-shadow:0 6px 24px rgba(0,0,0,0.14);min-width:155px;overflow:hidden;display:none;z-index:500;}
 .fab-menu.open{display:block;}
-.fab-item{display:flex;align-items:center;gap:10px;padding:12px 14px;font-size:13px;font-weight:700;color:var(--text);cursor:pointer;font-family:'DM Sans',sans-serif;border:none;background:none;width:100%;text-align:left;}
+.fab-item{display:flex;align-items:center;gap:10px;padding:12px 14px;font-size:13px;font-weight:700;color:var(--text);cursor:pointer;font-family:'IBM Plex Sans',sans-serif;border:none;background:none;width:100%;text-align:left;}
 .fab-item:active{background:var(--surface2);}
 .fab-item+.fab-item{border-top:1px solid var(--border-soft);}
 .fab-icon{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
 
-.mood-pill{padding:10px 4px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--surface2);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;color:var(--text2);cursor:pointer;text-align:center;}
+.mood-pill{padding:10px 4px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--surface2);font-family:'IBM Plex Sans',sans-serif;font-size:12px;font-weight:700;color:var(--text2);cursor:pointer;text-align:center;}
 .mood-pill.active{border-color:var(--accent);background:var(--accent-light);color:var(--accent);}
 
 /* ═══════════════════════════════════════════════
@@ -537,7 +534,7 @@ select {
    ═══════════════════════════════════════════════ */
 .mp-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px;}
 .mp-stat{background:var(--surface2);border-radius:var(--radius-xs);padding:8px 6px;text-align:center;border:1px solid var(--border-soft);}
-.mp-stat-val{font-family:'DM Serif Display',serif;font-size:17px;font-weight:400;color:var(--text);}
+.mp-stat-val{font-family:'IBM Plex Serif',serif;font-size:14px;font-weight:400;color:var(--text);}
 .mp-stat-lbl{font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-top:2px;}
 .mp-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;}
 .mp-badge{display:inline-flex;align-items:center;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid;}
@@ -613,7 +610,7 @@ select {
   <!-- Meal Prep Tracker -->
   <div style="margin-top:18px">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-      <div style="font-family:DM Serif Display,serif;font-size:18px;font-weight:400">Meal <em style="color:var(--accent);font-style:italic">Prep</em></div>
+      <div style="font-family:IBM Plex Serif,serif;font-size:14px;font-weight:400">Meal <em style="color:var(--accent);font-style:italic">Prep</em></div>
       <div id="prep-ratio-badge" style="font-size:11px;font-weight:800;border-radius:20px;padding:4px 12px"></div>
     </div>
     <div id="prep-progress-wrap" style="margin-bottom:12px"></div>
@@ -623,7 +620,7 @@ select {
 
 <!-- ═══ COMING SOON TABS ═══ -->
 <div id="sec-library" class="section">
-  <div id="lib-title" style="font-family:DM Serif Display,serif;font-size:21px;font-weight:700;margin-bottom:14px;letter-spacing:-0.3px">My <em style="color:var(--accent);font-style:italic">Meals</em></div>
+  <div id="lib-title" style="font-family:IBM Plex Serif,serif;font-size:13px;font-weight:700;margin-bottom:14px;letter-spacing:-0.3px">My <em style="color:var(--accent);font-style:italic">Meals</em></div>
   <div class="tog-bar">
     <button class="ctbtn active" id="libtog-meals" onclick="setLibTab('meals')">🍽 Meals</button>
     <button class="ctbtn" id="libtog-plans" onclick="setLibTab('plans')">📋 Day Plans</button>
@@ -643,14 +640,14 @@ select {
   </div>
 </div>
 <div id="sec-trends" class="section">
-  <div style="font-family:DM Serif Display,serif;font-size:21px;font-weight:700;margin-bottom:12px;letter-spacing:-0.3px">My <em style="color:var(--accent);font-style:italic">Trends</em></div>
+  <div style="font-family:IBM Plex Serif,serif;font-size:13px;font-weight:700;margin-bottom:12px;letter-spacing:-0.3px">My <em style="color:var(--accent);font-style:italic">Trends</em></div>
   <div class="tog-bar" style="margin-bottom:10px">
     <button class="ctbtn active" id="trendtog-nutrition" onclick="setTrendsTab('nutrition')">&#x1F4CA; Nutrition</button>
     <button class="ctbtn" id="trendtog-notes" onclick="setTrendsTab('notes')">&#x1F4D3; Notes</button>
   </div>
   <!-- Nutrition controls -->
   <div id="nutrition-controls" style="display:flex;gap:8px;margin-bottom:12px;align-items:center;flex-wrap:wrap">
-    <select id="trend-period-sel" onchange="setTrendPeriod(parseInt(this.value))" style="flex:1;min-width:90px;padding:8px 10px;font-size:13px;font-weight:700;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--surface);color:var(--text);font-family:DM Sans,sans-serif">
+    <select id="trend-period-sel" onchange="setTrendPeriod(parseInt(this.value))" style="flex:1;min-width:90px;padding:8px 10px;font-size:13px;font-weight:700;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--surface);color:var(--text);font-family:IBM Plex Sans,sans-serif">
       <option value="7">1 Week</option>
       <option value="14">2 Weeks</option>
       <option value="21">3 Weeks</option>
@@ -660,7 +657,7 @@ select {
       <button class="ctbtn active" id="trendview-daily"  onclick="setTrendView('daily')"  style="padding:7px 10px;font-size:12px">Daily</button>
       <button class="ctbtn"        id="trendview-weekly" onclick="setTrendView('weekly')" style="padding:7px 10px;font-size:12px">Weekly</button>
     </div>
-    <button onclick="openTrendTargets()" style="flex-shrink:0;padding:7px 11px;background:var(--accent-light);border:1.5px solid rgba(193,98,47,0.3);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;font-weight:700;color:var(--accent);cursor:pointer;white-space:nowrap">&#127919; Set Targets</button>
+    <button onclick="openTrendTargets()" style="flex-shrink:0;padding:7px 11px;background:var(--accent-light);border:1px solid var(--border);border-radius:var(--radius-sm);font-family:IBM Plex Sans,sans-serif;font-size:12px;font-weight:700;color:var(--accent);cursor:pointer;white-space:nowrap">&#127919; Set Targets</button>
   </div>
   <div id="trends-wrap"></div>
 </div>
@@ -710,7 +707,7 @@ select {
       <div class="fab-icon" style="background:#edf5f0;color:#4a7c59">&#9998;</div>Journal
     </button>
   </div>
-  <button id="fab-btn" onclick="toggleFab()" style="width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,var(--accent2),var(--accent));border:none;color:#fff;font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(193,98,47,0.45);transition:transform 0.18s;-webkit-tap-highlight-color:transparent">+</button>
+  <button id="fab-btn" onclick="toggleFab()" style="width:50px;height:50px;border-radius:50%;background:var(--accent);border:none;color:#fff;font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(0,0,0,0.20);transition:transform 0.18s;-webkit-tap-highlight-color:transparent">+</button>
 </div>
 
 <!-- ═══ ASSIGN MODAL ═══ -->
@@ -724,7 +721,7 @@ select {
     </div>
     <!-- Meal tab -->
     <div id="assign-tab-meal">
-      <input type="text" id="assign-meal-search" placeholder="Search meals..." oninput="filterAssignMeals()" style="width:100%;padding:10px 14px;font-size:14px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--surface2);color:var(--text);font-family:DM Sans,sans-serif;margin-bottom:10px;box-sizing:border-box">
+      <input type="text" id="assign-meal-search" placeholder="Search meals..." oninput="filterAssignMeals()" style="width:100%;padding:10px 14px;font-size:14px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--surface2);color:var(--text);font-family:IBM Plex Sans,sans-serif;margin-bottom:10px;box-sizing:border-box">
       <label style="margin-bottom:6px;display:block">Servings</label>
       <div class="port-row">
         <span style="font-size:13px;color:var(--text2);flex:1">How many servings?</span>
@@ -736,7 +733,7 @@ select {
     </div>
     <!-- Plan tab -->
     <div id="assign-tab-plan" style="display:none">
-      <input type="text" id="assign-plan-search" placeholder="Search day plans..." oninput="filterAssignPlans()" style="width:100%;padding:10px 14px;font-size:14px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--surface2);color:var(--text);font-family:DM Sans,sans-serif;margin-bottom:10px;box-sizing:border-box">
+      <input type="text" id="assign-plan-search" placeholder="Search day plans..." oninput="filterAssignPlans()" style="width:100%;padding:10px 14px;font-size:14px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--surface2);color:var(--text);font-family:IBM Plex Sans,sans-serif;margin-bottom:10px;box-sizing:border-box">
       <div id="assign-plan-list" style="max-height:340px;overflow-y:auto;"></div>
     </div>
     <div class="row end" style="margin-top:14px">
@@ -772,10 +769,16 @@ select {
     <!-- Notes -->
     <div class="form-group"><label>Notes <span style="font-weight:400;color:var(--text3);text-transform:none;letter-spacing:0">(optional)</span></label><textarea id="meal-notes" placeholder="e.g. good post-workout meal..." style="height:55px;resize:none;font-size:13px"></textarea></div>
 
+    <!-- Recipe Link — NEW -->
+    <div class="form-group">
+      <label>Recipe Link <span style="font-weight:400;color:var(--text3);text-transform:none;letter-spacing:0">(Instagram, YouTube, website)</span></label>
+      <input type="url" id="meal-link" placeholder="https://www.instagram.com/reel/..." style="font-size:13px">
+    </div>
+
     <!-- Total Servings -->
     <div class="form-group">
       <label>Total Servings <span style="font-weight:400;color:var(--text3);text-transform:none;letter-spacing:0">(how many servings does this recipe make?)</span></label>
-      <input type="number" id="meal-servings" min="1" value="1" style="width:80px;padding:8px 10px;font-size:14px;text-align:center;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--surface);color:var(--text);font-family:DM Sans,sans-serif">
+      <input type="number" id="meal-servings" min="1" value="1" style="width:80px;padding:8px 10px;font-size:14px;text-align:center;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--surface);color:var(--text);font-family:IBM Plex Sans,sans-serif">
     </div>
 
     <!-- Recipe Status -->
@@ -889,11 +892,11 @@ select {
     <div class="modal-title" id="m-plan-title">New Day Plan</div>
 
     <!-- Today-style calorie + macro header — updates as meals are added -->
-    <div id="plan-summary-card" style="background:linear-gradient(145deg,#3B6EE0 0%,#2353C4 50%,#173A9A 100%);color:#fff;border-radius:var(--radius);padding:16px;margin-bottom:16px;box-shadow:0 4px 16px rgba(35,83,196,0.28);position:relative;overflow:hidden">
+    <div id="plan-summary-card" style="background:linear-gradient(145deg,#3B6EE0 0%,#2353C4 50%,#173A9A 100%);color:#fff;border-radius:var(--radius);padding:16px;margin-bottom:16px;box-shadow:0 3px 10px rgba(0,0,0,0.12);position:relative;overflow:hidden">
       <div style="position:absolute;top:-20px;right:-20px;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,0.06);pointer-events:none"></div>
       <div style="font-size:10px;font-weight:700;opacity:0.7;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Plan Total</div>
       <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:8px">
-        <span id="plan-total-val" style="font-family:'DM Serif Display',serif;font-size:42px;font-weight:400;line-height:1">0</span>
+        <span id="plan-total-val" style="font-family:'IBM Plex Serif',serif;font-size:28px;font-weight:400;line-height:1">0</span>
         <span style="font-size:14px;font-weight:500;opacity:0.75">kcal</span>
         <span id="plan-target-lbl" style="font-size:12px;opacity:0.55;margin-left:2px"></span>
       </div>
@@ -904,15 +907,15 @@ select {
       <!-- Macro pills -->
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
         <div style="background:rgba(255,255,255,0.10);border-radius:11px;padding:8px 6px;text-align:center;border:1px solid rgba(255,255,255,0.14)">
-          <div id="plan-mac-p" style="font-family:'DM Serif Display',serif;font-size:18px;font-weight:400">0g</div>
+          <div id="plan-mac-p" style="font-family:'IBM Plex Serif',serif;font-size:14px;font-weight:400">0g</div>
           <div style="font-size:9.5px;font-weight:600;opacity:0.70;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px">Protein</div>
         </div>
         <div style="background:rgba(255,255,255,0.10);border-radius:11px;padding:8px 6px;text-align:center;border:1px solid rgba(255,255,255,0.14)">
-          <div id="plan-mac-c" style="font-family:'DM Serif Display',serif;font-size:18px;font-weight:400">0g</div>
+          <div id="plan-mac-c" style="font-family:'IBM Plex Serif',serif;font-size:14px;font-weight:400">0g</div>
           <div style="font-size:9.5px;font-weight:600;opacity:0.70;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px">Carbs</div>
         </div>
         <div style="background:rgba(255,255,255,0.10);border-radius:11px;padding:8px 6px;text-align:center;border:1px solid rgba(255,255,255,0.14)">
-          <div id="plan-mac-f" style="font-family:'DM Serif Display',serif;font-size:18px;font-weight:400">0g</div>
+          <div id="plan-mac-f" style="font-family:'IBM Plex Serif',serif;font-size:14px;font-weight:400">0g</div>
           <div style="font-size:9.5px;font-weight:600;opacity:0.70;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px">Fat</div>
         </div>
       </div>
@@ -1023,7 +1026,7 @@ select {
     <div class="form-group">
       <label>Target Weight</label>
       <div style="display:flex;gap:10px">
-        <input type="number" id="target-weight-val" placeholder="e.g. 73" step="0.1" min="0" style="flex:1;font-size:18px;font-weight:700">
+        <input type="number" id="target-weight-val" placeholder="e.g. 73" step="0.1" min="0" style="flex:1;font-size:14px;font-weight:700">
         <select id="target-weight-unit" style="width:80px"><option value="kg">kg</option><option value="lbs">lbs</option></select>
       </div>
     </div>
@@ -1040,9 +1043,9 @@ select {
     <div class="modal-handle"></div>
     <div class="modal-title">&#127919; Nutrition Targets</div>
     <div style="font-size:12px;color:var(--text3);margin-bottom:14px;line-height:1.6">Set your daily goals. Shown as progress on the Trends tab.</div>
-    <div style="background:var(--accent-light);border:1.5px solid rgba(193,98,47,0.3);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:12px">
+    <div style="background:var(--accent-light);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:12px">
       <label style="color:var(--accent)">&#x1F525; Calories (auto from macros)</label>
-      <input type="number" id="tt-kcal" min="0" style="font-size:18px;font-weight:700;background:var(--surface);color:var(--accent)" oninput="onTTInput('kcal',this.value)">
+      <input type="number" id="tt-kcal" min="0" style="font-size:14px;font-weight:700;background:var(--surface);color:var(--accent)" oninput="onTTInput('kcal',this.value)">
       <div id="tt-formula" style="font-size:10px;color:var(--text3);margin-top:4px"></div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">
@@ -1095,9 +1098,9 @@ select {
   <div class="modal" style="overflow-y:auto;max-height:90vh">
     <div class="modal-handle"></div>
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
-      <div style="width:36px;height:36px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">✓</div>
+      <div style="width:36px;height:36px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">✓</div>
       <div>
-        <div style="font-family:'DM Serif Display',serif;font-size:20px;font-weight:400">Complete your day</div>
+        <div style="font-family:'IBM Plex Serif',serif;font-size:15px;font-weight:400">Complete your day</div>
         <div style="font-size:12px;color:var(--text3);margin-top:1px" id="m-cd-date"></div>
       </div>
     </div>
@@ -1110,10 +1113,10 @@ select {
 
     <!-- Prompts -->
     <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px" id="cd-prompts">
-      <button onclick="cdAddPrompt('✅ What worked well today')" style="padding:6px 12px;background:var(--green-light);color:var(--green);border:1px solid rgba(14,138,95,0.25);border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif">✅ What worked</button>
-      <button onclick="cdAddPrompt('❌ What didn\'t work')" style="padding:6px 12px;background:var(--red-light);color:var(--red);border:1px solid rgba(196,56,56,0.2);border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif">❌ What didn't work</button>
-      <button onclick="cdAddPrompt('🔄 What to change next time')" style="padding:6px 12px;background:var(--yellow-light);color:var(--yellow);border:1px solid rgba(176,120,0,0.2);border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif">🔄 Change next time</button>
-      <button onclick="cdAddPrompt('💡 Notes')" style="padding:6px 12px;background:var(--blue-light);color:var(--blue);border:1px solid rgba(35,83,196,0.2);border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif">💡 Notes</button>
+      <button onclick="cdAddPrompt('✅ What worked well today')" style="padding:6px 12px;background:var(--green-light);color:var(--green);border:1px solid rgba(14,138,95,0.25);border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;font-family:IBM Plex Sans,sans-serif">✅ What worked</button>
+      <button onclick="cdAddPrompt('❌ What didn\'t work')" style="padding:6px 12px;background:var(--red-light);color:var(--red);border:1px solid rgba(196,56,56,0.2);border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;font-family:IBM Plex Sans,sans-serif">❌ What didn't work</button>
+      <button onclick="cdAddPrompt('🔄 What to change next time')" style="padding:6px 12px;background:var(--yellow-light);color:var(--yellow);border:1px solid rgba(176,120,0,0.2);border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;font-family:IBM Plex Sans,sans-serif">🔄 Change next time</button>
+      <button onclick="cdAddPrompt('💡 Notes')" style="padding:6px 12px;background:var(--blue-light);color:var(--blue);border:1px solid rgba(35,83,196,0.2);border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;font-family:IBM Plex Sans,sans-serif">💡 Notes</button>
     </div>
 
     <div class="form-group">
@@ -1132,7 +1135,7 @@ select {
 <div class="modal-overlay" id="m-confirm" style="align-items:center;justify-content:center">
   <div class="modal" style="border-radius:var(--radius);margin:0 24px;width:calc(100% - 48px);padding:28px 24px 24px">
     <div style="text-align:center;margin-bottom:6px;font-size:28px">💾</div>
-    <div style="font-family:'DM Serif Display',serif;font-size:18px;font-weight:400;text-align:center;margin-bottom:8px">Save changes?</div>
+    <div style="font-family:'IBM Plex Serif',serif;font-size:14px;font-weight:400;text-align:center;margin-bottom:8px">Save changes?</div>
     <div style="font-size:13px;color:var(--text2);text-align:center;line-height:1.6;margin-bottom:20px" id="m-confirm-msg"></div>
     <div style="display:flex;gap:10px">
       <button class="btn btn-ghost" style="flex:1" onclick="closeM('m-confirm')">No, keep original</button>
@@ -1173,7 +1176,7 @@ select {
 <div id="m-ing-pick" class="modal-overlay">
   <div class="modal slide-up" style="max-height:80vh">
     <div class="mhdr"><div id="m-ing-pick-title" class="mhdr-title">Add Ingredient</div><button class="mhdr-x" onclick="closeM('m-ing-pick')">✕</button></div>
-    <input type="text" id="ing-pick-search" placeholder="Search ingredients..." oninput="renderIngPickList()" style="margin:0 15px 10px;padding:10px 14px;font-size:14px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--surface2);color:var(--text);font-family:DM Sans,sans-serif;width:calc(100% - 30px);box-sizing:border-box">
+    <input type="text" id="ing-pick-search" placeholder="Search ingredients..." oninput="renderIngPickList()" style="margin:0 15px 10px;padding:10px 14px;font-size:14px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--surface2);color:var(--text);font-family:IBM Plex Sans,sans-serif;width:calc(100% - 30px);box-sizing:border-box">
     <div id="ing-pick-list" style="overflow-y:auto;max-height:55vh;padding:0 15px 15px"></div>
   </div>
 </div>
@@ -1446,8 +1449,24 @@ function getTodayCopy(mealId) {
 }
 function clearTodayCopies() { _todayMealCopies = {}; }
 
+// ── RECIPE LINK HELPERS ────────────────────────────────
+function getLinkIcon(url){
+  if(!url)return'🔗';var u=url.toLowerCase();
+  if(u.includes('instagram'))return'📸';
+  if(u.includes('youtube')||u.includes('youtu.be'))return'▶️';
+  if(u.includes('tiktok'))return'🎵';
+  return'🔗';
+}
+function getLinkLabel(url){
+  if(!url)return'';var u=url.toLowerCase();
+  if(u.includes('instagram'))return'Instagram';
+  if(u.includes('youtube')||u.includes('youtu.be'))return'YouTube';
+  if(u.includes('tiktok'))return'TikTok';
+  try{return new URL(url).hostname.replace('www.','')}catch(e){return'Recipe'}
+}
+
 // ── TODAY ──────────────────────────────────────────────────────
-var SLOT_COLORS = {Breakfast:'#c1622f',Lunch:'#3a6b9e',Dinner:'#4a7c59',Snack:'#7c5a9e'};
+var SLOT_COLORS = {Breakfast:'#666',Lunch:'#444',Dinner:'#222',Snack:'#888'};
 
 function renderToday() {
   var base = new Date();
@@ -1515,12 +1534,12 @@ function renderToday() {
     ? 'Today — ' + base.toLocaleDateString('en',{month:'long',day:'numeric',year:'numeric'})
     : base.toLocaleDateString('en',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
   h += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:8px">';
-  h += '<button onclick="shiftToday(-1)" style="width:36px;height:36px;border-radius:50%;background:var(--surface);border:1.5px solid var(--border);color:var(--text2);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">‹</button>';
+  h += '<button onclick="shiftToday(-1)" style="width:36px;height:36px;border-radius:50%;background:var(--surface);border:1.5px solid var(--border);color:var(--text2);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">‹</button>';
   h += '<div style="flex:1;text-align:center">';
   h += '<div style="font-size:13px;font-weight:700;color:var(--text)">' + dateLabel + '</div>';
-  if (!isActualToday) h += '<button onclick="todayOffset=0;renderToday()" style="font-size:11px;font-weight:700;color:var(--accent);background:var(--accent-light);border:none;border-radius:20px;padding:3px 10px;cursor:pointer;margin-top:4px;font-family:DM Sans,sans-serif">Back to Today</button>';
+  if (!isActualToday) h += '<button onclick="todayOffset=0;renderToday()" style="font-size:11px;font-weight:700;color:var(--accent);background:var(--accent-light);border:none;border-radius:20px;padding:3px 10px;cursor:pointer;margin-top:4px;font-family:IBM Plex Sans,sans-serif">Back to Today</button>';
   h += '</div>';
-  h += '<button onclick="shiftToday(1)" style="width:36px;height:36px;border-radius:50%;background:var(--surface);border:1.5px solid var(--border);color:var(--text2);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">›</button>';
+  h += '<button onclick="shiftToday(1)" style="width:36px;height:36px;border-radius:50%;background:var(--surface);border:1.5px solid var(--border);color:var(--text2);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">›</button>';
   h += '</div>';
 
   // ── Header card
@@ -1561,7 +1580,7 @@ function renderToday() {
     var slotCal = slots.reduce(function(s,sl){ return s + mealCals(getMeal(sl.mealId), sl.portions||1); }, 0);
     h += '<div class="today-slot" style="border-left:3px solid ' + SLOT_FG[mt] + ';background:' + SLOT_BG[mt] + ';border-radius:var(--radius-sm);margin-bottom:8px;padding:0">';
     h += '<div class="slot-hdr" style="padding:10px 12px 6px">';
-    h += '<div class="row" style="gap:8px"><span style="font-size:16px">' + SLOT_EMOJI[mt] + '</span><span class="slot-name" style="color:' + SLOT_FG[mt] + ';font-weight:800">' + mt + '</span></div>';
+    h += '<div class="row" style="gap:8px"><span style="font-size:13px">' + SLOT_EMOJI[mt] + '</span><span class="slot-name" style="color:' + SLOT_FG[mt] + ';font-weight:800">' + mt + '</span></div>';
     h += '<span class="slot-kcal" style="color:' + SLOT_FG[mt] + '">' + (slotCal > 0 ? slotCal + ' kcal' : '') + '</span>';
     h += '</div>';
     h += '<div class="slot-body" style="padding:0 12px 8px">';
@@ -1584,8 +1603,8 @@ function renderToday() {
           h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">';
           h += '<span style="font-size:13px;font-weight:700;color:var(--text)"><span style="margin-right:4px">' + mealEmoji(mc) + '</span>' + mc.name + statusBadge + '</span>';
           h += '<div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;justify-content:flex-end">';
-          h += '<button onclick="promptSaveMealChanges(\'' + sl.mealId + '\')" style="font-size:10px;font-weight:700;color:var(--green);background:var(--green-light);border:1px solid rgba(14,138,95,0.25);border-radius:20px;padding:3px 8px;cursor:pointer;font-family:DM Sans,sans-serif;white-space:nowrap">💾 Update</button>';
-          h += '<button onclick="openSaveAsNewMeal(\'' + sl.mealId + '\',\'today\')" style="font-size:10px;font-weight:700;color:var(--blue);background:var(--blue-light);border:1px solid rgba(42,122,181,0.25);border-radius:20px;padding:3px 8px;cursor:pointer;font-family:DM Sans,sans-serif;white-space:nowrap">📋 Save As</button>';
+          h += '<button onclick="promptSaveMealChanges(\'' + sl.mealId + '\')" style="font-size:10px;font-weight:700;color:var(--green);background:var(--green-light);border:1px solid rgba(14,138,95,0.25);border-radius:20px;padding:3px 8px;cursor:pointer;font-family:IBM Plex Sans,sans-serif;white-space:nowrap">💾 Update</button>';
+          h += '<button onclick="openSaveAsNewMeal(\'' + sl.mealId + '\',\'today\')" style="font-size:10px;font-weight:700;color:var(--blue);background:var(--blue-light);border:1px solid rgba(42,122,181,0.25);border-radius:20px;padding:3px 8px;cursor:pointer;font-family:IBM Plex Sans,sans-serif;white-space:nowrap">📋 Save As</button>';
           h += '<button onclick="rmSlotToday(\'' + dk + '\',\'' + mt + '\',\'' + sl.mealId + '\')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:13px;padding:2px 4px">✕</button>';
           h += '</div></div>';
           if (mc.ingredients && mc.ingredients.length) {
@@ -1606,7 +1625,7 @@ function renderToday() {
               h += '<div style="display:grid;grid-template-columns:1fr 52px 60px 52px 20px;gap:4px;align-items:center;padding:5px 0;border-bottom:1px solid var(--border-soft)">';
               h += '<span style="font-size:12px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + ing.name + '</span>';
               h += '<input type="number" value="' + ing.amount + '" min="0" step="' + (isGramUnit ? '1' : '0.5') + '" '
-                + 'style="width:100%;padding:4px 4px;font-size:12px;text-align:center;border-radius:8px;border:1.5px solid var(--border);background:var(--surface2);color:var(--text);font-family:DM Sans,sans-serif" '
+                + 'style="width:100%;padding:4px 4px;font-size:12px;text-align:center;border-radius:8px;border:1.5px solid var(--border);background:var(--surface2);color:var(--text);font-family:IBM Plex Sans,sans-serif" '
                 + 'oninput="updateTodayIng(\'' + sl.mealId + '\',' + ii + ',this.value)">';
               if (isGramUnit) {
                 h += '<span style="font-size:11px;color:var(--text3);text-align:center" id="inggrams-' + sl.mealId + '-' + ii + '">' + ing.unit + '</span>';
@@ -1619,14 +1638,17 @@ function renderToday() {
             });
           }
           // Add ingredient button
-          h += '<button onclick="addTodayIng(\'' + sl.mealId + '\')" style="width:100%;margin-top:6px;padding:6px;font-size:11px;font-weight:700;color:var(--accent);background:var(--accent-light);border:1px dashed var(--accent);border-radius:8px;cursor:pointer;font-family:DM Sans,sans-serif">+ Add Ingredient</button>';
+          h += '<button onclick="addTodayIng(\'' + sl.mealId + '\')" style="width:100%;margin-top:6px;padding:6px;font-size:11px;font-weight:700;color:var(--accent);background:var(--accent-light);border:1px dashed var(--accent);border-radius:8px;cursor:pointer;font-family:IBM Plex Sans,sans-serif">+ Add Ingredient</button>';
           h += '</div>';
         } else {
           // ── Meal view — simple row
           h += '<div class="slot-meal-row">';
-          h += '<span class="slot-meal-name"><span style="margin-right:4px">' + mealEmoji(m) + '</span>' + m.name + (sl.portions > 1 ? ' <span style="color:var(--text3);font-size:11px">×' + sl.portions + ' srv</span>' : '') + ((m.totalServings && m.totalServings > 1 && sl.portions <= 1) ? ' <span style="color:var(--text4);font-size:10px">1/' + m.totalServings + '</span>' : '') + statusBadge + '</span>';
+          h += '<div style="flex:1;min-width:0"><span class="slot-meal-name"><span style="margin-right:4px">' + mealEmoji(m) + '</span>' + m.name + (sl.portions > 1 ? ' <span style="color:var(--text3);font-size:11px">×' + sl.portions + ' srv</span>' : '') + ((m.totalServings && m.totalServings > 1 && sl.portions <= 1) ? ' <span style="color:var(--text4);font-size:10px">1/' + m.totalServings + '</span>' : '') + statusBadge + '</span>';
+          if (m.recipeLink) {
+            h += '<a href="' + m.recipeLink + '" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:14px;font-size:10px;font-weight:600;color:var(--text2);text-decoration:none;margin-top:3px">' + getLinkIcon(m.recipeLink) + ' ' + getLinkLabel(m.recipeLink) + ' →</a>';
+          }
+          h += '</div>';
           h += '<div style="display:flex;align-items:center;gap:8px">';
-          h += '<span class="slot-meal-kcal">' + mealCals(m, sl.portions||1) + ' kcal</span>';
           h += '<button onclick="rmSlotToday(\'' + dk + '\',\'' + mt + '\',\'' + sl.mealId + '\')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:13px;padding:2px">✕</button>';
           h += '</div></div>';
         }
@@ -1652,11 +1674,11 @@ function renderToday() {
   h += '<div style="font-size:11px;color:var(--text3);margin-top:1px">' + waterDone + ' / ' + waterTarget + ' bottles</div>';
   h += '</div>';
   h += '<div style="display:flex;align-items:center;gap:6px">';
-  h += '<button onclick="adjustHabit(\'' + dk + '\',\'water\',-0.5)" style="width:28px;height:28px;border-radius:50%;background:var(--surface2);border:1.5px solid var(--border);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text2);font-family:DM Sans">−</button>';
-  h += '<span style="font-size:16px;font-weight:800;color:' + (waterComplete ? 'var(--green)' : 'var(--accent)') + ';min-width:28px;text-align:center">' + waterDone + '</span>';
-  h += '<button onclick="adjustHabit(\'' + dk + '\',\'water\',0.5)" style="width:28px;height:28px;border-radius:50%;background:var(--surface2);border:1.5px solid var(--border);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text2);font-family:DM Sans">+</button>';
+  h += '<button onclick="adjustHabit(\'' + dk + '\',\'water\',-0.5)" style="width:28px;height:28px;border-radius:50%;background:var(--surface2);border:1.5px solid var(--border);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text2);font-family:IBM Plex Sans">−</button>';
+  h += '<span style="font-size:13px;font-weight:800;color:' + (waterComplete ? 'var(--green)' : 'var(--accent)') + ';min-width:28px;text-align:center">' + waterDone + '</span>';
+  h += '<button onclick="adjustHabit(\'' + dk + '\',\'water\',0.5)" style="width:28px;height:28px;border-radius:50%;background:var(--surface2);border:1.5px solid var(--border);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text2);font-family:IBM Plex Sans">+</button>';
   h += '</div>';
-  if (waterComplete) h += '<span style="font-size:16px">✅</span>';
+  if (waterComplete) h += '<span style="font-size:13px">✅</span>';
   h += '</div>';
 
   // Creatine + Hydration habit
@@ -1673,15 +1695,15 @@ function renderToday() {
   // Water target adjuster
   h += '<div style="display:flex;align-items:center;justify-content:flex-end;gap:6px;margin-bottom:4px">';
   h += '<span style="font-size:10px;color:var(--text4)">Target:</span>';
-  h += '<button onclick="adjustWaterTarget(-0.5)" style="background:none;border:1px solid var(--border);border-radius:4px;font-size:10px;cursor:pointer;padding:1px 5px;color:var(--text3);font-family:DM Sans">−</button>';
+  h += '<button onclick="adjustWaterTarget(-0.5)" style="background:none;border:1px solid var(--border);border-radius:4px;font-size:10px;cursor:pointer;padding:1px 5px;color:var(--text3);font-family:IBM Plex Sans">−</button>';
   h += '<span style="font-size:11px;font-weight:700;color:var(--text3)">' + waterTarget + ' bottles</span>';
-  h += '<button onclick="adjustWaterTarget(0.5)" style="background:none;border:1px solid var(--border);border-radius:4px;font-size:10px;cursor:pointer;padding:1px 5px;color:var(--text3);font-family:DM Sans">+</button>';
+  h += '<button onclick="adjustWaterTarget(0.5)" style="background:none;border:1px solid var(--border);border-radius:4px;font-size:10px;cursor:pointer;padding:1px 5px;color:var(--text3);font-family:IBM Plex Sans">+</button>';
   h += '</div>';
   h += '</div>';
 
   // ── New Day Plan button on Today
   h += '<div style="margin-top:10px;margin-bottom:4px">';
-  h += '<button onclick="openNewPlan()" style="width:100%;padding:12px;background:var(--surface);border:1.5px dashed var(--accent);border-radius:var(--radius);font-family:DM Sans,sans-serif;font-size:13px;font-weight:700;color:var(--accent);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background 0.15s">';
+  h += '<button onclick="openNewPlan()" style="width:100%;padding:12px;background:var(--surface);border:1.5px dashed var(--accent);border-radius:var(--radius);font-family:IBM Plex Sans,sans-serif;font-size:13px;font-weight:700;color:var(--accent);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background 0.15s">';
   h += '<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
   h += 'Create New Day Plan';
   h += '</button>';
@@ -1698,7 +1720,7 @@ function renderToday() {
   h += '<div><div style="font-size:14px;font-weight:700;color:' + (isCompleted ? 'var(--green)' : 'var(--text)') + '">' + (isCompleted ? 'Day completed' : 'Complete your day') + '</div>';
   h += '<div style="font-size:11px;color:var(--text3);margin-top:1px">' + (isCompleted ? 'Tap to edit your notes' : 'Add notes on what worked and what to change') + '</div></div>';
   h += '</div>';
-  h += '<button onclick="openCompleteDay(\'' + dk + '\')" style="padding:8px 14px;background:' + (isCompleted ? 'var(--green-light)' : 'linear-gradient(135deg,var(--accent2),var(--accent))') + ';color:' + (isCompleted ? 'var(--green)' : '#fff') + ';border:' + (isCompleted ? '1.5px solid rgba(14,138,95,0.3)' : 'none') + ';border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">' + (isCompleted ? '✎ Edit' : '✓ Complete Day') + '</button>';
+  h += '<button onclick="openCompleteDay(\'' + dk + '\')" style="padding:8px 14px;background:' + (isCompleted ? 'var(--green-light)' : 'var(--accent)') + ';color:' + (isCompleted ? 'var(--green)' : '#fff') + ';border:' + (isCompleted ? '1.5px solid rgba(14,138,95,0.3)' : 'none') + ';border-radius:var(--radius-sm);font-family:IBM Plex Sans,sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">' + (isCompleted ? '✎ Edit' : '✓ Complete Day') + '</button>';
   h += '</div>';
   if (isCompleted && note.text) {
     h += '<div style="padding:10px 14px;background:var(--green-light);border-top:1px solid rgba(14,138,95,0.15)">';
@@ -2141,7 +2163,7 @@ function renderDayView() {
 
   // Header bar
   var hdr = document.createElement('div');
-  hdr.style.cssText = 'background:var(--accent);color:#fff;border-radius:var(--radius);padding:14px 16px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 4px 12px rgba(193,98,47,0.25)';
+  hdr.style.cssText = 'background:var(--accent);color:#fff;border-radius:var(--radius);padding:14px 16px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 3px 10px rgba(0,0,0,0.12)';
   hdr.innerHTML = '<div><div style="font-size:10px;font-weight:700;opacity:0.7;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px">Daily Plan</div>'
     + '<div style="font-family:\'DM Serif Display\',serif;font-size:24px;font-weight:700">' + tc + ' <span style="font-size:13px;font-weight:400;opacity:0.8">kcal</span></div></div>'
     + '<div style="text-align:right;font-size:12px;font-weight:700;opacity:0.85">'
@@ -2256,10 +2278,10 @@ function renderDayDetail(dk, wrap) {
   var DOTS = {Breakfast:'#c1622f',Lunch:'#3a6b9e',Dinner:'#4a7c59',Snack:'#7c5a9e'};
 
   var hdr = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">';
-  hdr += '<div style="font-family:\'DM Serif Display\',serif;font-size:16px;font-weight:400">' + d.toLocaleDateString('en',{weekday:'long',month:'short',day:'numeric'}) + '</div>';
+  hdr += '<div style="font-family:\'DM Serif Display\',serif;font-size:13px;font-weight:400">' + d.toLocaleDateString('en',{weekday:'long',month:'short',day:'numeric'}) + '</div>';
   hdr += '<div style="display:flex;align-items:center;gap:8px">';
   hdr += '<div style="font-size:13px;font-weight:700;color:var(--accent)">' + tc + ' kcal</div>';
-  hdr += '<button onclick="weekAddFullPlan(\'' + dk + '\')" style="font-size:11px;font-weight:700;color:var(--green);background:var(--green-light);border:1px solid rgba(14,138,95,0.25);border-radius:20px;padding:4px 10px;cursor:pointer;font-family:DM Sans,sans-serif;white-space:nowrap">📋 Day Plan</button>';
+  hdr += '<button onclick="weekAddFullPlan(\'' + dk + '\')" style="font-size:11px;font-weight:700;color:var(--green);background:var(--green-light);border:1px solid rgba(14,138,95,0.25);border-radius:20px;padding:4px 10px;cursor:pointer;font-family:IBM Plex Sans,sans-serif;white-space:nowrap">📋 Day Plan</button>';
   hdr += '</div></div>';
 
   var body = '';
@@ -2269,7 +2291,7 @@ function renderDayDetail(dk, wrap) {
     body += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">';
     body += '<div style="display:flex;align-items:center;gap:5px"><div style="width:8px;height:8px;border-radius:50%;background:'+DOTS[mt]+'"></div>';
     body += '<span style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.4px">'+mt+'</span></div>';
-    body += '<button onclick="weekAddMeal(\''+dk+'\',\''+mt+'\')" style="font-size:11px;font-weight:700;color:var(--accent);background:var(--accent-light);border:none;border-radius:20px;padding:3px 10px;cursor:pointer;font-family:DM Sans,sans-serif">+ Add</button>';
+    body += '<button onclick="weekAddMeal(\''+dk+'\',\''+mt+'\')" style="font-size:11px;font-weight:700;color:var(--accent);background:var(--accent-light);border:none;border-radius:20px;padding:3px 10px;cursor:pointer;font-family:IBM Plex Sans,sans-serif">+ Add</button>';
     body += '</div>';
     if (slots.length === 0) {
       body += '<div style="font-size:12px;color:var(--text3);font-style:italic;padding:2px 0 2px 13px">Nothing planned</div>';
@@ -2281,7 +2303,7 @@ function renderDayDetail(dk, wrap) {
         body += '<div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface2);border-radius:8px;padding:7px 10px;margin-bottom:4px;border:1px solid var(--border-soft)">';
         body += '<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+m.name+'</div>';
         body += '<div style="font-size:11px;color:var(--text3);margin-top:1px">'+cal+' kcal · P:'+mac2.p+'g C:'+mac2.c+'g F:'+mac2.f+'g</div></div>';
-        body += '<button onclick="weekRemoveMeal(\''+dk+'\',\''+mt+'\',\''+sl.mealId+'\')" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:16px;padding:0 4px;flex-shrink:0;font-weight:700">✕</button>';
+        body += '<button onclick="weekRemoveMeal(\''+dk+'\',\''+mt+'\',\''+sl.mealId+'\')" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:13px;padding:0 4px;flex-shrink:0;font-weight:700">✕</button>';
         body += '</div>';
       });
     }
@@ -2340,7 +2362,7 @@ function weekAddFullPlan(dk) {
       });
       var card = document.createElement('div');
       card.style.cssText = 'background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:13px 14px;margin-bottom:8px;cursor:pointer';
-      card.innerHTML = '<div style="font-family:\'DM Serif Display\',serif;font-size:16px;font-weight:400;margin-bottom:4px">' + mp.name + '</div>'
+      card.innerHTML = '<div style="font-family:\'DM Serif Display\',serif;font-size:13px;font-weight:400;margin-bottom:4px">' + mp.name + '</div>'
         + '<div style="font-size:12px;color:var(--text2)">' + totalMeals + ' meals · ' + totalCal + ' kcal</div>'
         + '<div style="font-size:11px;color:var(--text3);margin-top:2px">P:' + macTot.p + 'g C:' + macTot.c + 'g F:' + macTot.f + 'g' + (mp.goal ? ' · ' + mp.goal : '') + '</div>';
       card.onclick = function() {
@@ -2410,7 +2432,7 @@ function renderWeekPickerFilters(dk, mt, existing, dateStr) {
     var isAll = tag === 'All';
     var isActive = isAll ? _weekPickFilter.length === 0 : _weekPickFilter.indexOf(tag) >= 0;
     var pill = document.createElement('button');
-    pill.style.cssText = 'flex-shrink:0;padding:6px 13px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif;white-space:nowrap;border:1.5px solid;transition:all 0.14s;'
+    pill.style.cssText = 'flex-shrink:0;padding:6px 13px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;font-family:IBM Plex Sans,sans-serif;white-space:nowrap;border:1.5px solid;transition:all 0.14s;'
       + (isActive
         ? 'background:var(--accent);color:#fff;border-color:var(--accent);'
         : 'background:var(--surface);color:var(--text3);border-color:var(--border);');
@@ -2550,8 +2572,8 @@ function populateAssignPlanList() {
     hdr.style.cssText = 'padding:13px 14px;cursor:pointer';
 
     var hdrHtml = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">';
-    hdrHtml += '<div style="font-family:\'DM Serif Display\',serif;font-size:16px;font-weight:400;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + mp.name + '</div>';
-    hdrHtml += '<span style="font-family:\'DM Serif Display\',serif;font-size:18px;font-weight:700;color:var(--accent);flex-shrink:0;margin-left:10px">' + totalCal + ' kcal</span>';
+    hdrHtml += '<div style="font-family:\'DM Serif Display\',serif;font-size:13px;font-weight:400;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + mp.name + '</div>';
+    hdrHtml += '<span style="font-family:\'DM Serif Display\',serif;font-size:14px;font-weight:700;color:var(--accent);flex-shrink:0;margin-left:10px">' + totalCal + ' kcal</span>';
     hdrHtml += '</div>';
 
     // Macro row
@@ -2836,7 +2858,7 @@ function openAssign(dk, mt) {
       + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'
       + MT.map(function(t){
           var sc = SLOT_COLORS[t];
-          return '<button onclick="openAssign(\'' + dk + '\',\'' + t + '\')" style="padding:12px;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;font-family:DM Sans,sans-serif;font-size:13px;font-weight:700;color:var(--text2);display:flex;align-items:center;gap:8px"><div style="width:10px;height:10px;border-radius:50%;background:' + sc + '"></div>' + t + '</button>';
+          return '<button onclick="openAssign(\'' + dk + '\',\'' + t + '\')" style="padding:12px;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;font-family:IBM Plex Sans,sans-serif;font-size:13px;font-weight:700;color:var(--text2);display:flex;align-items:center;gap:8px"><div style="width:10px;height:10px;border-radius:50%;background:' + sc + '"></div>' + t + '</button>';
         }).join('')
       + '</div></div>';
     document.getElementById('m-assign').classList.add('open');
@@ -2859,7 +2881,7 @@ function openAssign(dk, mt) {
       var srvLabel = (m.totalServings && m.totalServings > 1) ? ' · ' + m.totalServings + ' srv' : '';
       var card = document.createElement('div'); card.className = 'assign-meal-card';
       card.dataset.mealName = m.name;
-      card.innerHTML = '<div style="display:flex;align-items:center;gap:8px"><span style="font-size:18px">' + emoji + '</span><div style="flex:1;min-width:0"><div class="assign-meal-name">' + m.name + '</div>'
+      card.innerHTML = '<div style="display:flex;align-items:center;gap:8px"><span style="font-size:14px">' + emoji + '</span><div style="flex:1;min-width:0"><div class="assign-meal-name">' + m.name + '</div>'
         + '<div class="assign-meal-meta">' + cal + ' kcal · P:' + mac.p + 'g C:' + mac.c + 'g F:' + mac.f + 'g' + srvLabel + '</div></div></div>';
       card.onclick = function(){ startAssign(m.id, mt, dk); };
       list.appendChild(card);
@@ -3045,7 +3067,7 @@ function renderMeals(){
     return`<div class="card" style="padding:0;overflow:hidden">
       <div style="padding:14px 15px 10px">
         <div class="row between" style="margin-bottom:6px">
-          <div style="font-family:DM Serif Display,serif;font-size:16px;font-weight:700;flex:1;min-width:0;margin-right:8px;line-height:1.3"><span style="margin-right:4px">${mealEmoji(m)}</span>${m.name}</div>
+          <div style="font-family:IBM Plex Serif,serif;font-size:13px;font-weight:700;flex:1;min-width:0;margin-right:8px;line-height:1.3"><span style="margin-right:4px">${mealEmoji(m)}</span>${m.name}</div>
           <div class="row" style="gap:6px;flex-shrink:0">
             <button class="icon-btn" onclick="openEditMeal('${m.id}')"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
             <button class="icon-btn" style="color:var(--red)" onclick="delMeal('${m.id}')"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
@@ -3066,7 +3088,7 @@ function renderMeals(){
           <span style="font-size:11px;font-weight:700;color:var(--purple)">F ${mac.f}g</span>
           ${(m.totalServings && m.totalServings > 1) ? `<span style="font-size:10px;font-weight:700;color:var(--text3);background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:2px 7px">${m.totalServings} servings</span>` : ''}
         </div>
-        <span style="font-family:DM Serif Display,serif;font-size:17px;font-weight:700;color:var(--accent)">${cal} kcal${(m.totalServings && m.totalServings > 1) ? '<span style="font-size:10px;font-weight:600;color:var(--text3)"> /srv</span>' : ''}</span>
+        <span style="font-family:IBM Plex Serif,serif;font-size:14px;font-weight:700;color:var(--accent)">${cal} kcal${(m.totalServings && m.totalServings > 1) ? '<span style="font-size:10px;font-weight:600;color:var(--text3)"> /srv</span>' : ''}</span>
       </div>
     </div>`;
 
@@ -3157,7 +3179,7 @@ function setMealPrep(p) {
   });
 }
 
-function openAddMeal(){editId=null;_mealStatus='';_mealPrep='';document.getElementById('m-meal-title').textContent='New Meal';document.getElementById('meal-name').value='';document.getElementById('meal-servings').value='1';buildTags();document.getElementById('ing-inputs').innerHTML='';addIngRow();addIngRow();updTotalCal();setMealStatus('');setMealPrep('');document.getElementById('m-meal').classList.add('open');}
+function openAddMeal(){editId=null;_mealStatus='';_mealPrep='';document.getElementById('m-meal-title').textContent='New Meal';document.getElementById('meal-name').value='';document.getElementById('meal-servings').value='1';var lnk=document.getElementById('meal-link');if(lnk)lnk.value='';var mne=document.getElementById('meal-notes');if(mne)mne.value='';buildTags();document.getElementById('ing-inputs').innerHTML='';addIngRow();addIngRow();updTotalCal();setMealStatus('');setMealPrep('');document.getElementById('m-meal').classList.add('open');}
 
 function openEditMeal(id){
   const m=getMeal(id);if(!m)return;
@@ -3166,6 +3188,7 @@ function openEditMeal(id){
   document.getElementById('meal-name').value=m.name;
   document.getElementById('meal-servings').value=m.totalServings||1;
   var ne=document.getElementById('meal-notes');if(ne)ne.value=m.notes||'';
+  var linkEl=document.getElementById('meal-link');if(linkEl)linkEl.value=m.recipeLink||'';
   buildTags(m.tags||{});
   setMealStatus((m.tags && m.tags.status) || '');
   setMealPrep((m.tags && m.tags.prepType) || '');
@@ -3315,8 +3338,9 @@ function saveMeal(){
   });
   const mNotes=(document.getElementById('meal-notes')&&document.getElementById('meal-notes').value.trim())||'';
   const mServings=parseInt(document.getElementById('meal-servings').value)||1;
-  if(editId){const i=meals.findIndex(m=>m.id===editId);if(i>=0)meals[i]={...meals[i],name,tags,ingredients:ings,notes:mNotes,totalServings:mServings};}
-  else meals.push({id:uid(),name,tags,ingredients:ings,notes:mNotes,totalServings:mServings});
+  const mLink=(document.getElementById('meal-link')&&document.getElementById('meal-link').value.trim())||'';
+  if(editId){const i=meals.findIndex(m=>m.id===editId);if(i>=0)meals[i]={...meals[i],name,tags,ingredients:ings,notes:mNotes,totalServings:mServings,recipeLink:mLink};}
+  else meals.push({id:uid(),name,tags,ingredients:ings,notes:mNotes,totalServings:mServings,recipeLink:mLink});
   save();closeM('m-meal');renderMeals();
   showToast(editId ? 'Meal updated ✓' : 'Meal saved ✓');
 }
@@ -3400,7 +3424,7 @@ function renderPlans(){
     var hdrTop='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">';
     hdrTop+='<div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">';
     hdrTop+='<span class="mp-arrow" style="font-size:12px;color:var(--text3);flex-shrink:0">&#9654;</span>';
-    hdrTop+='<div style="font-family:\'DM Serif Display\',serif;font-size:17px;font-weight:400;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+mp.name+'</div>';
+    hdrTop+='<div style="font-family:\'DM Serif Display\',serif;font-size:14px;font-weight:400;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+mp.name+'</div>';
     hdrTop+='</div>';
     hdrTop+='<div style="display:flex;align-items:center;gap:6px;flex-shrink:0">';
     hdrTop+='<button class="icon-btn" style="width:30px;height:30px" data-edit-plan="'+mp.id+'"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>';
@@ -3414,7 +3438,7 @@ function renderPlans(){
     hdrStats+='<span style="font-size:11px;font-weight:700;color:var(--purple)">F '+totalF+'g</span>';
     hdrStats+='<span style="font-size:11px;color:var(--text3)">'+mealCount+' meals</span>';
     hdrStats+='</div>';
-    hdrStats+='<span style="font-family:\'DM Serif Display\',serif;font-size:17px;font-weight:700;color:var(--accent)">'+totalCal+' kcal</span>';
+    hdrStats+='<span style="font-family:\'DM Serif Display\',serif;font-size:14px;font-weight:700;color:var(--accent)">'+totalCal+' kcal</span>';
     hdrStats+='</div>';
 
     if(mp.goal){
@@ -3559,8 +3583,8 @@ function renderPlanSlotMeals(mt){
       var hdr = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">';
       hdr += '<span style="font-size:13px;font-weight:700;color:var(--text)">' + mc.name + '</span>';
       hdr += '<div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;justify-content:flex-end">';
-      hdr += '<button onclick="savePlanMealChanges(\'' + entry.mealId + '\')" style="font-size:10px;font-weight:700;color:var(--green);background:var(--green-light);border:1px solid rgba(14,138,95,0.25);border-radius:20px;padding:3px 8px;cursor:pointer;font-family:DM Sans,sans-serif;white-space:nowrap">💾 Update</button>';
-      hdr += '<button onclick="openSaveAsNewMeal(\'' + entry.mealId + '\',\'plan\')" style="font-size:10px;font-weight:700;color:var(--blue);background:var(--blue-light);border:1px solid rgba(42,122,181,0.25);border-radius:20px;padding:3px 8px;cursor:pointer;font-family:DM Sans,sans-serif;white-space:nowrap">📋 Save As</button>';
+      hdr += '<button onclick="savePlanMealChanges(\'' + entry.mealId + '\')" style="font-size:10px;font-weight:700;color:var(--green);background:var(--green-light);border:1px solid rgba(14,138,95,0.25);border-radius:20px;padding:3px 8px;cursor:pointer;font-family:IBM Plex Sans,sans-serif;white-space:nowrap">💾 Update</button>';
+      hdr += '<button onclick="openSaveAsNewMeal(\'' + entry.mealId + '\',\'plan\')" style="font-size:10px;font-weight:700;color:var(--blue);background:var(--blue-light);border:1px solid rgba(42,122,181,0.25);border-radius:20px;padding:3px 8px;cursor:pointer;font-family:IBM Plex Sans,sans-serif;white-space:nowrap">📋 Save As</button>';
       hdr += '<button style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:13px;padding:2px 4px" data-rm-slot="' + mt + '" data-rm-idx="' + i + '">✕</button>';
       hdr += '</div></div>';
 
@@ -3583,7 +3607,7 @@ function renderPlanSlotMeals(mt){
           rows += '<div style="display:grid;grid-template-columns:1fr 52px 60px 52px 20px;gap:4px;align-items:center;padding:5px 0;border-bottom:1px solid var(--border-soft)">';
           rows += '<span style="font-size:12px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + ing.name + '</span>';
           rows += '<input type="number" value="' + ing.amount + '" min="0" step="' + (isGramUnit ? '1' : '0.5') + '" '
-            + 'style="width:100%;padding:4px 4px;font-size:12px;text-align:center;border-radius:8px;border:1.5px solid var(--border);background:var(--surface2);color:var(--text);font-family:DM Sans,sans-serif" '
+            + 'style="width:100%;padding:4px 4px;font-size:12px;text-align:center;border-radius:8px;border:1.5px solid var(--border);background:var(--surface2);color:var(--text);font-family:IBM Plex Sans,sans-serif" '
             + 'oninput="updatePlanIng(\'' + entry.mealId + '\',' + ii + ',this.value)">';
           if (isGramUnit) {
             rows += '<span style="font-size:11px;color:var(--text3);text-align:center" id="planinggrams-' + entry.mealId + '-' + ii + '">' + ing.unit + '</span>';
@@ -3597,7 +3621,7 @@ function renderPlanSlotMeals(mt){
       }
 
       // Add ingredient button
-      rows += '<button onclick="addPlanIng(\'' + entry.mealId + '\',\'' + mt + '\')" style="width:100%;margin-top:6px;padding:6px;font-size:11px;font-weight:700;color:var(--accent);background:var(--accent-light);border:1px dashed var(--accent);border-radius:8px;cursor:pointer;font-family:DM Sans,sans-serif">+ Add Ingredient</button>';
+      rows += '<button onclick="addPlanIng(\'' + entry.mealId + '\',\'' + mt + '\')" style="width:100%;margin-top:6px;padding:6px;font-size:11px;font-weight:700;color:var(--accent);background:var(--accent-light);border:1px dashed var(--accent);border-radius:8px;cursor:pointer;font-family:IBM Plex Sans,sans-serif">+ Add Ingredient</button>';
 
       div.innerHTML = hdr + grid + rows;
       // Wire up remove button
@@ -3790,7 +3814,7 @@ function renderPlanPickList() {
   Array.from(tags).forEach(function(tag) {
     var isActive = tag === 'All' ? _planPickFilter.length === 0 : _planPickFilter.indexOf(tag) >= 0;
     var pill = document.createElement('button');
-    pill.style.cssText = 'flex-shrink:0;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif;white-space:nowrap;border:1.5px solid;'
+    pill.style.cssText = 'flex-shrink:0;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;font-family:IBM Plex Sans,sans-serif;white-space:nowrap;border:1.5px solid;'
       + (isActive ? 'background:var(--accent);color:#fff;border-color:var(--accent);' : 'background:var(--surface);color:var(--text3);border-color:var(--border);');
     pill.textContent = tag;
     pill.onclick = function() {
@@ -4290,7 +4314,7 @@ function renderTrendsNotes() {
     h += '</div>';
     h += '<div style="display:flex;align-items:center;gap:6px">';
     h += '<div style="width:24px;height:24px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;flex-shrink:0">✓</div>';
-    h += '<button onclick="openCompleteDay(\'' + dk + '\')" style="font-size:11px;font-weight:700;color:var(--text3);background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:3px 10px;cursor:pointer;font-family:DM Sans,sans-serif">Edit</button>';
+    h += '<button onclick="openCompleteDay(\'' + dk + '\')" style="font-size:11px;font-weight:700;color:var(--text3);background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:3px 10px;cursor:pointer;font-family:IBM Plex Sans,sans-serif">Edit</button>';
     h += '</div>';
     h += '</div>';
 
@@ -4383,7 +4407,7 @@ function renderNutritionTrends() {
 
   h += '<div class="card" style="margin-bottom:10px;display:flex;align-items:center;gap:14px">';
   h += '<div style="width:48px;height:48px;border-radius:50%;background:' + (streak > 0 ? 'linear-gradient(135deg,#ff9500,#ff5e3a)' : 'var(--surface2)') + ';display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:' + (streak > 0 ? '0 3px 12px rgba(255,94,58,0.3)' : 'none') + '">';
-  h += '<span style="font-size:22px">' + (streak > 0 ? '🔥' : '⏸') + '</span>';
+  h += '<span style="font-size:13px">' + (streak > 0 ? '🔥' : '⏸') + '</span>';
   h += '</div>';
   h += '<div style="flex:1">';
   h += '<div style="font-family:\'DM Serif Display\',serif;font-size:28px;font-weight:400;color:var(--text);line-height:1">' + streak + '</div>';
@@ -4407,18 +4431,18 @@ function renderNutritionTrends() {
   var creatinePct = habitDaysChecked > 0 ? Math.round(creatineHitDays / habitDaysChecked * 100) : 0;
 
   h += '<div class="card" style="margin-bottom:10px">';
-  h += '<div style="font-family:DM Serif Display,serif;font-size:16px;font-weight:700;margin-bottom:10px">Habit Tracking</div>';
+  h += '<div style="font-family:IBM Plex Serif,serif;font-size:13px;font-weight:700;margin-bottom:10px">Habit Tracking</div>';
   h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
   // Water card
   h += '<div style="background:var(--surface2);border-radius:var(--radius-xs);padding:10px;text-align:center;border:1px solid var(--border-soft)">';
-  h += '<div style="font-size:22px;margin-bottom:4px">💧</div>';
-  h += '<div style="font-size:20px;font-weight:800;color:' + (waterPct >= 80 ? 'var(--green)' : waterPct >= 50 ? '#b07d00' : 'var(--red)') + '">' + waterPct + '%</div>';
+  h += '<div style="font-size:13px;margin-bottom:4px">💧</div>';
+  h += '<div style="font-size:15px;font-weight:800;color:' + (waterPct >= 80 ? 'var(--green)' : waterPct >= 50 ? '#b07d00' : 'var(--red)') + '">' + waterPct + '%</div>';
   h += '<div style="font-size:10px;font-weight:700;color:var(--text3);margin-top:2px">Water (' + waterHitDays + '/' + habitDaysChecked + ' days)</div>';
   h += '</div>';
   // Creatine card
   h += '<div style="background:var(--surface2);border-radius:var(--radius-xs);padding:10px;text-align:center;border:1px solid var(--border-soft)">';
-  h += '<div style="font-size:22px;margin-bottom:4px">⚡</div>';
-  h += '<div style="font-size:20px;font-weight:800;color:' + (creatinePct >= 80 ? 'var(--green)' : creatinePct >= 50 ? '#b07d00' : 'var(--red)') + '">' + creatinePct + '%</div>';
+  h += '<div style="font-size:13px;margin-bottom:4px">⚡</div>';
+  h += '<div style="font-size:15px;font-weight:800;color:' + (creatinePct >= 80 ? 'var(--green)' : creatinePct >= 50 ? '#b07d00' : 'var(--red)') + '">' + creatinePct + '%</div>';
   h += '<div style="font-size:10px;font-weight:700;color:var(--text3);margin-top:2px">Creatine (' + creatineHitDays + '/' + habitDaysChecked + ' days)</div>';
   h += '</div>';
   h += '</div></div>';
@@ -4428,8 +4452,8 @@ function renderNutritionTrends() {
   var calColor=calPct>=95&&calPct<=110?'#4a7c59':calPct>110?'#c94040':'#b07d00';
   h += '<div class="card" style="margin-bottom:10px">';
   h += '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px">';
-  h += '<div style="font-family:DM Serif Display,serif;font-size:16px;font-weight:700">Avg Daily Calories</div>';
-  h += '<div style="font-size:22px;font-weight:700;color:var(--accent)">'+avgCal+'<span style="font-size:11px;font-weight:400;color:var(--text3)"> kcal</span></div>';
+  h += '<div style="font-family:IBM Plex Serif,serif;font-size:13px;font-weight:700">Avg Daily Calories</div>';
+  h += '<div style="font-size:13px;font-weight:700;color:var(--accent)">'+avgCal+'<span style="font-size:11px;font-weight:400;color:var(--text3)"> kcal</span></div>';
   h += '</div>';
   if (tgtCal>0) {
     h += '<div style="height:10px;background:var(--surface2);border-radius:5px;overflow:hidden;margin-bottom:6px"><div style="height:100%;width:'+calPct+'%;background:'+calColor+';border-radius:5px"></div></div>';
@@ -4513,7 +4537,7 @@ function renderNutritionTrends() {
       svgBars += '<text x="'+cx.toFixed(1)+'" y="11" text-anchor="middle" font-size="12">'+MOOD_EM[d.mood]+'</text>';
     }
     if (d.sleep !== null && d.sleep !== undefined) {
-      svgBars += '<text x="'+cx.toFixed(1)+'" y="23" text-anchor="middle" font-size="7" font-weight="700" fill="#3a6b9e" font-family="DM Sans,sans-serif">'+d.sleep+'h</text>';
+      svgBars += '<text x="'+cx.toFixed(1)+'" y="23" text-anchor="middle" font-size="7" font-weight="700" fill="#3a6b9e" font-family="IBM Plex Sans,sans-serif">'+d.sleep+'h</text>';
     }
 
     // Bar
@@ -4531,8 +4555,8 @@ function renderNutritionTrends() {
 
     // Date labels
     var lblColor = isToday ? 'var(--accent)' : 'var(--text3)';
-    svgBars += '<text x="'+cx.toFixed(1)+'" y="'+(SVG_H-10)+'" text-anchor="middle" font-size="7" font-weight="700" fill="'+lblColor+'" font-family="DM Sans,sans-serif">'+d.dayName+'</text>';
-    svgBars += '<text x="'+cx.toFixed(1)+'" y="'+(SVG_H-2)+'" text-anchor="middle" font-size="6.5" fill="'+lblColor+'" font-family="DM Sans,sans-serif">'+d.dateNum+'</text>';
+    svgBars += '<text x="'+cx.toFixed(1)+'" y="'+(SVG_H-10)+'" text-anchor="middle" font-size="7" font-weight="700" fill="'+lblColor+'" font-family="IBM Plex Sans,sans-serif">'+d.dayName+'</text>';
+    svgBars += '<text x="'+cx.toFixed(1)+'" y="'+(SVG_H-2)+'" text-anchor="middle" font-size="6.5" fill="'+lblColor+'" font-family="IBM Plex Sans,sans-serif">'+d.dateNum+'</text>';
   });
 
   var tgtLineY = tgtCal > 0 ? svgY(tgtCal).toFixed(1) : null;
@@ -4545,12 +4569,12 @@ function renderNutritionTrends() {
   h += '<div class="chart-card">';
   // Header row with nav arrows
   h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
-  h += '<button onclick="shiftBarWeek(-1)" style="background:none;border:none;font-size:18px;color:var(--text3);cursor:pointer;padding:4px 8px;border-radius:6px">&#8592;</button>';
+  h += '<button onclick="shiftBarWeek(-1)" style="background:none;border:none;font-size:14px;color:var(--text3);cursor:pointer;padding:4px 8px;border-radius:6px">&#8592;</button>';
   h += '<div style="text-align:center">';
   h += '<div class="chart-title" style="margin-bottom:0">'+(isCurrentWk?'This Week':wkLabel)+'</div>';
   h += '<div class="chart-sub">'+wkLabel+' · kcal &amp; mood</div>';
   h += '</div>';
-  h += '<button onclick="shiftBarWeek(1)" '+(isCurrentWk?'style="background:none;border:none;font-size:18px;color:var(--border);cursor:default;padding:4px 8px"':'style="background:none;border:none;font-size:18px;color:var(--text3);cursor:pointer;padding:4px 8px;border-radius:6px"')+'>&#8594;</button>';
+  h += '<button onclick="shiftBarWeek(1)" '+(isCurrentWk?'style="background:none;border:none;font-size:14px;color:var(--border);cursor:default;padding:4px 8px"':'style="background:none;border:none;font-size:14px;color:var(--text3);cursor:pointer;padding:4px 8px;border-radius:6px"')+'>&#8594;</button>';
   h += '</div>';
 
   h += '<div style="display:flex;gap:4px;align-items:stretch">';
@@ -4569,7 +4593,7 @@ function renderNutritionTrends() {
   h += svgBars;
   if (tgtLineY !== null) {
     h += '<line x1="0" y1="'+tgtLineY+'" x2="'+SVG_W+'" y2="'+tgtLineY+'" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="4,3"/>';
-    h += '<text x="'+(SVG_W-2)+'" y="'+(parseFloat(tgtLineY)-3)+'" text-anchor="end" font-size="7" font-weight="700" fill="var(--accent)" font-family="DM Sans,sans-serif">'+tgtCal+'</text>';
+    h += '<text x="'+(SVG_W-2)+'" y="'+(parseFloat(tgtLineY)-3)+'" text-anchor="end" font-size="7" font-weight="700" fill="var(--accent)" font-family="IBM Plex Sans,sans-serif">'+tgtCal+'</text>';
   }
   h += '</svg>';
   h += '<div id="bar-tooltip" style="display:none;position:absolute;top:26px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.75);color:#fff;font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;pointer-events:none;z-index:10;white-space:nowrap"></div>';
@@ -4609,13 +4633,13 @@ function renderNutritionTrends() {
   // ── Inline Journal collapsible ────────────────────────────────
   h += '<div class="stat-card" style="margin-top:12px">';
   h += '<div style="display:flex;justify-content:space-between;align-items:center;cursor:pointer" onclick="toggleInlineJournal()">';
-  h += '<div style="font-family:DM Serif Display,serif;font-size:15px;font-weight:700">Journal &amp; Mood</div>';
+  h += '<div style="font-family:IBM Plex Serif,serif;font-size:15px;font-weight:700">Journal &amp; Mood</div>';
   h += '<span id="inline-journal-arrow" style="font-size:14px;color:var(--text3)">&#9654;</span>';
   h += '</div>';
   h += '<div id="inline-journal-body" style="display:none;margin-top:12px">';
   h += '<div style="display:flex;gap:8px;margin-bottom:12px">';
   h += '<button onclick="openJournalWrite()" class="btn btn-primary" style="flex:1;padding:10px">&#9998; Write</button>';
-  h += '<button onclick="openMoodLog()" style="flex:1;padding:10px;background:var(--purple-light);border:1.5px solid rgba(124,90,158,0.3);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;font-weight:700;color:var(--purple);cursor:pointer">&#128517; Mood</button>';
+  h += '<button onclick="openMoodLog()" style="flex:1;padding:10px;background:var(--purple-light);border:1.5px solid rgba(124,90,158,0.3);border-radius:var(--radius-sm);font-family:IBM Plex Sans,sans-serif;font-size:13px;font-weight:700;color:var(--purple);cursor:pointer">&#128517; Mood</button>';
   h += '</div>';
   var jEntries = [];
   moodLogs.forEach(function(l){
@@ -4710,7 +4734,7 @@ function renderIngredients() {
 
   var items = Object.values(byName).sort(function(a,b){ return a.name.localeCompare(b.name); });
 
-  var h = '<div style="font-family:DM Serif Display,serif;font-size:21px;font-weight:400;margin-bottom:14px;letter-spacing:-0.3px">My <em style="color:var(--accent);font-style:italic">Pantry</em></div>';
+  var h = '<div style="font-family:IBM Plex Serif,serif;font-size:13px;font-weight:400;margin-bottom:14px;letter-spacing:-0.3px">My <em style="color:var(--accent);font-style:italic">Pantry</em></div>';
 
   // Add ingredient button
   h += '<button onclick="openAddIngredient()" class="btn btn-primary btn-full" style="margin-bottom:14px">';
@@ -4758,7 +4782,7 @@ function renderIngredients() {
     h += '<span style="font-size:12px;font-weight:800;color:var(--blue)">C ' + cStr + '</span>';
     h += '<span style="font-size:12px;font-weight:800;color:var(--purple)">F ' + fStr + '</span>';
     h += '</div>';
-    h += '<div style="font-family:\'DM Serif Display\',serif;font-size:16px;font-weight:700;color:var(--accent);min-width:55px;text-align:right">' + calStr + ' <span style="font-size:10px;font-weight:600;color:var(--text3)">kcal</span></div>';
+    h += '<div style="font-family:\'DM Serif Display\',serif;font-size:13px;font-weight:700;color:var(--accent);min-width:55px;text-align:right">' + calStr + ' <span style="font-size:10px;font-weight:600;color:var(--text3)">kcal</span></div>';
     h += '</div>';
 
     // Delete button for standalone ingredients
@@ -4778,7 +4802,7 @@ function renderShopping() {
   var wrap = document.getElementById('shopping-wrap');
   if (!wrap) return;
 
-  var h = '<div style="font-family:DM Serif Display,serif;font-size:21px;font-weight:400;margin-bottom:14px;letter-spacing:-0.3px">Shopping <em style="color:var(--accent);font-style:italic">List</em></div>';
+  var h = '<div style="font-family:IBM Plex Serif,serif;font-size:13px;font-weight:400;margin-bottom:14px;letter-spacing:-0.3px">Shopping <em style="color:var(--accent);font-style:italic">List</em></div>';
   h += '<div id="ing-tab-content"></div>';
   wrap.innerHTML = h;
   renderShoppingListTab();
@@ -4805,8 +4829,8 @@ function renderShoppingListTab() {
   el.innerHTML =
     '<div style="background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:14px;margin-bottom:12px">' +
       '<div style="display:flex;gap:8px;margin-bottom:12px">' +
-        '<button onclick="setIngRange(\'' + defFrom + '\',\'' + defTo + '\')" style="flex:1;padding:8px;background:var(--accent-light);border:1.5px solid rgba(193,98,47,0.3);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;font-weight:700;color:var(--accent);cursor:pointer">This Week</button>' +
-        '<button onclick="setIngRange(\'' + nextFrom + '\',\'' + nextTo + '\')" style="flex:1;padding:8px;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:12px;font-weight:700;color:var(--text2);cursor:pointer">Next Week</button>' +
+        '<button onclick="setIngRange(\'' + defFrom + '\',\'' + defTo + '\')" style="flex:1;padding:8px;background:var(--accent-light);border:1px solid var(--border);border-radius:var(--radius-sm);font-family:IBM Plex Sans,sans-serif;font-size:12px;font-weight:700;color:var(--accent);cursor:pointer">This Week</button>' +
+        '<button onclick="setIngRange(\'' + nextFrom + '\',\'' + nextTo + '\')" style="flex:1;padding:8px;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:IBM Plex Sans,sans-serif;font-size:12px;font-weight:700;color:var(--text2);cursor:pointer">Next Week</button>' +
       '</div>' +
       '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">' +
         '<div><label style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:4px;display:block">From</label>' +
@@ -4814,7 +4838,7 @@ function renderShoppingListTab() {
         '<div><label style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:4px;display:block">To</label>' +
         '<input type="date" id="ing-to" value="' + defTo + '" style="font-size:13px;padding:8px 10px"></div>' +
       '</div>' +
-      '<button onclick="generateShoppingList()" style="width:100%;padding:11px;background:linear-gradient(135deg,var(--accent2),var(--accent));color:#fff;border:none;border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:14px;font-weight:700;cursor:pointer">📋 Generate List</button>' +
+      '<button onclick="generateShoppingList()" style="width:100%;padding:11px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);font-family:IBM Plex Sans,sans-serif;font-size:14px;font-weight:700;cursor:pointer">📋 Generate List</button>' +
     '</div>' +
     '<div id="shopping-list-wrap"></div>';
 
@@ -4911,7 +4935,7 @@ function generateShoppingList() {
         items.length + ' ingredients &nbsp;·&nbsp; ' + dates.length + ' days</div>' +
       '<button onclick="clearIngChecked()" style="font-size:11px;font-weight:700;color:var(--text3);' +
         'background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:3px 10px;' +
-        'cursor:pointer;font-family:DM Sans,sans-serif">Clear ticks</button>' +
+        'cursor:pointer;font-family:IBM Plex Sans,sans-serif">Clear ticks</button>' +
     '</div>' +
     '<div style="display:flex;gap:16px">' +
       '<div style="font-size:11px;color:var(--text2)">📦 From <strong>' + mealNames.length + ' meal types</strong></div>' +
@@ -5160,7 +5184,7 @@ function setSettingsTab(tab) {
 function renderGoalsView() {
   var GOAL_TYPES=['Fat Loss','Muscle Gain','Maintenance','Recomp'];
   var h='';
-  h+='<div class="card"><div style="font-family:DM Serif Display,serif;font-size:16px;font-weight:700;margin-bottom:4px">Goal Type</div>';
+  h+='<div class="card"><div style="font-family:IBM Plex Serif,serif;font-size:13px;font-weight:700;margin-bottom:4px">Goal Type</div>';
   h+='<div style="font-size:12px;color:var(--text3);margin-bottom:12px">What are you working towards?</div>';
   h+='<div style="display:flex;flex-wrap:wrap;gap:6px">';
   GOAL_TYPES.forEach(function(g){
@@ -5168,7 +5192,7 @@ function renderGoalsView() {
   });
   h+='</div></div>';
 
-  h+='<div class="card"><div style="font-family:DM Serif Display,serif;font-size:16px;font-weight:700;margin-bottom:12px">Body Stats</div>';
+  h+='<div class="card"><div style="font-family:IBM Plex Serif,serif;font-size:13px;font-weight:700;margin-bottom:12px">Body Stats</div>';
   h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">';
   h+='<div class="form-group" style="margin-bottom:0"><label>Current Weight</label><input type="number" id="s-cw" value="'+(userGoal.currentWeight||'')+'" placeholder="e.g. 80" step="0.1" min="0" oninput="saveGoals()"></div>';
   h+='<div class="form-group" style="margin-bottom:0"><label>Target Weight</label><input type="number" id="s-tw" value="'+(userGoal.targetWeight||'')+'" placeholder="e.g. 73" step="0.1" min="0" oninput="saveGoals()"></div>';
@@ -5176,11 +5200,11 @@ function renderGoalsView() {
   h+='</div></div>';
 
   h+='<div class="card">';
-  h+='<div style="font-family:DM Serif Display,serif;font-size:16px;font-weight:700;margin-bottom:4px">Calorie &amp; Macro Targets</div>';
+  h+='<div style="font-family:IBM Plex Serif,serif;font-size:13px;font-weight:700;margin-bottom:4px">Calorie &amp; Macro Targets</div>';
   h+='<div style="font-size:12px;color:var(--text3);line-height:1.6;margin-bottom:14px">Calories are always <em>derived</em> from macros. Edit any macro and calories update instantly. Or edit calories to scale all macros proportionally.</div>';
-  h+='<div style="background:var(--accent-light);border:1.5px solid rgba(193,98,47,0.3);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:12px">';
+  h+='<div style="background:var(--accent-light);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:12px">';
   h+='<label style="color:var(--accent)">&#x1F525; Calories (auto-calculated)</label>';
-  h+='<input type="number" id="tgt-kcal" value="'+targets.kcal+'" min="0" oninput="onTargetInput(\'kcal\',this.value)" style="font-size:18px;font-weight:700;background:var(--surface);color:var(--accent)">';
+  h+='<input type="number" id="tgt-kcal" value="'+targets.kcal+'" min="0" oninput="onTargetInput(\'kcal\',this.value)" style="font-size:14px;font-weight:700;background:var(--surface);color:var(--accent)">';
   h+='<div style="font-size:10px;color:var(--text3);margin-top:4px">('+targets.protein+'g &times; 4) + ('+targets.carbs+'g &times; 4) + ('+targets.fat+'g &times; 9) = '+targets.kcal+' kcal</div>';
   h+='</div>';
   h+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">';
@@ -5204,7 +5228,7 @@ function renderGoalsView() {
 function renderRulesView() {
   var h='';
   h+='<div class="card">';
-  h+='<div style="font-family:DM Serif Display,serif;font-size:16px;font-weight:700;margin-bottom:4px">Food Rules</div>';
+  h+='<div style="font-family:IBM Plex Serif,serif;font-size:13px;font-weight:700;margin-bottom:4px">Food Rules</div>';
   h+='<div style="font-size:12px;color:var(--text3);line-height:1.6;margin-bottom:12px">Flag ingredients you want to avoid. Banned = red badge on meals. Warning = yellow badge.</div>';
   h+='<button class="btn btn-primary btn-full" style="margin-bottom:16px" onclick="openRuleModal()">+ Add Rule</button>';
   h+='<div style="font-size:11px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">&#x1F6AB; Banned ('+foodRules.banned.length+')</div>';
@@ -5228,7 +5252,7 @@ function renderCalTrackingView() {
   var thresh = (typeof targets.calThreshold !== 'undefined') ? targets.calThreshold : 30;
   var h = '';
   h += '<div class="card">';
-  h += '<div style="font-family:DM Serif Display,serif;font-size:16px;font-weight:700;margin-bottom:4px">Monthly Planner Colours</div>';
+  h += '<div style="font-family:IBM Plex Serif,serif;font-size:13px;font-weight:700;margin-bottom:4px">Monthly Planner Colours</div>';
   h += '<div style="font-size:12px;color:var(--text3);margin-bottom:16px">Colour-code each day based on calorie intake vs your target.</div>';
   h += '<div style="background:var(--surface2);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:14px;display:flex;flex-direction:column;gap:8px">';
   h += '<div style="display:flex;align-items:center;gap:8px"><div style="width:12px;height:12px;border-radius:50%;background:var(--green);flex-shrink:0"></div><span style="font-size:13px;font-weight:600;color:var(--text2)">Green — within 5% of target</span></div>';
@@ -5240,7 +5264,7 @@ function renderCalTrackingView() {
   h += '<input type="range" min="10" max="50" step="5" value="' + thresh + '" '
     + 'style="flex:1;accent-color:var(--accent)" '
     + 'oninput="updateCalThreshold(this.value)">';
-  h += '<span id="thresh-val" style="font-family:DM Serif Display,serif;font-size:18px;font-weight:400;color:var(--accent);min-width:40px;text-align:right">' + thresh + '%</span>';
+  h += '<span id="thresh-val" style="font-family:IBM Plex Serif,serif;font-size:14px;font-weight:400;color:var(--accent);min-width:40px;text-align:right">' + thresh + '%</span>';
   h += '</div></div>';
   h += '<div style="font-size:11px;color:var(--text3)">Example: with target 2000 kcal and threshold 30%, intake below 1400 kcal = yellow.</div>';
   h += '</div>';
@@ -5509,10 +5533,10 @@ function saveJournalEntry() {
 function renderJournal() {
   var wrap=document.getElementById('journal-wrap');if(!wrap)return;
   var h='';
-  h+='<div style="font-family:DM Serif Display,serif;font-size:22px;font-weight:700;margin-bottom:14px">My <em style="color:var(--accent);font-style:italic">Journal</em></div>';
+  h+='<div style="font-family:IBM Plex Serif,serif;font-size:13px;font-weight:700;margin-bottom:14px">My <em style="color:var(--accent);font-style:italic">Journal</em></div>';
   h+='<div style="display:flex;gap:8px;margin-bottom:16px">';
   h+='<button onclick="openJournalWrite()" class="btn btn-primary" style="flex:1">&#9998; Write</button>';
-  h+='<button onclick="openMoodLog()" style="flex:1;padding:11px;background:var(--purple-light);border:1.5px solid rgba(124,90,158,0.3);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;font-weight:700;color:var(--purple);cursor:pointer">&#128517; Mood</button>';
+  h+='<button onclick="openMoodLog()" style="flex:1;padding:11px;background:var(--purple-light);border:1.5px solid rgba(124,90,158,0.3);border-radius:var(--radius-sm);font-family:IBM Plex Sans,sans-serif;font-size:13px;font-weight:700;color:var(--purple);cursor:pointer">&#128517; Mood</button>';
   h+='</div>';
   var entries=[];
   moodLogs.forEach(function(l){
