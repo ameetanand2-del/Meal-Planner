@@ -594,9 +594,10 @@ select {
 <div id="sec-planner" class="section">
   <div class="cal-toggle">
     <button class="ctbtn active" id="ctog-week"  onclick="setCalView('week')">Weekly</button>
-    <button class="ctbtn"        id="ctog-month" onclick="setCalView('month')">Monthly</button>
+    <button class="ctbtn"        id="ctog-prep" onclick="setCalView('prep')">Meal Prep</button>
   </div>
-  <div class="cal-nav">
+  <!-- Weekly calendar nav (hidden in prep view) -->
+  <div class="cal-nav" id="cal-nav-bar">
     <button class="icon-btn" onclick="calNav(-1)">
       <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="15,18 9,12 15,6"/></svg>
     </button>
@@ -607,14 +608,9 @@ select {
   </div>
   <div id="cal-wrap"></div>
 
-  <!-- Meal Prep Tracker -->
-  <div style="margin-top:18px">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-      <div style="font-family:IBM Plex Serif,serif;font-size:14px;font-weight:400">Meal <em style="color:var(--accent);font-style:italic">Prep</em></div>
-      <div id="prep-ratio-badge" style="font-size:11px;font-weight:800;border-radius:20px;padding:4px 12px"></div>
-    </div>
-    <div id="prep-progress-wrap" style="margin-bottom:12px"></div>
-    <div id="prep-list"></div>
+  <!-- Meal Prep Checklist (replaces Monthly) -->
+  <div id="prep-checklist-section" style="display:none">
+    <div id="prep-checklist-wrap"></div>
   </div>
 </div>
 
@@ -2072,10 +2068,14 @@ function pickIngredient(idx) {
 // ── PLANNER ───────────────────────────────────────────────────
 function setCalView(v) {
   calView = v;
-  ['week','month'].forEach(function(x){
+  ['week','prep'].forEach(function(x){
     var el = document.getElementById('ctog-' + x);
     if (el) el.classList.toggle('active', x === v);
   });
+  // Show/hide appropriate sections
+  document.getElementById('cal-nav-bar').style.display = v === 'prep' ? 'none' : 'flex';
+  document.getElementById('cal-wrap').style.display = v === 'prep' ? 'none' : 'block';
+  document.getElementById('prep-checklist-section').style.display = v === 'prep' ? 'block' : 'none';
   renderCal();
 }
 
@@ -2085,9 +2085,8 @@ function calNav(dir) {
 }
 
 function renderCal() {
-  if (calView === 'week')  renderWeek();
-  else renderMonth();
-  renderMealPrep();
+  if (calView === 'prep') renderPrepChecklist();
+  else renderWeek();
 }
 
 function weekDates(off) {
@@ -2152,6 +2151,199 @@ function renderWeek() {
 
   if (selDate) renderDayDetail(selDate, wrap);
 }
+
+// ── MEAL PREP CHECKLIST ─────────────────────────────────
+var _prepChecked = JSON.parse(localStorage.getItem('mp4_prep_checked') || '{}');
+function savePrepChecked() { localStorage.setItem('mp4_prep_checked', JSON.stringify(_prepChecked)); }
+
+function renderPrepChecklist() {
+  var wrap = document.getElementById('prep-checklist-wrap');
+  if (!wrap) return;
+
+  // Default to current week
+  var now = new Date();
+  var dow = now.getDay();
+  var monday = new Date(now); monday.setDate(now.getDate() - ((dow + 6) % 7));
+  var sunday = new Date(monday); sunday.setDate(monday.getDate() + 6);
+  var storedFrom = document.getElementById('prep-from');
+  var storedTo = document.getElementById('prep-to');
+  var defFrom = storedFrom ? storedFrom.value : dkey(monday);
+  var defTo = storedTo ? storedTo.value : dkey(sunday);
+
+  // Quick week buttons
+  var prevMon = new Date(monday); prevMon.setDate(monday.getDate() - 7);
+  var prevSun = new Date(prevMon); prevSun.setDate(prevMon.getDate() + 6);
+  var nextMon = new Date(monday); nextMon.setDate(monday.getDate() + 7);
+  var nextSun = new Date(nextMon); nextSun.setDate(nextMon.getDate() + 6);
+
+  var h = '';
+  h += '<div style="font-family:IBM Plex Serif,serif;font-size:14px;font-weight:500;margin-bottom:10px">Meal Prep Checklist</div>';
+
+  // Date range picker
+  h += '<div style="background:var(--surface);border:1px solid var(--border-soft);border-radius:var(--radius-sm);padding:10px;margin-bottom:12px">';
+  h += '<div style="display:flex;gap:4px;margin-bottom:8px">';
+  h += '<button onclick="setPrepRange(\'' + dkey(prevMon) + '\',\'' + dkey(prevSun) + '\')" style="flex:1;padding:6px 4px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;font-family:IBM Plex Sans,sans-serif;font-size:10px;font-weight:600;color:var(--text2);cursor:pointer">Last Week</button>';
+  h += '<button onclick="setPrepRange(\'' + dkey(monday) + '\',\'' + dkey(sunday) + '\')" style="flex:1;padding:6px 4px;background:var(--accent-light);border:1px solid var(--border);border-radius:8px;font-family:IBM Plex Sans,sans-serif;font-size:10px;font-weight:600;color:var(--accent);cursor:pointer">This Week</button>';
+  h += '<button onclick="setPrepRange(\'' + dkey(nextMon) + '\',\'' + dkey(nextSun) + '\')" style="flex:1;padding:6px 4px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;font-family:IBM Plex Sans,sans-serif;font-size:10px;font-weight:600;color:var(--text2);cursor:pointer">Next Week</button>';
+  h += '</div>';
+  h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
+  h += '<div><label style="font-size:9px">From</label><input type="date" id="prep-from" value="' + defFrom + '" onchange="renderPrepChecklist()" style="font-size:12px;padding:6px 8px"></div>';
+  h += '<div><label style="font-size:9px">To</label><input type="date" id="prep-to" value="' + defTo + '" onchange="renderPrepChecklist()" style="font-size:12px;padding:6px 8px"></div>';
+  h += '</div></div>';
+
+  // Gather unique meals in the range
+  var fromDK = defFrom, toDK = defTo;
+  var dates = [];
+  var cur = new Date(fromDK + 'T12:00:00');
+  var end = new Date(toDK + 'T12:00:00');
+  while (cur <= end) { dates.push(dkey(cur)); cur.setDate(cur.getDate() + 1); }
+
+  var uniqueMeals = {};
+  dates.forEach(function(dk) {
+    if (!plan[dk]) return;
+    MT.forEach(function(mt) {
+      (plan[dk][mt] || []).forEach(function(slot) {
+        var meal = getMeal(slot.mealId); if (!meal) return;
+        if (!uniqueMeals[meal.id]) {
+          uniqueMeals[meal.id] = { meal: meal, count: 0, totalPortions: 0, days: [] };
+        }
+        uniqueMeals[meal.id].count++;
+        uniqueMeals[meal.id].totalPortions += (slot.portions || 1);
+        var dayLabel = parseDK(dk).toLocaleDateString('en', {weekday:'short'});
+        if (uniqueMeals[meal.id].days.indexOf(dayLabel) < 0) uniqueMeals[meal.id].days.push(dayLabel);
+      });
+    });
+  });
+
+  var items = Object.values(uniqueMeals);
+  if (!items.length) {
+    h += '<div style="text-align:center;padding:30px 14px;color:var(--text3)"><div style="font-size:28px;margin-bottom:8px">📋</div><div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:3px">No meals planned</div><div style="font-size:11px">Plan meals in the Weekly view first</div></div>';
+    wrap.innerHTML = h; return;
+  }
+
+  // Sort: unchecked first, then by name
+  items.sort(function(a, b) {
+    var ac = _prepChecked[a.meal.id + '|' + fromDK] ? 1 : 0;
+    var bc = _prepChecked[b.meal.id + '|' + fromDK] ? 1 : 0;
+    if (ac !== bc) return ac - bc;
+    return a.meal.name.localeCompare(b.meal.name);
+  });
+
+  var doneCount = items.filter(function(it) { return _prepChecked[it.meal.id + '|' + fromDK]; }).length;
+
+  // Progress
+  h += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">';
+  h += '<div style="flex:1;height:4px;background:var(--surface2);border-radius:3px;overflow:hidden"><div style="height:100%;background:var(--accent);border-radius:3px;width:' + (items.length ? Math.round(doneCount / items.length * 100) : 0) + '%;transition:width 0.3s"></div></div>';
+  h += '<span style="font-size:11px;font-weight:700;color:var(--text2)">' + doneCount + '/' + items.length + '</span>';
+  h += '</div>';
+
+  // Meal cards
+  items.forEach(function(it) {
+    var m = it.meal;
+    var checkKey = m.id + '|' + fromDK;
+    var checked = !!_prepChecked[checkKey];
+    var tags = m.tags || {};
+    var prepType = tags.prepType || '';
+    var status = tags.status || '';
+
+    // Tag badges
+    var badges = '';
+    if (prepType === 'Meal Prep') badges += '<span style="font-size:9px;font-weight:700;background:var(--surface2);color:var(--text2);border:1px solid var(--border);border-radius:12px;padding:2px 6px">📦 Meal Prep</span>';
+    if (prepType === 'Have to Make') badges += '<span style="font-size:9px;font-weight:700;background:var(--surface2);color:var(--text2);border:1px solid var(--border);border-radius:12px;padding:2px 6px">🔥 Cook Fresh</span>';
+    if (status === 'New Recipe') badges += '<span style="font-size:9px;font-weight:700;background:var(--surface2);color:var(--text2);border:1px solid var(--border);border-radius:12px;padding:2px 6px">✨ New</span>';
+    if (status === 'Need to Try') badges += '<span style="font-size:9px;font-weight:700;background:var(--surface2);color:var(--text2);border:1px solid var(--border);border-radius:12px;padding:2px 6px">🧪 Try</span>';
+    if (tags.cuisine) badges += '<span style="font-size:9px;font-weight:600;background:var(--surface2);color:var(--text3);border:1px solid var(--border);border-radius:12px;padding:2px 6px">' + tags.cuisine + '</span>';
+
+    h += '<div style="background:var(--surface);border:1px solid ' + (checked ? 'var(--green)' : 'var(--border-soft)') + ';border-radius:var(--radius-sm);margin-bottom:6px;overflow:hidden;' + (checked ? 'opacity:0.65;' : '') + '">';
+
+    // Header row — checkbox + name + expand
+    h += '<div onclick="togglePrepExpand(this)" style="display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer">';
+    // Checkbox
+    h += '<div onclick="event.stopPropagation();togglePrepCheck(\'' + m.id + '\',\'' + fromDK + '\')" style="width:22px;height:22px;border-radius:50%;border:2px solid ' + (checked ? 'var(--green)' : 'var(--border)') + ';background:' + (checked ? 'var(--green)' : 'transparent') + ';display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.15s;cursor:pointer">' + (checked ? '<svg width="10" height="10" fill="none" stroke="#fff" stroke-width="3" viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>' : '') + '</div>';
+    // Name + meta
+    h += '<div style="flex:1;min-width:0">';
+    h += '<div style="font-size:12px;font-weight:600;color:var(--text);' + (checked ? 'text-decoration:line-through;color:var(--text3);' : '') + '">' + mealEmoji(m) + ' ' + m.name + '</div>';
+    h += '<div style="font-size:10px;color:var(--text3);margin-top:2px">' + it.days.join(', ') + ' · ×' + it.totalPortions + ' servings</div>';
+    if (badges) h += '<div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:4px">' + badges + '</div>';
+    h += '</div>';
+    // Expand arrow
+    h += '<span style="font-size:10px;color:var(--text4);flex-shrink:0">▼</span>';
+    h += '</div>';
+
+    // Expandable body (hidden by default)
+    h += '<div class="prep-expand-body" style="display:none;border-top:1px solid var(--border-soft);padding:10px 12px">';
+
+    // Recipe link
+    if (m.recipeLink) {
+      h += '<a href="' + m.recipeLink + '" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:6px;padding:8px 10px;background:var(--accent-light);border:1px solid var(--border);border-radius:8px;text-decoration:none;margin-bottom:8px">';
+      h += '<span style="font-size:14px">' + getLinkIcon(m.recipeLink) + '</span>';
+      h += '<span style="font-size:11px;font-weight:600;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + getLinkLabel(m.recipeLink) + '</span>';
+      h += '<span style="font-size:10px;font-weight:700;color:var(--accent)">Open →</span>';
+      h += '</a>';
+    }
+
+    // Notes
+    if (m.notes) {
+      h += '<div style="background:var(--surface2);border-radius:8px;padding:8px 10px;margin-bottom:8px;border:1px solid var(--border-soft)">';
+      h += '<div style="font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;margin-bottom:3px">Notes</div>';
+      h += '<div style="font-size:11px;color:var(--text);line-height:1.5;white-space:pre-wrap">' + m.notes + '</div>';
+      h += '</div>';
+    }
+
+    // Ingredient list (display only, with edit button)
+    if (m.ingredients && m.ingredients.length) {
+      h += '<div style="margin-bottom:4px">';
+      h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
+      h += '<span style="font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase">Ingredients</span>';
+      h += '<button onclick="event.stopPropagation();openEditMeal(\'' + m.id + '\')" style="font-size:9px;font-weight:600;color:var(--accent);background:var(--accent-light);border:1px solid var(--border);border-radius:12px;padding:2px 8px;cursor:pointer;font-family:IBM Plex Sans,sans-serif">✎ Edit</button>';
+      h += '</div>';
+
+      var servings = parseInt(m.totalServings) || 1;
+      var portionLabel = it.totalPortions > 1 ? ' (×' + it.totalPortions + ')' : '';
+
+      m.ingredients.forEach(function(ing) {
+        var amt = parseFloat(ing.amount) || 0;
+        var totalAmt = amt * it.totalPortions / servings;
+        var displayAmt = totalAmt % 1 === 0 ? totalAmt : parseFloat(totalAmt.toFixed(1));
+        h += '<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid var(--border-soft)">';
+        h += '<span style="font-size:11px;color:var(--text)">' + ing.name + '</span>';
+        h += '<span style="font-size:11px;font-weight:600;color:var(--text2)">' + displayAmt + ' ' + (ing.unit || 'g') + '</span>';
+        h += '</div>';
+      });
+      h += '</div>';
+    }
+
+    h += '</div>'; // prep-expand-body
+    h += '</div>'; // card
+  });
+
+  wrap.innerHTML = h;
+}
+
+function togglePrepExpand(hdrEl) {
+  var body = hdrEl.parentElement.querySelector('.prep-expand-body');
+  if (!body) return;
+  var open = body.style.display !== 'none';
+  body.style.display = open ? 'none' : 'block';
+  var arrow = hdrEl.querySelector('span:last-child');
+  if (arrow) arrow.textContent = open ? '▼' : '▲';
+}
+
+function togglePrepCheck(mealId, rangeKey) {
+  var key = mealId + '|' + rangeKey;
+  _prepChecked[key] = !_prepChecked[key];
+  savePrepChecked();
+  renderPrepChecklist();
+}
+
+function setPrepRange(from, to) {
+  var f = document.getElementById('prep-from');
+  var t = document.getElementById('prep-to');
+  if (f) f.value = from;
+  if (t) t.value = to;
+  renderPrepChecklist();
+}
+
 
 function renderDayView() {
   var d = parseDK(selDate);
