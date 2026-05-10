@@ -1640,9 +1640,6 @@ function renderToday() {
           // ── Meal view — simple row
           h += '<div class="slot-meal-row">';
           h += '<div style="flex:1;min-width:0"><span class="slot-meal-name"><span style="margin-right:4px">' + mealEmoji(m) + '</span>' + m.name + (sl.portions > 1 ? ' <span style="color:var(--text3);font-size:11px">×' + sl.portions + ' srv</span>' : '') + ((m.totalServings && m.totalServings > 1 && sl.portions <= 1) ? ' <span style="color:var(--text4);font-size:10px">1/' + m.totalServings + '</span>' : '') + statusBadge + '</span>';
-          if (m.recipeLink) {
-            h += '<a href="' + m.recipeLink + '" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:14px;font-size:10px;font-weight:600;color:var(--text2);text-decoration:none;margin-top:3px">' + getLinkIcon(m.recipeLink) + ' ' + getLinkLabel(m.recipeLink) + ' →</a>';
-          }
           h += '</div>';
           h += '<div style="display:flex;align-items:center;gap:8px">';
           h += '<button onclick="rmSlotToday(\'' + dk + '\',\'' + mt + '\',\'' + sl.mealId + '\')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:13px;padding:2px">✕</button>';
@@ -2301,13 +2298,16 @@ function renderPrepChecklist() {
       var servings = parseInt(m.totalServings) || 1;
       var portionLabel = it.totalPortions > 1 ? ' (×' + it.totalPortions + ')' : '';
 
-      m.ingredients.forEach(function(ing) {
+      m.ingredients.forEach(function(ing, ii) {
         var amt = parseFloat(ing.amount) || 0;
         var totalAmt = amt * it.totalPortions / servings;
         var displayAmt = totalAmt % 1 === 0 ? totalAmt : parseFloat(totalAmt.toFixed(1));
-        h += '<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid var(--border-soft)">';
-        h += '<span style="font-size:11px;color:var(--text)">' + ing.name + '</span>';
-        h += '<span style="font-size:11px;font-weight:600;color:var(--text2)">' + displayAmt + ' ' + (ing.unit || 'g') + '</span>';
+        var ingKey = m.id + '|' + fromDK + '|' + ii;
+        var ingDone = !!_prepChecked[ingKey];
+        h += '<div onclick="togglePrepCheck(\'' + m.id + '|' + fromDK + '|' + ii + '\',true)" style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border-soft);cursor:pointer;' + (ingDone ? 'opacity:0.45;' : '') + '">';
+        h += '<div style="width:16px;height:16px;border-radius:4px;border:1.5px solid ' + (ingDone ? 'var(--green)' : 'var(--border)') + ';background:' + (ingDone ? 'var(--green)' : 'transparent') + ';display:flex;align-items:center;justify-content:center;flex-shrink:0">' + (ingDone ? '<svg width="8" height="8" fill="none" stroke="#fff" stroke-width="3" viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>' : '') + '</div>';
+        h += '<span style="font-size:11px;color:var(--text);flex:1;' + (ingDone ? 'text-decoration:line-through;color:var(--text3);' : '') + '">' + ing.name + '</span>';
+        h += '<span style="font-size:11px;font-weight:600;color:var(--text2);white-space:nowrap">' + displayAmt + ' ' + (ing.unit || 'g') + '</span>';
         h += '</div>';
       });
       h += '</div>';
@@ -2329,8 +2329,15 @@ function togglePrepExpand(hdrEl) {
   if (arrow) arrow.textContent = open ? '▼' : '▲';
 }
 
-function togglePrepCheck(mealId, rangeKey) {
-  var key = mealId + '|' + rangeKey;
+function togglePrepCheck(keyOrId, rangeKeyOrRaw) {
+  var key;
+  if (rangeKeyOrRaw === true) {
+    // Called from ingredient: first arg is the full key already
+    key = keyOrId;
+  } else {
+    // Called from meal checkbox: build key from mealId + rangeKey
+    key = keyOrId + '|' + rangeKeyOrRaw;
+  }
   _prepChecked[key] = !_prepChecked[key];
   savePrepChecked();
   renderPrepChecklist();
