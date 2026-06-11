@@ -648,9 +648,11 @@ select {
 <div id="sec-library" class="section">
   <div id="lib-title" style="font-family:DM Serif Display,serif;font-size:21px;font-weight:700;margin-bottom:14px;letter-spacing:-0.3px">My <em style="color:var(--accent);font-style:italic">Meals</em></div>
   <div class="tog-bar">
+    <button class="ctbtn" id="libtog-targeted" onclick="setLibTab('targeted')">🎯 Targeted</button>
     <button class="ctbtn active" id="libtog-meals" onclick="setLibTab('meals')">🍽 Meals</button>
     <button class="ctbtn" id="libtog-plans" onclick="setLibTab('plans')">📋 Day Plans</button>
   </div>
+  <div id="lib-panel-targeted" style="display:none"></div>
   <div id="lib-panel-meals">
     <button class="btn btn-primary btn-full" style="margin-bottom:12px" onclick="openAddMeal()">
       <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>New Meal
@@ -1295,6 +1297,20 @@ const DEMO_PLAN  = {};
 let meals = [];
 let plan  = (function(){ var s=localStorage.getItem('mp4_plan');  return s?JSON.parse(s):DEMO_PLAN;  })();
 let mealPlans   = JSON.parse(localStorage.getItem('mp4_plans')   || '[]');
+// Targeted meals — a curated, restricted rotation per meal type (e.g. for a fat-loss phase)
+let targetedMeals = (function(){
+  var def = {Breakfast:{target:4,ids:[]},Lunch:{target:4,ids:[]},Dinner:{target:4,ids:[]},Snack:{target:4,ids:[]}};
+  try {
+    var t = JSON.parse(localStorage.getItem('mp4_targeted') || 'null');
+    if (!t) return def;
+    ['Breakfast','Lunch','Dinner','Snack'].forEach(function(mt){
+      if (!t[mt]) t[mt] = {target:4, ids:[]};
+      if (!Array.isArray(t[mt].ids)) t[mt].ids = [];
+      if (!t[mt].target) t[mt].target = 4;
+    });
+    return t;
+  } catch(e){ return def; }
+})();
 let custIngs    = JSON.parse(localStorage.getItem('mp4_custom')  || '[]');
 let customTags  = JSON.parse(localStorage.getItem('mp4_ctags')   || '{"cuisine":[],"effort":[],"diet":[]}');
 let targets = (function(){
@@ -1343,6 +1359,7 @@ function save() {
   localStorage.setItem('mp4_chk',     JSON.stringify(chkd));
   localStorage.setItem('mp4_custom',  JSON.stringify(custIngs));
   localStorage.setItem('mp4_plans',   JSON.stringify(mealPlans));
+  localStorage.setItem('mp4_targeted',JSON.stringify(targetedMeals));
   localStorage.setItem('mp4_targets', JSON.stringify({protein:targets.protein,carbs:targets.carbs,fat:targets.fat,fiber:targets.fiber,kcalMin:targets.kcalMin,kcalMax:targets.kcalMax,carbsMin:targets.carbsMin,carbsMax:targets.carbsMax}));
   localStorage.setItem('mp4_ctags',   JSON.stringify(customTags));
   localStorage.setItem('mos_weight',  JSON.stringify(weightLogs));
@@ -4297,17 +4314,135 @@ function updateProgressBars() {
 // ── LIBRARY TAB ───────────────────────────────────────────────
 function setLibTab(tab) {
   libTab = tab;
+  document.getElementById('libtog-targeted').classList.toggle('active', tab === 'targeted');
   document.getElementById('libtog-meals').classList.toggle('active', tab === 'meals');
   document.getElementById('libtog-plans').classList.toggle('active', tab === 'plans');
+  document.getElementById('lib-panel-targeted').style.display = tab === 'targeted' ? 'block' : 'none';
   document.getElementById('lib-panel-meals').style.display = tab === 'meals' ? 'block' : 'none';
   document.getElementById('lib-panel-plans').style.display = tab === 'plans' ? 'block' : 'none';
-  document.getElementById('lib-title').innerHTML = tab === 'meals' ? 'My <em>Meals</em>' : 'Day <em>Plans</em>';
-  if (tab === 'meals') { buildFilters(); renderMeals(); }
+  document.getElementById('lib-title').innerHTML = tab === 'targeted' ? 'Targeted <em>Meals</em>' : (tab === 'meals' ? 'My <em>Meals</em>' : 'Day <em>Plans</em>');
+  if (tab === 'targeted') renderTargeted();
+  else if (tab === 'meals') { buildFilters(); renderMeals(); }
   else renderPlans();
 }
 function renderLibTab() {
-  if (libTab === 'meals') { buildFilters(); renderMeals(); }
+  if (libTab === 'targeted') renderTargeted();
+  else if (libTab === 'meals') { buildFilters(); renderMeals(); }
   else renderPlans();
+}
+
+// ── TARGETED MEALS ───────────────────────────────────────────
+function adjustTargetedGoal(mt, delta){
+  var b = targetedMeals[mt]; if(!b) return;
+  b.target = Math.max(1, (b.target||4) + delta);
+  save(); renderTargeted();
+}
+function removeTargetedMeal(mt, id){
+  var b = targetedMeals[mt]; if(!b) return;
+  b.ids = b.ids.filter(function(x){return x!==id;});
+  save(); renderTargeted();
+}
+function addTargetedMeal(mt, id){
+  var b = targetedMeals[mt]; if(!b) return;
+  if (b.ids.indexOf(id) < 0) b.ids.push(id);
+  save(); renderTargeted(); renderTargetedPicker();
+}
+
+var _targetedPickerMT = null;
+function openTargetedPicker(mt){
+  _targetedPickerMT = mt;
+  var overlay = document.getElementById('m-targeted-pick');
+  if(!overlay){
+    overlay = document.createElement('div');
+    overlay.id='m-targeted-pick'; overlay.className='modal-overlay';
+    overlay.innerHTML = '<div class="modal" style="max-height:88vh;overflow-y:auto">'
+      +'<div class="modal-handle"></div>'
+      +'<div id="targeted-pick-title" class="modal-title"></div>'
+      +'<input type="text" id="targeted-pick-search" placeholder="Search meals..." oninput="renderTargetedPicker()" style="width:100%;padding:10px 14px;font-size:14px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--surface2);color:var(--text);font-family:DM Sans,sans-serif;margin-bottom:8px;box-sizing:border-box">'
+      +'<label style="display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text2);font-weight:600;margin-bottom:10px;cursor:pointer"><input type="checkbox" id="targeted-pick-all" onchange="renderTargetedPicker()" style="width:16px;height:16px;flex-shrink:0;margin:0"> Show all meal types</label>'
+      +'<div id="targeted-pick-list"></div>'
+      +'<div class="row end" style="margin-top:6px"><button class="btn btn-ghost btn-full" onclick="closeM(\'m-targeted-pick\')">Done</button></div>'
+      +'</div>';
+    document.body.appendChild(overlay);
+  }
+  document.getElementById('targeted-pick-title').textContent = 'Add to ' + mt;
+  var s=document.getElementById('targeted-pick-search'); if(s)s.value='';
+  var a=document.getElementById('targeted-pick-all'); if(a)a.checked=false;
+  renderTargetedPicker();
+  overlay.classList.add('open');
+}
+function renderTargetedPicker(){
+  var mt=_targetedPickerMT; if(!mt) return;
+  var el=document.getElementById('targeted-pick-list'); if(!el) return;
+  var q=((document.getElementById('targeted-pick-search')||{}).value||'').toLowerCase().trim();
+  var showAll=(document.getElementById('targeted-pick-all')||{}).checked;
+  var already=targetedMeals[mt].ids;
+  var list=meals.filter(function(m){
+    if(already.indexOf(m.id)>=0) return false;
+    if(showAll) return true;
+    return !m.mealType || m.mealType===mt;   // matching type or untyped
+  });
+  if(q) list=list.filter(function(m){return m.name.toLowerCase().indexOf(q)>=0;});
+  if(!list.length){ el.innerHTML='<div style="text-align:center;color:var(--text3);font-size:13px;padding:20px 0">No meals found — try “Show all meal types”.</div>'; return; }
+  var DOTC={Breakfast:'#E8A04A',Lunch:'#4A90D9',Dinner:'#5FA77E',Snack:'#9B7FC9'};
+  var h='';
+  list.forEach(function(m){
+    var cal=mealCals(m); var mc=mealMacros(m);
+    h+='<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border-soft)">';
+    h+='<div style="flex:1;min-width:0">';
+    h+='<div style="font-size:13.5px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(m.mealType?'<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:'+(DOTC[m.mealType]||'var(--text4)')+';margin-right:6px;vertical-align:middle"></span>':'')+m.name+'</div>';
+    h+='<div style="font-size:11px;color:var(--text3);margin-top:2px">'+cal+' kcal · P '+mc.p+' · C '+mc.c+' · Fi '+mc.fi+'</div>';
+    h+='</div>';
+    h+='<button onclick="addTargetedMeal(\''+mt+'\',\''+m.id+'\')" style="flex-shrink:0;font-size:12.5px;font-weight:700;color:var(--accent);background:var(--accent-light);border:none;border-radius:20px;padding:6px 13px;cursor:pointer;font-family:DM Sans,sans-serif">+ Add</button>';
+    h+='</div>';
+  });
+  el.innerHTML=h;
+}
+
+function renderTargeted(){
+  var wrap=document.getElementById('lib-panel-targeted'); if(!wrap) return;
+  var DOTC={Breakfast:'#E8A04A',Lunch:'#4A90D9',Dinner:'#5FA77E',Snack:'#9B7FC9'};
+  var h='';
+  h+='<div style="font-size:12px;color:var(--text3);line-height:1.5;margin-bottom:14px">Build a restricted rotation for your fat-loss phase — set how many meals you want per slot, then add the ones you\u2019ll actually rotate through.</div>';
+
+  var totalSet=0, totalTarget=0;
+  MT.forEach(function(mt){ totalSet+=targetedMeals[mt].ids.length; totalTarget+=targetedMeals[mt].target; });
+  h+='<div style="background:var(--surface);border:1px solid var(--border-soft);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between">';
+  h+='<span style="font-size:13px;font-weight:700;color:var(--text2)">Rotation filled</span>';
+  h+='<span style="font-family:\'DM Serif Display\',serif;font-size:18px;color:'+(totalSet>=totalTarget?'var(--green)':'var(--accent)')+'">'+totalSet+' / '+totalTarget+'</span>';
+  h+='</div>';
+
+  MT.forEach(function(mt){
+    var b=targetedMeals[mt];
+    var count=b.ids.length, target=b.target;
+    var full=count>=target;
+    h+='<div style="margin-bottom:18px">';
+    h+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">';
+    h+='<div style="display:flex;align-items:center;gap:8px"><span style="width:9px;height:9px;border-radius:50%;background:'+DOTC[mt]+'"></span><span style="font-size:13px;font-weight:700;color:var(--text)">'+mt+'</span>'
+      +'<span style="font-size:12px;font-weight:800;color:'+(full?'var(--green)':'var(--text3)')+'">'+count+'/'+target+'</span></div>';
+    h+='<div style="display:flex;align-items:center;gap:6px"><span style="font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:0.4px">target</span>'
+      +'<button onclick="adjustTargetedGoal(\''+mt+'\',-1)" style="width:24px;height:24px;border-radius:50%;background:var(--surface2);border:1.5px solid var(--border);font-size:15px;cursor:pointer;color:var(--text2);font-family:DM Sans;line-height:1">\u2212</button>'
+      +'<span style="font-size:13px;font-weight:800;color:var(--text);min-width:16px;text-align:center">'+target+'</span>'
+      +'<button onclick="adjustTargetedGoal(\''+mt+'\',1)" style="width:24px;height:24px;border-radius:50%;background:var(--surface2);border:1.5px solid var(--border);font-size:15px;cursor:pointer;color:var(--text2);font-family:DM Sans;line-height:1">+</button></div>';
+    h+='</div>';
+    if(!count){
+      h+='<div style="font-size:12.5px;color:var(--text3);font-style:italic;padding:2px 0 8px 17px">No meals added yet</div>';
+    } else {
+      b.ids.forEach(function(id){
+        var m=getMeal(id); if(!m) return;
+        var cal=mealCals(m); var mc=mealMacros(m);
+        h+='<div style="display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border-soft);border-left:3px solid '+DOTC[mt]+';border-radius:11px;padding:10px 12px;margin-bottom:6px">';
+        h+='<div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+m.name+'</div>'
+          +'<div style="font-size:11px;color:var(--text3);margin-top:2px">'+cal+' kcal · P '+mc.p+' · C '+mc.c+' · Fi '+mc.fi+'</div></div>';
+        h+='<button onclick="removeTargetedMeal(\''+mt+'\',\''+id+'\')" style="background:none;border:none;color:var(--text4);cursor:pointer;font-size:18px;flex-shrink:0;line-height:1">&times;</button>';
+        h+='</div>';
+      });
+    }
+    h+='<button onclick="openTargetedPicker(\''+mt+'\')" style="width:100%;padding:9px;border:1px dashed '+(full?'var(--border)':'var(--accent)')+';background:'+(full?'var(--surface2)':'var(--accent-light)')+';color:'+(full?'var(--text3)':'var(--accent)')+';border-radius:var(--radius-sm);font-size:12.5px;font-weight:700;cursor:pointer;font-family:DM Sans,sans-serif">+ Add '+mt+' meal'+(full?' · target reached':'')+'</button>';
+    h+='</div>';
+  });
+
+  wrap.innerHTML=h;
 }
 
 // ── PROGRESS TAB ──────────────────────────────────────────────
