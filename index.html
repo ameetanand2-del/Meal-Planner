@@ -1490,6 +1490,25 @@ function mealMacros(m, portions) {
   return {p:Math.round(tot.p/servings*portions),c:Math.round(tot.c/servings*portions),f:Math.round(tot.f/servings*portions),fi:Math.round(tot.fi/servings*portions)};
 }
 
+// Macro grams for a single ingredient as used (key: 'p','c','f','fi')
+function ingMacro(ing, key) {
+  var amt = parseFloat(ing.amount) || 0;
+  var unit = ing.unit || 'g';
+  if (unit === 'tsp')       amt *= 5;
+  else if (unit === 'tbsp') amt *= 15;
+  else if (unit === 'cup')  amt *= 240;
+  var ratio = amt / 100;
+  if (MACRO_DB[ing.name]) return (MACRO_DB[ing.name][key] || 0) * ratio;
+  if (ing.calTotal && (ing.protein != null || ing.carbs != null || ing.fat != null)) {
+    if (key === 'p') return parseFloat(ing.protein) || 0;
+    if (key === 'c') return parseFloat(ing.carbs)   || 0;
+    if (key === 'f') return parseFloat(ing.fat)     || 0;
+    if (key === 'fi') { var g = parseFloat(ing.grams) || amt; return (typeof lookupFiber==='function'?lookupFiber(ing.name):0)*(g/100); }
+  }
+  var mac = getMacros(ing.name, ing.calories, ing.amount, ing.unit);
+  return key === 'fi' ? (mac.fi || 0) : (mac[key] || 0);
+}
+
 function dayMacros(dk) {
   var tot = {p:0,c:0,f:0,fi:0};
   MT.forEach(function(mt) {
@@ -1536,6 +1555,7 @@ function renderToday() {
   var tc  = dayCals(dk);
   var mac = dayMacros(dk);
   var tgt = targets;
+  var carbsOver = (tgt.carbsMax > 0 && mac.c > tgt.carbsMax);
   var pct = tgt.kcal > 0 ? Math.min(100, Math.round(tc / tgt.kcal * 100)) : 0;
   var isActualToday = (todayOffset === 0);
   var h = '';
@@ -1705,8 +1725,15 @@ function renderToday() {
               var curCal    = Math.round(baseCals);
               var curGrams  = baseGrams % 1 === 0 ? baseGrams : parseFloat(baseGrams.toFixed(1));
               var isGramUnit = (ing.unit === 'g' || ing.unit === 'ml');
-              h += '<div style="display:grid;grid-template-columns:1fr 52px 60px 52px 20px;gap:4px;align-items:center;padding:5px 0;border-bottom:1px solid var(--border-soft)">';
-              h += '<span style="font-size:12px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + ing.name + '</span>';
+              // High-carb flag — helps you spot what to drop when carbs run high
+              var ingC = Math.round(ingMacro(ing, 'c'));
+              var isHighCarb = ingC >= 15;
+              var rowBg = isHighCarb ? (carbsOver ? 'rgba(229,72,77,0.09)' : 'rgba(192,138,46,0.09)') : 'transparent';
+              h += '<div style="display:grid;grid-template-columns:1fr 52px 60px 52px 20px;gap:4px;align-items:center;padding:5px 4px;border-bottom:1px solid var(--border-soft);background:' + rowBg + ';border-radius:6px">';
+              h += '<div style="display:flex;align-items:center;gap:5px;min-width:0">'
+                 + '<span style="font-size:12px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + ing.name + '</span>'
+                 + (isHighCarb ? '<span style="flex-shrink:0;font-size:8.5px;font-weight:800;color:' + (carbsOver?'var(--red)':'var(--yellow)') + ';background:' + (carbsOver?'var(--red-light)':'var(--yellow-light)') + ';border-radius:7px;padding:1px 5px;white-space:nowrap">' + ingC + 'g C</span>' : '')
+                 + '</div>';
               h += '<input type="number" value="' + ing.amount + '" min="0" step="' + (isGramUnit ? '1' : '0.5') + '" '
                 + 'style="width:100%;padding:4px 4px;font-size:12px;text-align:center;border-radius:8px;border:1.5px solid var(--border);background:var(--surface2);color:var(--text);font-family:DM Sans,sans-serif" '
                 + 'oninput="updateTodayIng(\'' + sl.mealId + '\',' + ii + ',this.value)">';
@@ -2422,17 +2449,22 @@ function renderDaySheetBody() {
   if (tgt > 0) h += '<span style="font-size:12px;color:var(--text4);margin-left:2px">/ ' + tgt + '</span>';
   h += '</div>';
 
+  var sCalD = macroStatus(tc, {min:targets.kcalMin, max:targets.kcalMax});
   if (tgt > 0) {
     h += '<div style="height:6px;background:var(--surface3);border-radius:4px;overflow:hidden;margin-bottom:12px">'
-       + '<div style="height:100%;width:' + pct + '%;background:var(--accent);border-radius:4px;transition:width 0.4s"></div></div>';
+       + '<div style="height:100%;width:' + pct + '%;background:' + sCalD.color + ';border-radius:4px;transition:width 0.4s"></div></div>';
   }
 
-  h += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px">';
-  [['Protein',mac.p],['Carbs',mac.c],['Fat',mac.f]].forEach(function(m){
-    h += '<div style="background:var(--surface2);border:1px solid var(--border-soft);border-radius:12px;padding:9px 6px;text-align:center">'
-       + '<div style="font-family:\'DM Serif Display\',serif;font-size:18px">' + m[1] + 'g</div>'
-       + '<div style="font-size:9.5px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-top:2px">' + m[0] + '</div></div>';
-  });
+  h += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:8px">';
+  var dpill = function(lbl,val,st){
+    return '<div style="background:var(--surface2);border:1px solid var(--border-soft);border-radius:12px;padding:9px 4px;text-align:center">'
+      + '<div style="font-family:\'DM Serif Display\',serif;font-size:17px;color:' + st.color + '">' + val + 'g</div>'
+      + '<div style="font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.4px;margin-top:2px">' + lbl + '</div></div>';
+  };
+  h += dpill('Protein', mac.p,  macroStatus(mac.p,  {target:targets.protein}));
+  h += dpill('Carbs',   mac.c,  macroStatus(mac.c,  {min:targets.carbsMin,max:targets.carbsMax}));
+  h += dpill('Fat',     mac.f,  macroStatus(mac.f,  {}));
+  h += dpill('Fiber',   mac.fi, macroStatus(mac.fi, {target:targets.fiber}));
   h += '</div>';
 
   h += '<button onclick="weekAddFullPlan(\'' + dk + '\')" style="width:100%;background:var(--surface2);border:1px solid var(--border-soft);border-radius:var(--radius-sm);padding:10px;font-family:DM Sans,sans-serif;font-size:12.5px;font-weight:600;color:var(--text2);cursor:pointer;margin-bottom:16px">Apply a day plan</button>';
@@ -2458,7 +2490,7 @@ function renderDaySheetBody() {
         h += '<div style="display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border-soft);border-left:3px solid ' + DOTS[mt] + ';border-radius:11px;padding:11px 12px;margin-bottom:6px">';
         h += '<div style="flex:1;min-width:0">'
            + '<div style="font-size:14px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + m.name + (sl.portions>1?' ×'+sl.portions:'') + '</div>'
-           + '<div style="font-size:11.5px;color:var(--text3);margin-top:2px">' + cal + ' kcal · P ' + mc.p + ' · C ' + mc.c + ' · F ' + mc.f + '</div></div>';
+           + '<div style="font-size:11.5px;color:var(--text3);margin-top:2px">' + cal + ' kcal · P ' + mc.p + ' · C ' + mc.c + ' · F ' + mc.f + ' · Fi ' + mc.fi + '</div></div>';
         h += '<button onclick="weekRemoveMeal(\'' + dk + '\',\'' + mt + '\',\'' + sl.mealId + '\')" style="background:none;border:none;color:var(--text4);cursor:pointer;font-size:18px;padding:0 2px;flex-shrink:0;line-height:1">&times;</button>';
         h += '</div>';
       });
