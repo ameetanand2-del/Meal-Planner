@@ -1495,9 +1495,10 @@ function mealMacros(m, portions) {
       tot.p  += parseFloat(ing.protein) || 0;
       tot.c  += parseFloat(ing.carbs)   || 0;
       tot.f  += parseFloat(ing.fat)     || 0;
-      // fiber isn't stored on these — estimate from the reference table
+      // fiber: prefer MACRO_DB if we have the ingredient, else estimate
       var gF = parseFloat(ing.grams) || amt;
-      tot.fi += (typeof lookupFiber === 'function' ? lookupFiber(ing.name) : 0) * (gF/100);
+      var dbFi = MACRO_DB[ing.name] ? (MACRO_DB[ing.name].fi || 0) * (gF/100) : (typeof lookupFiber === 'function' ? lookupFiber(ing.name) : 0) * (gF/100);
+      tot.fi += dbFi;
     } else {
       var mac = getMacros(ing.name, ing.calories, ing.amount, ing.unit);
       tot.p += mac.p; tot.c += mac.c; tot.f += mac.f; tot.fi += (mac.fi||0);
@@ -2595,7 +2596,7 @@ function applyWeekPlan(dk, mp) {
 }
 
 function openWeekMealPicker(dk, mt) {
-  _weekPickFilter = [];
+  _weekPickFilter = mt ? [mt] : [];
   var existing = (plan[dk] && plan[dk][mt]) ? plan[dk][mt].map(function(s){ return s.mealId; }) : [];
   var overlay = document.getElementById('m-week-pick');
   if (!overlay) {
@@ -2619,21 +2620,21 @@ function openWeekMealPicker(dk, mt) {
 }
 
 function renderWeekPickerFilters(dk, mt, existing, dateStr) {
-  // Build tag set from all meals
-  var tags = new Set(['All']);
+  // Meal-type pills come first (Breakfast/Lunch/Dinner/Snack), since that's
+  // the primary filter — then other tags, all properly deduped.
+  var mealTypes = ['Breakfast','Lunch','Dinner','Snack'];
+  var otherTags = new Set();
   meals.forEach(function(m) {
     var t = m.tags || {};
-    if (t.mealType) tags.add(t.mealType);
-    if (t.cuisine)  tags.add(t.cuisine);
-    if (t.effort)   tags.add(t.effort);
-    (t.diet || []).forEach(function(d){ tags.add(d); });
+    tagList(t.cuisine).forEach(function(x){ if (mealTypes.indexOf(x) < 0) otherTags.add(x); });
+    tagList(t.effort).forEach(function(x){ if (mealTypes.indexOf(x) < 0) otherTags.add(x); });
+    tagList(t.diet).forEach(function(x){ if (mealTypes.indexOf(x) < 0) otherTags.add(x); });
   });
-  // Also add mealType as a tag based on meal's mealType field
-  meals.forEach(function(m){ if (m.mealType) tags.add(m.mealType); });
+  var tags = ['All'].concat(mealTypes).concat(Array.from(otherTags).sort());
 
   var filtersEl = document.getElementById('m-week-pick-filters');
   filtersEl.innerHTML = '';
-  Array.from(tags).forEach(function(tag) {
+  tags.forEach(function(tag) {
     var isAll = tag === 'All';
     var isActive = isAll ? _weekPickFilter.length === 0 : _weekPickFilter.indexOf(tag) >= 0;
     var pill = document.createElement('button');
@@ -2662,15 +2663,15 @@ function renderWeekPickerMeals(dk, mt, existing, dateStr) {
   var list = document.getElementById('m-week-pick-list');
   list.innerHTML = '';
 
-  // Filter meals by active tags
+  // Filter meals by active tags (meal type or cuisine/effort/diet, normalized)
   var filtered = meals.filter(function(m) {
     if (_weekPickFilter.length === 0) return true;
     var t = m.tags || {};
     return _weekPickFilter.every(function(tag) {
       return (m.mealType === tag)
-        || (t.cuisine === tag)
-        || (t.effort === tag)
-        || ((t.diet || []).indexOf(tag) >= 0);
+        || tagList(t.cuisine).indexOf(tag) >= 0
+        || tagList(t.effort).indexOf(tag) >= 0
+        || tagList(t.diet).indexOf(tag) >= 0;
     });
   });
 
@@ -3302,11 +3303,14 @@ function renderMeals(){
       </div>`;
     }).join('');
     const mac = mealMacros(m);
-    return`<div class="card" style="padding:0;overflow:hidden">
+    return`<div class="meal-swipe" style="position:relative;margin-bottom:12px;border-radius:var(--radius);overflow:hidden">
+      <div class="meal-note-rail" style="position:absolute;inset:0;display:flex;align-items:center;gap:8px;padding-left:20px;background:var(--accent);color:#fff;font-weight:800;font-size:14px;opacity:0;pointer-events:none"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg> Note</div>
+      <div class="meal-card card" data-mealid="${m.id}" style="position:relative;padding:0;overflow:hidden;margin:0">
       <div style="padding:14px 15px 10px">
         <div class="row between" style="margin-bottom:6px">
           <div style="font-family:DM Serif Display,serif;font-size:16px;font-weight:700;flex:1;min-width:0;margin-right:8px;line-height:1.3"><span style="margin-right:4px">${mealEmoji(m)}</span>${m.name}</div>
           <div class="row" style="gap:6px;flex-shrink:0">
+            ${m.notes && m.notes.trim() ? `<button class="icon-btn" style="color:var(--accent);background:var(--accent-light)" title="View note" onclick="event.stopPropagation();openMealNote('${m.id}')"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg></button>` : ''}
             <button class="icon-btn" onclick="openEditMeal('${m.id}')"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
             <button class="icon-btn" style="color:var(--red)" onclick="delMeal('${m.id}')"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
           </div>
@@ -3328,13 +3332,90 @@ function renderMeals(){
         </div>
         <span style="font-family:DM Serif Display,serif;font-size:17px;font-weight:700;color:var(--accent)">${cal} kcal${(m.totalServings && m.totalServings > 1) ? '<span style="font-size:10px;font-weight:600;color:var(--text3)"> /srv</span>' : ''}</span>
       </div>
+    </div>
     </div>`;
 
   }).join('');
 }
 
-// current diet tags being built for this meal
-let curDietTags=[];
+// ── MEAL NOTES (swipe right to add; icon to view) ───────────────
+var _noteMealId = null;
+function openMealNote(id){
+  var m = getMeal(id); if(!m) return;
+  _noteMealId = id;
+  var overlay = document.getElementById('m-meal-note');
+  if(!overlay){
+    overlay = document.createElement('div'); overlay.id='m-meal-note'; overlay.className='modal-overlay';
+    overlay.innerHTML = '<div class="modal"><div class="modal-handle"></div>'
+      +'<div id="mn-title" class="modal-title" style="margin-bottom:2px"></div>'
+      +'<div style="font-size:12px;color:var(--text3);margin-bottom:12px">How was it? What would you change next time?</div>'
+      +'<textarea id="mn-text" placeholder="e.g. Great post-workout. A bit dry — next time add more sauce and an extra egg." style="width:100%;min-height:140px;padding:12px 14px;font-size:14px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--surface2);color:var(--text);font-family:DM Sans,sans-serif;box-sizing:border-box;resize:vertical;line-height:1.55"></textarea>'
+      +'<div class="row" style="justify-content:space-between;gap:10px;margin-top:14px"><button class="btn btn-ghost" id="mn-del" onclick="deleteMealNote()" style="color:var(--red)">Delete</button><button class="btn btn-primary" onclick="saveMealNote()">Save note</button></div>'
+      +'</div>';
+    document.body.appendChild(overlay);
+  }
+  document.getElementById('mn-title').textContent = m.name;
+  document.getElementById('mn-text').value = m.notes || '';
+  document.getElementById('mn-del').style.display = (m.notes && m.notes.trim()) ? '' : 'none';
+  overlay.classList.add('open');
+  setTimeout(function(){ var t=document.getElementById('mn-text'); if(t) t.focus(); }, 160);
+}
+function saveMealNote(){
+  var m = getMeal(_noteMealId); if(!m) return;
+  m.notes = document.getElementById('mn-text').value.trim();
+  save(); closeM('m-meal-note');
+  if (libTab === 'meals') renderMeals();
+  showToast(m.notes ? 'Note saved ✓' : 'Note cleared');
+}
+function deleteMealNote(){
+  var m = getMeal(_noteMealId); if(!m) return;
+  m.notes = ''; save(); closeM('m-meal-note');
+  if (libTab === 'meals') renderMeals();
+  showToast('Note deleted');
+}
+
+// Swipe-right on a meal card opens its note editor
+(function(){
+  var active=null, startX=0, startY=0, dx=0, dragging=false;
+  function pt(e){ return e.touches && e.touches[0] ? e.touches[0] : e; }
+  function down(e){
+    var card = e.target.closest && e.target.closest('.meal-card');
+    if(!card) return;
+    if(e.target.closest('button,input,a,select,textarea,svg')) return;
+    active=card; var p=pt(e); startX=p.clientX; startY=p.clientY; dx=0; dragging=false;
+    card.style.transition='none';
+  }
+  function move(e){
+    if(!active) return;
+    var p=pt(e), x=p.clientX, y=p.clientY; dx=x-startX; var dy=y-startY;
+    if(!dragging){
+      if(Math.abs(dx)<8) return;
+      if(Math.abs(dy) > Math.abs(dx)){ active=null; return; } // vertical scroll
+      dragging=true;
+    }
+    if(dx<0) dx=0; if(dx>120) dx=120;
+    active.style.transform='translateX('+dx+'px)';
+    var rail=active.parentNode.querySelector('.meal-note-rail');
+    if(rail) rail.style.opacity=Math.min(1, dx/55);
+    if(e.cancelable) e.preventDefault();
+  }
+  function up(){
+    if(!active) return;
+    var card=active, fire = dx>60, id=card.getAttribute('data-mealid');
+    card.style.transition='transform 0.22s cubic-bezier(0.34,1.2,0.64,1)';
+    card.style.transform='translateX(0)';
+    var rail=card.parentNode.querySelector('.meal-note-rail');
+    if(rail) rail.style.opacity=0;
+    active=null; dragging=false;
+    if(fire && id) setTimeout(function(){ openMealNote(id); }, 130);
+  }
+  document.addEventListener('touchstart',down,{passive:true});
+  document.addEventListener('touchmove',move,{passive:false});
+  document.addEventListener('touchend',up);
+  document.addEventListener('mousedown',down);
+  document.addEventListener('mousemove',move);
+  document.addEventListener('mouseup',up);
+})();
 
 function buildTags(tags={}){
   curDietTags=[...(tags.diet||[])];
@@ -6015,6 +6096,24 @@ var MY_INGREDIENTS = JSON.parse(localStorage.getItem('mp4_my_ings') || '[]');
 
 
 var MY_RECIPES = [
+  {id:'r_post_workout_snack', name:'S- Post Workout Snack', mealType:'Snack',
+   tags:{cuisine:[],effort:['Quick'],diet:['High Protein']},
+   ingredients:[
+    {name:'Irreparable - Almond and coconut granola', amount:'50',  unit:'g', grams:50,  calories:258, protein:6,  carbs:16, fat:18, calTotal:true},
+    {name:'Chobani - Natural Greek Yoghurt',           amount:'130', unit:'g', grams:130, calories:112, protein:11, carbs:5,  fat:5,  calTotal:true}
+   ]},
+
+  {id:'r_mango_chiaseed_oats', name:'S- Mango Chiaseed and Oats', mealType:'Breakfast',
+   tags:{cuisine:[],effort:['Quick'],diet:['High Protein']},
+   ingredients:[
+    {name:'Leanfit Protein powder - Protein Powder', amount:'1',   unit:'scoop', grams:30,  calories:120, protein:25, carbs:2,  fat:2,  calTotal:true},
+    {name:'Bonsoy - Soy Milk 250ml',                 amount:'200', unit:'ml',    grams:200, calories:116, protein:8,  carbs:11, fat:4,  calTotal:true},
+    {name:'Red Tractor - Black Chia Seeds',           amount:'15',  unit:'g',     grams:15,  calories:67,  protein:3,  carbs:1,  fat:5,  calTotal:true},
+    {name:'coles - organic Australian rolled oats',   amount:'35',  unit:'g',     grams:35,  calories:133, protein:5,  carbs:19, fat:3,  calTotal:true},
+    {name:'Mango, frozen',                            amount:'100', unit:'g',     grams:100, calories:60,  protein:1,  carbs:15, fat:0,  calTotal:true},
+    {name:'Mayvers - Dark roasted peanut butter',     amount:'20',  unit:'g',     grams:20,  calories:116, protein:5,  carbs:3,  fat:10, calTotal:true}
+   ]},
+
   {id:'r_salmon_eggs', name:'Salmon and Eggs', mealType:'Breakfast',
    tags:{cuisine:[],effort:['Quick'],diet:['High Protein','Low Carb']},
    ingredients:[
