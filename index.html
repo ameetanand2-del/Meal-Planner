@@ -368,6 +368,33 @@ select {
 .wk-mini-try { background:var(--red-light) !important; color:var(--red) !important; border-left-color:var(--red) !important; }
 .wk-more { font-size:8.5px; font-weight:700; color:var(--text3); padding-left:6px; }
 
+/* ── Stamp mode (tap a header, pick a meal, tap days to drop it in) ── */
+.wk-head-cell { cursor:pointer; transition:background 0.14s, color 0.14s; user-select:none; }
+.wk-head-cell:active { background:var(--surface3); }
+.wk-head-cell.stamping { background:var(--accent); color:#fff; }
+.wk-head-cell.stamping .wk-head-dot { background:#fff !important; }
+.wk-slot-stampable { background:repeating-linear-gradient(135deg, rgba(59,111,224,0.05) 0px, rgba(59,111,224,0.05) 4px, transparent 4px, transparent 9px); cursor:pointer; }
+.wk-slot-stampable:active { background-color:var(--accent-light); }
+.wk-slot-stamped { background:var(--accent-light) !important; }
+.wk-mini-armed { background:var(--accent) !important; color:#fff !important; border-left-color:#fff !important; }
+
+.stamp-list { display:flex; flex-direction:column; gap:6px; max-height:50vh; overflow-y:auto; margin-top:4px; }
+.stamp-hint { font-size:11.5px; color:var(--text3); line-height:1.5; margin-bottom:12px; }
+.stamp-item { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:11px; border:1.5px solid var(--border-soft); background:var(--surface2); cursor:pointer; transition:all 0.14s; }
+.stamp-item:active { transform:scale(0.98); }
+.stamp-item.armed { background:var(--accent-light); border-color:var(--accent); }
+.stamp-item-name { font-size:13.5px; font-weight:600; color:var(--text); }
+.stamp-item-sub { font-size:11px; color:var(--text3); margin-top:2px; }
+.stamp-item-check { flex-shrink:0; width:20px; height:20px; border-radius:50%; background:var(--accent); color:#fff; font-size:11px; font-weight:800; display:flex; align-items:center; justify-content:center; }
+.stamp-empty { text-align:center; padding:16px; color:var(--text3); font-size:12.5px; }
+
+/* Persistent reopen bar under the matrix while stamp mode is active */
+.stamp-reopen-bar { display:flex; gap:8px; margin-bottom:16px; }
+.stamp-reopen-btn { flex:1; min-width:0; display:flex; align-items:center; justify-content:space-between; gap:8px; background:var(--surface); border:1.5px solid var(--accent); border-radius:var(--radius-sm); padding:11px 14px; font-size:13px; font-weight:600; color:var(--text); cursor:pointer; font-family:'DM Sans',sans-serif; box-shadow:var(--shadow-xs); }
+.stamp-reopen-btn:active { background:var(--accent-light); }
+.stamp-reopen-arrow { flex-shrink:0; font-size:12px; font-weight:700; color:var(--accent); }
+.stamp-exit-btn { flex-shrink:0; background:var(--surface2); border:1.5px solid var(--border); border-radius:var(--radius-sm); padding:11px 16px; font-size:13px; font-weight:700; color:var(--text2); cursor:pointer; font-family:'DM Sans',sans-serif; }
+
 .dv-panel { background:var(--surface); border:1.5px solid var(--border-soft); border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow-md); }
 .dv-row   { display:grid; grid-template-columns:82px 1fr; min-height:56px; }
 .dv-row+.dv-row { border-top:1px solid var(--border-soft); }
@@ -1342,6 +1369,9 @@ function macroStatus(value, opt){
 
 // UI state
 let calView = 'week', calOff = 0, selDate = dkey(new Date());
+// "Stamp" mode — tap a meal-type column header, pick one meal, then tap day
+// cells in that column to drop the meal into multiple days at once.
+let stampMode = null, stampMealId = null;
 let assignMode = null, curPort = 1, _assignDK = null, _assignMT = null;
 var todayOffset = 0; // 0 = today, -1 = yesterday, +1 = tomorrow etc.
 
@@ -2197,6 +2227,7 @@ function pickIngredient(idx) {
 // ── PLANNER ───────────────────────────────────────────────────
 function setCalView(v) {
   calView = v;
+  if (v !== 'week') { stampMode = null; stampMealId = null; if (document.getElementById('m-stamp-pick')) closeM('m-stamp-pick'); }
   ['week','month'].forEach(function(x){
     var el = document.getElementById('ctog-' + x);
     if (el) el.classList.toggle('active', x === v);
@@ -2233,12 +2264,14 @@ function buildDayMatrix(dates){
   var slotDot = {Breakfast:'#E8A04A',Lunch:'#4A90D9',Dinner:'#5FA77E',Snack:'#9B7FC9'};
   var matrix = document.createElement('div'); matrix.className = 'wk-matrix';
 
-  // Column header — meal slots across the top
+  // Column header — meal slots across the top. Tap one to enter "stamp" mode
+  // for that meal type (pick a meal once, then tap days to drop it in).
   var head = document.createElement('div'); head.className = 'wk-head';
   head.appendChild(document.createElement('div')); // empty corner
   MT.forEach(function(mt){
-    var hc = document.createElement('div'); hc.className = 'wk-head-cell';
+    var hc = document.createElement('div'); hc.className = 'wk-head-cell' + (stampMode===mt ? ' stamping' : '');
     hc.innerHTML = '<span class="wk-head-dot" style="background:'+slotDot[mt]+'"></span>'+mt;
+    hc.onclick = function(){ toggleStampHeader(mt); };
     head.appendChild(hc);
   });
   matrix.appendChild(head);
@@ -2258,15 +2291,23 @@ function buildDayMatrix(dates){
     MT.forEach(function(mt){
       var cell = document.createElement('div'); cell.className = 'wk-slot';
       var slots = getSlots(dk, mt);
+      var isStampCol = (stampMode === mt);
+      var hasArmedHere = isStampCol && stampMealId && slots.some(function(s){ return s.mealId === stampMealId; });
+      if (isStampCol) {
+        cell.classList.add('wk-slot-stampable');
+        if (hasArmedHere) cell.classList.add('wk-slot-stamped');
+        cell.onclick = function(e){ e.stopPropagation(); toggleStampDay(dk); };
+      }
       var shown = 0;
       slots.forEach(function(sl){
         if (shown >= 2) return;
         var m = getMeal(sl.mealId); if (!m) return;
         var isNeedTry = m.tags && m.tags.status && (m.tags.status === 'Need to Try');
+        var isArmedHere = isStampCol && stampMealId && sl.mealId === stampMealId;
         var chip = document.createElement('div');
-        chip.className = 'wk-mini' + (isNeedTry ? ' wk-mini-try' : '');
+        chip.className = 'wk-mini' + (isNeedTry ? ' wk-mini-try' : '') + (isArmedHere ? ' wk-mini-armed' : '');
         chip.style.borderLeftColor = slotDot[mt];
-        chip.textContent = (isNeedTry ? '🧪 ' : '') + m.name;
+        chip.textContent = (isArmedHere ? '✓ ' : (isNeedTry ? '🧪 ' : '')) + m.name;
         cell.appendChild(chip);
         shown++;
       });
@@ -2282,6 +2323,125 @@ function buildDayMatrix(dates){
   return matrix;
 }
 
+// Build the "pick a meal" panel shown under the matrix while in stamp mode
+// Popup with all meals of the active type. Tapping a meal arms it for
+// stamping; "Back to calendar" just closes the popup (stamp mode stays
+// active so the reopen bar shows); "Done" exits stamp mode entirely.
+function openStampPicker(){
+  if (!stampMode) return;
+  var overlay = document.getElementById('m-stamp-pick');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'm-stamp-pick';
+    overlay.className = 'modal-overlay';
+    overlay.style.alignItems = 'flex-end';
+    overlay.innerHTML = '<div class="modal" style="max-height:82vh;overflow-y:auto">'
+      + '<div class="modal-handle"></div>'
+      + '<div id="stamp-pick-body"></div>'
+      + '<div class="row" style="justify-content:space-between;gap:10px;margin-top:14px">'
+      +   '<button class="btn btn-ghost" onclick="closeStampPicker()">‹ Back to calendar</button>'
+      +   '<button class="btn btn-primary" onclick="exitStampMode()">Done</button>'
+      + '</div>'
+      + '</div>';
+    document.body.appendChild(overlay);
+  }
+  renderStampPickerBody();
+  overlay.classList.add('open');
+}
+
+function closeStampPicker(){
+  closeM('m-stamp-pick');
+}
+
+function exitStampMode(){
+  stampMode = null; stampMealId = null;
+  closeM('m-stamp-pick');
+  renderWeek();
+}
+
+function renderStampPickerBody(){
+  if (!stampMode) return;
+  var el = document.getElementById('stamp-pick-body');
+  if (!el) return;
+  var slotDot = {Breakfast:'#E8A04A',Lunch:'#4A90D9',Dinner:'#5FA77E',Snack:'#9B7FC9'};
+  var h = '';
+  h += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">'
+     + '<span style="width:9px;height:9px;border-radius:50%;background:'+slotDot[stampMode]+'"></span>'
+     + '<span style="font-family:\'DM Serif Display\',serif;font-size:18px">'+stampMode+' meals</span></div>';
+  h += '<div class="stamp-hint">'
+     + (stampMealId
+        ? 'Selected — tap "Back to calendar", then tap any day in the ' + stampMode + ' column to add or remove it.'
+        : 'Tap a meal to select it, then go back and tap days to drop it in. Tap multiple days to repeat it across the week.')
+     + '</div>';
+  h += '<div class="stamp-list">';
+  var opts = meals.filter(function(m){ return m.mealType === stampMode; });
+  if (!opts.length) {
+    h += '<div class="stamp-empty">No ' + stampMode.toLowerCase() + ' meals yet — add one in Meals first.</div>';
+  } else {
+    opts.forEach(function(m){
+      var cal = mealCals(m), mac = mealMacros(m);
+      var armed = stampMealId === m.id;
+      h += '<div class="stamp-item' + (armed ? ' armed' : '') + '" onclick="selectStampMeal(\'' + m.id + '\')">'
+         + '<div style="flex:1;min-width:0">'
+         + '<div class="stamp-item-name">' + m.name + '</div>'
+         + '<div class="stamp-item-sub">' + cal + ' kcal · P ' + mac.p + ' · C ' + mac.c + ' · F ' + mac.f + '</div></div>'
+         + (armed ? '<div class="stamp-item-check">✓</div>' : '')
+         + '</div>';
+    });
+  }
+  h += '</div>';
+  el.innerHTML = h;
+}
+
+// Small persistent bar under the matrix while stamp mode is active —
+// reopens the popup, and shows the currently-armed meal if any.
+function buildStampReopenBar(){
+  var slotDot = {Breakfast:'#E8A04A',Lunch:'#4A90D9',Dinner:'#5FA77E',Snack:'#9B7FC9'};
+  var bar = document.createElement('div'); bar.className = 'stamp-reopen-bar';
+  var armedMeal = stampMealId ? getMeal(stampMealId) : null;
+  var label = armedMeal ? armedMeal.name : ('Choose a ' + stampMode.toLowerCase() + ' meal');
+  var reopenBtn = document.createElement('button');
+  reopenBtn.className = 'stamp-reopen-btn';
+  reopenBtn.innerHTML = '<span style="display:flex;align-items:center;gap:8px;min-width:0">'
+    + '<span style="width:8px;height:8px;border-radius:50%;background:' + slotDot[stampMode] + ';flex-shrink:0"></span>'
+    + '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + label + '</span></span>'
+    + '<span class="stamp-reopen-arrow">Options ›</span>';
+  reopenBtn.onclick = function(){ openStampPicker(); };
+  bar.appendChild(reopenBtn);
+  var exitBtn = document.createElement('button');
+  exitBtn.className = 'stamp-exit-btn';
+  exitBtn.textContent = 'Done';
+  exitBtn.onclick = function(){ exitStampMode(); };
+  bar.appendChild(exitBtn);
+  return bar;
+}
+
+function toggleStampHeader(mt){
+  if (stampMode === mt) { exitStampMode(); return; }
+  stampMode = mt; stampMealId = null;
+  renderWeek();
+  openStampPicker();
+}
+
+function selectStampMeal(mealId){
+  stampMealId = (stampMealId === mealId) ? null : mealId;
+  renderWeek();
+  renderStampPickerBody();
+}
+
+function toggleStampDay(dk){
+  if (!stampMode) return;
+  if (!stampMealId) { openStampPicker(); showToast('Pick a meal first'); return; }
+  if (!plan[dk]) plan[dk] = {};
+  if (!plan[dk][stampMode]) plan[dk][stampMode] = [];
+  var idx = plan[dk][stampMode].findIndex(function(s){ return s.mealId === stampMealId; });
+  if (idx >= 0) plan[dk][stampMode].splice(idx, 1);
+  else plan[dk][stampMode].push({mealId: stampMealId, portions: 1});
+  save();
+  renderWeek();
+  if (_daySheetDK) renderDaySheetBody();
+}
+
 function renderWeek() {
   var dates = weekDates(calOff);
   var f = dates[0], l = dates[6];
@@ -2290,6 +2450,7 @@ function renderWeek() {
     l.toLocaleDateString('en',{month:'short',day:'numeric'});
   var wrap = document.getElementById('cal-wrap'); wrap.innerHTML = '';
   wrap.appendChild(buildDayMatrix(dates));
+  if (stampMode) wrap.appendChild(buildStampReopenBar());
 }
 
 function renderDayView() {
