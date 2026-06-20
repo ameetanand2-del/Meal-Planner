@@ -5308,10 +5308,10 @@ var FIBER_REF = [
   ['almond',12],['walnut',7],['peanut',6],['cashew',3],['seeds',9],
   ['lentil',8],['mung',8],['chickpea',7],['kidney bean',7],['black bean',8],['beans',7],
   ['oat',10],['barley',9],['quinoa',3],['multigrain',6],['wholemeal',7],['whole wheat',7],
-  ['sourdough',3],['rye',6],['bread',3],['pasta',4],['brown rice',2],['rice',1],
+  ['sourdough',3],['rye',6],['bread',3],['rolls',3],['pasta',4],['brown rice',2],['rice',1],
   ['avocado',7],['date',7],['raisin',4],['berries',5],['banana',3],['apple',2],['mango',2],
   ['broccoli',3],['spinach',2],['capsicum',2],['pepper',2],['kimchi',2],['onion',2],['carrot',3],
-  ['coconut',9],['popcorn',14]
+  ['coconut',9],['popcorn',14],['granola',6]
 ];
 function lookupFiber(name){
   var n = (name||'').toLowerCase();
@@ -6273,6 +6273,22 @@ var MY_RECIPES = [
     {name:'coles - organic Australian rolled oats',   amount:'35',  unit:'g',     grams:35,  calories:133, protein:5,  carbs:19, fat:3,  calTotal:true},
     {name:'Mango, frozen',                            amount:'100', unit:'g',     grams:100, calories:60,  protein:1,  carbs:15, fat:0,  calTotal:true},
     {name:'Mayvers - Dark roasted peanut butter',     amount:'20',  unit:'g',     grams:20,  calories:116, protein:5,  carbs:3,  fat:10, calTotal:true}
+   ]},
+
+  {id:'r_yogurt_granola_bowl', name:'S - Yogurt Granola Bowl', mealType:'Snack',
+   tags:{cuisine:[],effort:['Quick'],diet:['High Protein']},
+   ingredients:[
+    {name:'Chobani Greek Yogurt - Greek Yogurt, Blueberry on the Bottom', amount:'1',  unit:'container', grams:150, calories:120, protein:12, carbs:18, fat:0, calTotal:true},
+    {name:'Red tractor - High  protein granola( honey cut)',              amount:'40', unit:'g',         grams:40,  calories:163, protein:8,  carbs:21, fat:5, calTotal:true}
+   ]},
+
+  {id:'r_cheesy_omelate', name:'B- Cheesy Omelate', mealType:'Breakfast',
+   tags:{cuisine:[],effort:['Quick'],diet:['High Protein']},
+   ingredients:[
+    {name:'Coles Bakery - Stone Baked Pane Di Casa Rolls 4 PK', amount:'52.5', unit:'g', grams:52.5, calories:119, protein:4,  carbs:23, fat:1,  calTotal:true},
+    {name:'Egg',                                                amount:'5',    unit:'large eggs', grams:300, calories:358, protein:31, carbs:2,  fat:24, calTotal:true},
+    {name:'Olive oil',                                          amount:'10',   unit:'g', grams:10,  calories:88,  protein:0,  carbs:0,  fat:10, calTotal:true},
+    {name:'Perfect Italiano - Perfect Pizza',                   amount:'60',   unit:'g', grams:60,  calories:197, protein:16, carbs:0,  fat:15, calTotal:true}
    ]},
 
   {id:'r_salmon_eggs', name:'Salmon and Eggs', mealType:'Breakfast',
